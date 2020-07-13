@@ -2,9 +2,9 @@ package com.Estampille.estampille;
 
 public class estampilleCsv {
 
-    private int dep;
+    private String dep;
     private String code;
-    private int siret;
+    private double siret;
     private String nom;
     private String adresse;
     private int codePostal;
@@ -16,7 +16,7 @@ public class estampilleCsv {
 
 
     //Getter
-    public int getDep() {
+    public String getDep() {
         return dep;
     }
 
@@ -24,7 +24,7 @@ public class estampilleCsv {
         return code;
     }
 
-    public int getSiret() {
+    public double getSiret() {
         return siret;
     }
 
@@ -58,7 +58,7 @@ public class estampilleCsv {
 
 
     //Setter
-    public void setDep(int dep) {
+    public void setDep(String dep) {
         this.dep = dep;
     }
 
@@ -66,7 +66,7 @@ public class estampilleCsv {
         this.code = code;
     }
 
-    public void setSiret(int siret) {
+    public void setSiret(double siret) {
         this.siret = siret;
     }
 

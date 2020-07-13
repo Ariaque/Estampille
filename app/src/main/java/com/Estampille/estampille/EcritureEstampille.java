@@ -19,6 +19,8 @@ public class EcritureEstampille extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ecriture_estampille);
+
+        readCsv();
     }
 
     private List<estampilleCsv> estampilleCsv = new ArrayList<>();
@@ -36,16 +38,38 @@ public class EcritureEstampille extends AppCompatActivity {
                 //lire les données
 
                 estampilleCsv estampille = new estampilleCsv();
-                estampille.setDep(Integer.parseInt(tab[0]));
-                estampille.setCode(tab[1]);
-                estampille.setSiret(Integer.parseInt(tab[2]));
+                if(tab[0].length() >0 )
+                    estampille.setDep(tab[0]);
+                else
+                    estampille.setDep("0");
+                if(tab[1].length() >0 )
+                    estampille.setCode(tab[1]);
+                else
+                    estampille.setCode("0");
+                if(tab[2].length() >0 )
+                    estampille.setSiret(Double.parseDouble(tab[2]));
+                else
+                    estampille.setSiret(Double.parseDouble("0"));
                 estampille.setNom(tab[3]);
                 estampille.setAdresse(tab[4]);
                 estampille.setCodePostal(Integer.parseInt(tab[5]));
-                estampille.setCommune(tab[6]);
-                estampille.setCategorie(tab[7]);
-                estampille.setActivite(tab[8]);
-                estampille.setEspece(tab[9]);
+                if(tab.length >= 7 &&  tab[6].length() >0 )
+                    estampille.setCommune(tab[6]);
+                else
+                    estampille.setCommune("0");
+                if(tab.length >= 8 &&  tab[7].length() >0 )
+                    estampille.setCategorie(tab[7]);
+                else
+                    estampille.setCategorie("0");
+                if(tab.length >= 9 &&  tab[8].length() >0 )
+                    estampille.setActivite(tab[8]);
+                else
+                    estampille.setActivite("0");
+                if(tab.length >= 10 &&  tab[9].length() >0 )
+                    estampille.setEspece(tab[9]);
+                else
+                    estampille.setEspece("0");
+
                 estampilleCsv.add(estampille);
 
                 Log.d("Estampille :" ,"Voici les informations de l'estampille" + estampille);
