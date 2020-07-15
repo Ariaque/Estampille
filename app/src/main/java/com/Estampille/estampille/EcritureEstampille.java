@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -25,6 +27,7 @@ public class EcritureEstampille extends AppCompatActivity {
     private Button button;
     private Button buttonRetour;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +43,7 @@ public class EcritureEstampille extends AppCompatActivity {
         });
 
         initActivity();
-        readCsv();
+        createOnClickBtnAjout();
     }
     //Initialisation de l'activity
     private void initActivity(){
@@ -49,18 +52,16 @@ public class EcritureEstampille extends AppCompatActivity {
         createOnClickBtnAjout();
     }
 
-    //Gestion du button pourla recherche de l'estampille
+    //Gestion du button pour la recherche de l'estampille
     private void createOnClickBtnAjout(){
         button.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                //Faire la recherche de l'estampille
+                readCsv();
             }
         });
     }
-
-
-
     private List<estampilleCsv> estampilleCsv = new ArrayList<>();
     private void readCsv() {
      InputStream is = getResources().openRawResource(R.raw.bdd);
@@ -68,6 +69,8 @@ public class EcritureEstampille extends AppCompatActivity {
                 new InputStreamReader(is, Charset.forName("UTF-8"))
         );
         String line = "";
+        String leTexte = ZoneText.getText().toString();
+        TextView view = (TextView) findViewById(R.id.textView);
         try {
             while ((line = reader.readLine()) != null) {
                 //split ';'
@@ -110,11 +113,16 @@ public class EcritureEstampille extends AppCompatActivity {
 
                 estampilleCsv.add(estampille);
 
+                if (leTexte.equals(tab[1]))
+                   view.setText("L'estampille proviens du département : "+tab[0]+" le code estampille est : "+tab[1]+" le code Siret est le :"+tab[2]+" Le nom de l'entreprise est : "+tab[3]+" l'entreprise ce situe à l'adresse suivante : "+tab[4]+"le code postal"+tab[5]);
+
+
                 Log.d("Estampille :" ,"Voici les informations de l'estampille" + estampille);
             }
         } catch (IOException e){
             Log.wtf("Erreur  dans la lecture du CSV " + line, e);
             e.printStackTrace();
         }
+
     }
 }
