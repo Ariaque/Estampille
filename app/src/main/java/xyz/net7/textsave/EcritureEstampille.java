@@ -64,6 +64,10 @@ public class EcritureEstampille extends AppCompatActivity {
     private List<estampilleCsv> estampilleCsv = new ArrayList<>();
     private void readCsv() {
         InputStream is = getResources().openRawResource(R.raw.bdd);
+        String ocrText = "a";
+        Intent intent =getIntent();
+        if(intent.hasExtra("ocrText"))
+        ocrText = intent.getStringExtra("ocrText");
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(is, Charset.forName("UTF-8"))
         );
@@ -77,13 +81,6 @@ public class EcritureEstampille extends AppCompatActivity {
         TextView view6 = (TextView) findViewById(R.id.textView6);
         TextView view7 = (TextView) findViewById(R.id.textView7);
 
-        String str = view.getText().toString();
-        String str2 = view2.getText().toString();
-        String str3 = view3.getText().toString();
-        String str4 = view4.getText().toString();
-        String str5 = view5.getText().toString();
-        String str6 = view6.getText().toString();
-        String str7 = view7.getText().toString();
 
         try {
             while ((line = reader.readLine()) != null) {
@@ -127,7 +124,7 @@ public class EcritureEstampille extends AppCompatActivity {
 
                 estampilleCsv.add(estampille);
 
-                if (leTexte.equals(tab[1])) {
+                if (leTexte.equals(tab[1]) || ocrText != "a") {
                     view.setText("Nom de l'entreprise : " + tab[3]);
                     view2.setText("Le département ou ce situe l'entreprise est  : " + tab[0]);
                     view3.setText("L'entreprise ce situe  à l'adresse suivante : " + tab[4]);
@@ -137,6 +134,7 @@ public class EcritureEstampille extends AppCompatActivity {
                     view7.setText("Code Estampille: " + tab[1]);
                 }
 
+
                 Log.d("Estampille :" ,"Voici les informations de l'estampille" + estampille);
             }
 
@@ -144,5 +142,6 @@ public class EcritureEstampille extends AppCompatActivity {
             Log.wtf("Erreur  dans la lecture du CSV " + line, e);
             e.printStackTrace();
         }
+        Log.d("Test : ", "AFFICHE DE LA VARIABLE SRCTEST"+ ocrText);
     }
 }

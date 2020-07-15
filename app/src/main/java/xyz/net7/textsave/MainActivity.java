@@ -218,9 +218,18 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
 
                         if (srcText != null && !srcText.equals("")) {
+                            srcText.replace("FR", "");
+                            srcText.replace("-", ".");
+                            srcText.replace("CE", "");
                             ocrText.setText(srcText);
                         }
                         mProgressDialog.dismiss();
+                        Intent otherActivity = new Intent(getApplicationContext(),EcritureEstampille.class);
+
+                        otherActivity.putExtra("ocerText", srcText);
+
+                        startActivity(otherActivity);
+                        finish();
                     }
                 });
             }
