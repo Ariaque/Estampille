@@ -15,6 +15,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     protected String mCurrentPhotoPath;
     private Uri photoURI1;
     private Uri oldPhotoURI;
+    private Button ecrire;
+
 
     private static final String errorFileCreate = "Error file create!";
     private static final String errorConvert = "Error convert!";
@@ -65,6 +69,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
 
+        this.ecrire = findViewById(R.id.ecrire);
+        ecrire.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent otherActivity = new Intent(getApplicationContext(),EcritureEstampille.class);
+                startActivity(otherActivity);
+                finish();
+            }
+        });
+
         ButterKnife.bind(this);
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
@@ -74,7 +88,11 @@ public class MainActivity extends AppCompatActivity {
         }
         String language = "eng";
         mTessOCR = new TesseractOCR(this, language);
+
     }
+
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
