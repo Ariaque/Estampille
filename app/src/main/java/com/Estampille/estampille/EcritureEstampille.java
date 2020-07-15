@@ -2,8 +2,14 @@ package com.Estampille.estampille;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,13 +21,45 @@ import java.util.List;
 
 public class EcritureEstampille extends AppCompatActivity {
 
+    private EditText ZoneText;
+    private Button button;
+    private Button buttonRetour;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ecriture_estampille);
+        this.buttonRetour = findViewById(R.id.buttonRetour);
+        buttonRetour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent otherActivity = new Intent(getApplicationContext(),MainActivity.class);
+                startActivity(otherActivity);
+                finish();
+            }
+        });
 
+        initActivity();
         readCsv();
     }
+    //Initialisation de l'activity
+    private void initActivity(){
+        ZoneText = (EditText)findViewById(R.id.ZoneText);
+        button = (Button)findViewById(R.id.button);
+        createOnClickBtnAjout();
+    }
+
+    //Gestion du button pourla recherche de l'estampille
+    private void createOnClickBtnAjout(){
+        button.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+    }
+
+
 
     private List<estampilleCsv> estampilleCsv = new ArrayList<>();
     private void readCsv() {
