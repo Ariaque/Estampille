@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,12 +28,12 @@ public class EcritureEstampille extends AppCompatActivity {
     private Button button;
     private Button buttonRetour;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ecriture_estampille);
         this.buttonRetour = findViewById(R.id.buttonRetour);
+        this.button = findViewById(R.id.button);
         buttonRetour.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -49,16 +50,17 @@ public class EcritureEstampille extends AppCompatActivity {
     private void initActivity(){
         ZoneText = (EditText)findViewById(R.id.ZoneText);
         button = (Button)findViewById(R.id.button);
-        createOnClickBtnAjout();
+        //createOnClickBtnAjout();
     }
 
     //Gestion du button pour la recherche de l'estampille
     private void createOnClickBtnAjout(){
-        button.setOnClickListener(new Button.OnClickListener() {
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //Faire la recherche de l'estampille
                 readCsv();
+
             }
         });
     }
@@ -70,7 +72,22 @@ public class EcritureEstampille extends AppCompatActivity {
         );
         String line = "";
         String leTexte = ZoneText.getText().toString();
-        TextView view = (TextView) findViewById(R.id.textView);
+       TextView view = (TextView) findViewById(R.id.textView);
+        TextView view2 = (TextView) findViewById(R.id.textView2);
+        TextView view3 = (TextView) findViewById(R.id.textView3);
+        TextView view4 = (TextView) findViewById(R.id.textView4);
+        TextView view5 = (TextView) findViewById(R.id.textView5);
+        TextView view6 = (TextView) findViewById(R.id.textView6);
+        TextView view7 = (TextView) findViewById(R.id.textView7);
+
+        String str = view.getText().toString();
+        String str2 = view2.getText().toString();
+        String str3 = view3.getText().toString();
+        String str4 = view4.getText().toString();
+        String str5 = view5.getText().toString();
+        String str6 = view6.getText().toString();
+        String str7 = view7.getText().toString();
+
         try {
             while ((line = reader.readLine()) != null) {
                 //split ';'
@@ -113,16 +130,22 @@ public class EcritureEstampille extends AppCompatActivity {
 
                 estampilleCsv.add(estampille);
 
-                if (leTexte.equals(tab[1]))
-                   view.setText("L'estampille proviens du département : "+tab[0]+" le code estampille est : "+tab[1]+" le code Siret est le :"+tab[2]+" Le nom de l'entreprise est : "+tab[3]+" l'entreprise ce situe à l'adresse suivante : "+tab[4]+"le code postal"+tab[5]);
-
+                if (leTexte.equals(tab[1])) {
+                    view.setText("Nom de l'entreprise : " + tab[3]);
+                    view2.setText("Le département ou ce situe l'entreprise est  : " + tab[0]);
+                    view3.setText("L'entreprise ce situe  à l'adresse suivante : " + tab[4]);
+                    view4.setText("le Code postale est : " + tab[5]);
+                    view5.setText("Nom de la ville : " + tab[6]);
+                    view6.setText("Numero Siret : " + tab[2]);
+                    view7.setText("Code Estampille: " + tab[1]);
+                }
 
                 Log.d("Estampille :" ,"Voici les informations de l'estampille" + estampille);
             }
+
         } catch (IOException e){
             Log.wtf("Erreur  dans la lecture du CSV " + line, e);
             e.printStackTrace();
         }
-
     }
 }
