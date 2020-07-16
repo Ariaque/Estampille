@@ -65,6 +65,7 @@ public class EcritureEstampille extends AppCompatActivity {
     private void readCsv() {
         InputStream is = getResources().openRawResource(R.raw.bdd);
         String ocrText = "a";
+        Boolean etat = false;
         Intent intent =getIntent();
         if(intent.hasExtra("ocrText"))
         ocrText = intent.getStringExtra("ocrText");
@@ -124,7 +125,7 @@ public class EcritureEstampille extends AppCompatActivity {
 
                 estampilleCsv.add(estampille);
 
-                if (leTexte.equals(tab[1]) || ocrText != "a") {
+                if (leTexte.equals(tab[1])) {
                     view.setText("Nom de l'entreprise : " + tab[3]);
                     view2.setText("Le département ou ce situe l'entreprise est  : " + tab[0]);
                     view3.setText("L'entreprise ce situe  à l'adresse suivante : " + tab[4]);
@@ -132,9 +133,8 @@ public class EcritureEstampille extends AppCompatActivity {
                     view5.setText("Nom de la ville : " + tab[6]);
                     view6.setText("Numero Siret : " + tab[2]);
                     view7.setText("Code Estampille: " + tab[1]);
+                    etat = true;
                 }
-
-
                 Log.d("Estampille :" ,"Voici les informations de l'estampille" + estampille);
             }
 
@@ -142,6 +142,12 @@ public class EcritureEstampille extends AppCompatActivity {
             Log.wtf("Erreur  dans la lecture du CSV " + line, e);
             e.printStackTrace();
         }
+        if (etat == false) {
+            Intent otherActivity = new Intent(getApplicationContext(), PageErreur.class);
+            startActivity(otherActivity);
+            finish();
+        }
+
         Log.d("Test : ", "AFFICHE DE LA VARIABLE SRCTEST"+ ocrText);
     }
 }

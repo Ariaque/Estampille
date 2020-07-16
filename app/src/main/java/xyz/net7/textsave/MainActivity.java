@@ -214,6 +214,8 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 final String srcText = mTessOCR.getOCRResult(bitmap);
                 runOnUiThread(new Runnable() {
+                    private Button ecrire;
+
                     @Override
                     public void run() {
 
@@ -224,12 +226,20 @@ public class MainActivity extends AppCompatActivity {
                             ocrText.setText(srcText);
                         }
                         mProgressDialog.dismiss();
-                        Intent otherActivity = new Intent(getApplicationContext(),EcritureEstampille.class);
 
-                        otherActivity.putExtra("ocerText", srcText);
 
-                        startActivity(otherActivity);
-                        finish();
+                        this.ecrire = findViewById(R.id.ecrire);
+                        ecrire.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent otherActivity = new Intent(getApplicationContext(),EcritureEstampille.class);
+
+                                otherActivity.putExtra("ocerText", srcText);
+
+                                startActivity(otherActivity);
+                                finish();
+                            }
+                        });
                     }
                 });
             }
