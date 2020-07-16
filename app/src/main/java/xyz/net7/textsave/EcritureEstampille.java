@@ -128,7 +128,7 @@ public class EcritureEstampille extends AppCompatActivity {
                 if (leTexte.equals(tab[1])) {
                     view.setText("Nom de l'entreprise : " + tab[3]);
                     view2.setText("Le département ou ce situe l'entreprise est  : " + tab[0]);
-                    view3.setText("L'entreprise ce situe  à l'adresse suivante : " + tab[4]);
+                    view3.setText("L'adresse entreprise: " + tab[4]);
                     view4.setText("le Code postale est : " + tab[5]);
                     view5.setText("Nom de la ville : " + tab[6]);
                     view6.setText("Numero Siret : " + tab[2]);
