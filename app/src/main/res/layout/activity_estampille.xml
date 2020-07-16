@@ -23,42 +23,42 @@
         android:id="@+id/textView6"
         android:layout_width="196dp"
         android:layout_height="33dp"
-        android:layout_marginTop="380dp"
+        android:layout_marginTop="375dp"
         android:text=" "/>
 
     <TextView
         android:id="@+id/textView5"
         android:layout_width="196dp"
         android:layout_height="33dp"
-        android:layout_marginTop="352dp"
+        android:layout_marginTop="335dp"
         android:text=" " />
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="196dp"
         android:layout_height="33dp"
-        android:layout_marginTop="320dp"
+        android:layout_marginTop="295dp"
         android:text=" " />
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="196dp"
         android:layout_height="33dp"
-        android:layout_marginTop="288dp"
+        android:layout_marginTop="258dp"
         android:text=" " />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="196dp"
         android:layout_height="33dp"
-        android:layout_marginTop="256dp"
+        android:layout_marginTop="220dp"
         android:text=" " />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="196dp"
-        android:layout_height="33dp"
-        android:layout_marginTop="224dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="180dp"
         android:text=" " />
 
     <Button
