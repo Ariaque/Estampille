@@ -66,6 +66,7 @@ public class EcritureEstampille extends AppCompatActivity {
         InputStream is = getResources().openRawResource(R.raw.bdd);
         String ocrText = "a";
         Boolean etat = false;
+        String leTexte="o";
         Intent intent =getIntent();
         if(intent.hasExtra("ocrText"))
         ocrText = intent.getStringExtra("ocrText");
@@ -73,7 +74,14 @@ public class EcritureEstampille extends AppCompatActivity {
                 new InputStreamReader(is, Charset.forName("UTF-8"))
         );
         String line = "";
-        String leTexte = ZoneText.getText().toString();
+
+        if (!ocrText.equals("a")){
+            ZoneText.setText(ocrText);
+        }
+        leTexte = ZoneText.getText().toString();
+        leTexte.replace("FR", "");
+        leTexte.replace("-", ".");
+        leTexte.replace("CE", "");
         TextView view = (TextView) findViewById(R.id.textView);
         TextView view2 = (TextView) findViewById(R.id.textView2);
         TextView view3 = (TextView) findViewById(R.id.textView3);
