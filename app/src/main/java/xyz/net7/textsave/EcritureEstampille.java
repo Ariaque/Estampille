@@ -42,6 +42,15 @@ public class EcritureEstampille extends AppCompatActivity {
 
         initActivity();
         createOnClickBtnAjout();
+
+        String ocrText = "a";
+        Intent intent =getIntent();
+        if(intent.hasExtra("ocrText"))
+            ocrText = intent.getStringExtra("ocrText");
+
+        if (!ocrText.equals("a")){
+            ZoneText.setText(ocrText);
+        }
     }
     //Initialisation de l'activity
     private void initActivity(){
@@ -67,17 +76,17 @@ public class EcritureEstampille extends AppCompatActivity {
         String ocrText = "a";
         Boolean etat = false;
         String leTexte="o";
-        Intent intent =getIntent();
-        if(intent.hasExtra("ocrText"))
-        ocrText = intent.getStringExtra("ocrText");
+        //Intent intent =getIntent();
+        //if(intent.hasExtra("ocrText"))
+        //ocrText = intent.getStringExtra("ocrText");
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(is, Charset.forName("UTF-8"))
         );
         String line = "";
 
-        if (!ocrText.equals("a")){
+        /*if (!ocrText.equals("a")){
             ZoneText.setText(ocrText);
-        }
+        }*/
         leTexte = ZoneText.getText().toString();
         leTexte.replace("FR", "");
         leTexte.replace("-", ".");

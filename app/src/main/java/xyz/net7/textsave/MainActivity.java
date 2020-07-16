@@ -218,17 +218,32 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void run() {
-
+                        String tempText = srcText;
                         if (srcText != null && !srcText.equals("")) {
-                            srcText.replace("FR", "");
-                            srcText.replace("-", ".");
-                            srcText.replace("CE", "");
-                            ocrText.setText(srcText);
+
+                            tempText = tempText.replace("FR", "");
+                            tempText = tempText.replace("-", ".");
+                            tempText = tempText.replace("CE", "");
+                            tempText = tempText.replace("l", "1");
+                            tempText = tempText.replace("I", "1");
+                            tempText = tempText.replace(" ", "");
+                            tempText = tempText.replace("\n", "");
+                            if(tempText.indexOf(".") == -1) {
+                                tempText = tempText.substring(0, 2) + "." + tempText.substring(2);
+                                tempText = tempText.substring(0, 6) + "." + tempText.substring(6);
+                            }
+                            ocrText.setText(tempText);
                         }
                         mProgressDialog.dismiss();
+                        Intent otherActivity = new Intent(getApplicationContext(),EcritureEstampille.class);
+
+                        otherActivity.putExtra("ocrText", tempText);
+
+                        startActivity(otherActivity);
+                        finish();
 
 
-                        this.ecrire = findViewById(R.id.ecrire);
+                        /*this.ecrire = findViewById(R.id.ecrire);
                         ecrire.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -239,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(otherActivity);
                                 finish();
                             }
-                        });
+                        });*/
                     }
                 });
             }
