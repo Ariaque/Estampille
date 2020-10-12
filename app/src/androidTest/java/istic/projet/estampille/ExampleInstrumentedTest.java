@@ -1,4 +1,4 @@
-package xyz.net7.textsave;
+package istic.projet.estampille;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

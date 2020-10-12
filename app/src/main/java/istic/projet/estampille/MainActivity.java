@@ -1,4 +1,4 @@
-package xyz.net7.textsave;
+package istic.projet.estampille;
 
 import android.app.ProgressDialog;
 import android.content.Context;
