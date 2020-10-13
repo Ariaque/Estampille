@@ -1,6 +1,9 @@
 package istic.projet.estampille;
 
-public class estampilleCsv {
+/**
+ * Class which represent the origin of one product found with the stamp
+ */
+public class EstampilleCsv {
 
     private String dep;
     private String code;
@@ -12,8 +15,6 @@ public class estampilleCsv {
     private String categorie;
     private String activite;
     private String espece;
-
-
 
     //Getter
     public String getDep() {

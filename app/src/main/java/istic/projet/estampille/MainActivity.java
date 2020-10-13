@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
 
+        //Add listener to button
         this.ecrire = findViewById(R.id.ecrire);
         ecrire.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,49 +92,43 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode) {
-            case REQUEST_IMAGE1_CAPTURE: {
-                if (resultCode == RESULT_OK) {
-                    Bitmap bmp = null;
-                    try {
-                        InputStream is = context.getContentResolver().openInputStream(photoURI1);
-                        BitmapFactory.Options options = new BitmapFactory.Options();
-                        bmp = BitmapFactory.decodeStream(is, null, options);
+        //Manage the end of search product activity
+        if (requestCode == REQUEST_IMAGE1_CAPTURE) {
+            if (resultCode == RESULT_OK) {
+                Bitmap bmp = null;
+                try {
+                    InputStream is = context.getContentResolver().openInputStream(photoURI1);
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    bmp = BitmapFactory.decodeStream(is, null, options);
 
-                    } catch (Exception ex) {
-                        Log.i(getClass().getSimpleName(), ex.getMessage());
-                        Toast.makeText(context, errorConvert, Toast.LENGTH_SHORT).show();
-                    }
-
-                    firstImage.setImageBitmap(bmp);
-                    doOCR(bmp);
-
-                    OutputStream os;
-                    try {
-                        os = new FileOutputStream(photoURI1.getPath());
-                        if (bmp != null) {
-                            bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
-                        }
-                        os.flush();
-                        os.close();
-                    } catch (Exception ex) {
-                        Log.e(getClass().getSimpleName(), ex.getMessage());
-                        Toast.makeText(context, errorFileCreate, Toast.LENGTH_SHORT).show();
-                    }
-
-                } else {
-                    {
-                        photoURI1 = oldPhotoURI;
-                        firstImage.setImageURI(photoURI1);
-                    }
+                } catch (Exception ex) {
+                    Log.i(getClass().getSimpleName(), ex.getMessage());
+                    Toast.makeText(context, errorConvert, Toast.LENGTH_SHORT).show();
                 }
+
+                firstImage.setImageBitmap(bmp);
+                doOCR(bmp);
+
+                OutputStream os;
+                try {
+                    os = new FileOutputStream(photoURI1.getPath());
+                    if (bmp != null) {
+                        bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                    }
+                    os.flush();
+                    os.close();
+                } catch (Exception ex) {
+                    Log.e(getClass().getSimpleName(), ex.getMessage());
+                    Toast.makeText(context, errorFileCreate, Toast.LENGTH_SHORT).show();
+                }
+
+            } else {
+                photoURI1 = oldPhotoURI;
+                firstImage.setImageURI(photoURI1);
             }
         }
     }
@@ -241,20 +236,6 @@ public class MainActivity extends AppCompatActivity {
 
                         startActivity(otherActivity);
                         finish();
-
-
-                        /*this.ecrire = findViewById(R.id.ecrire);
-                        ecrire.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Intent otherActivity = new Intent(getApplicationContext(),EcritureEstampille.class);
-
-                                otherActivity.putExtra("ocerText", srcText);
-
-                                startActivity(otherActivity);
-                                finish();
-                            }
-                        });*/
                     }
                 });
             }

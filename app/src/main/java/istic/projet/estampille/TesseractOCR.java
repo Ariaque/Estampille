@@ -18,7 +18,11 @@ public class TesseractOCR {
 
     private final TessBaseAPI mTess;
 
-
+    /**
+     * Class constructor
+     * @param context
+     * @param language
+     */
     public TesseractOCR(Context context, String language) {
         mTess = new TessBaseAPI();
         boolean fileExistFlag = false;
@@ -86,6 +90,10 @@ public class TesseractOCR {
         }
     }
 
+    /**
+     * @param bitmap the image of the product
+     * @return the text read in the image
+     */
     public String getOCRResult(Bitmap bitmap) {
         mTess.setImage(bitmap);
         return mTess.getUTF8Text();

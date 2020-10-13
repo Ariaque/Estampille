@@ -1,7 +1,5 @@
 package istic.projet.estampille;
 
-
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,27 +8,33 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * This activity matches with the screen which permit to know the origins of the product
+ */
 public class EcritureEstampille extends AppCompatActivity {
 
-    private EditText ZoneText;
+    private EditText zoneText;
     private Button button;
     private Button buttonRetour;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //Display the screen which permit to type the stamp
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_estampille);
+
+        //Retrieve design elements
         this.buttonRetour = findViewById(R.id.buttonRetour);
         this.button = findViewById(R.id.button);
+        this.zoneText = findViewById(R.id.ZoneText);
+
+        //Add listener that allows to return to the home page
         buttonRetour.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -40,57 +44,41 @@ public class EcritureEstampille extends AppCompatActivity {
             }
         });
 
-        initActivity();
-        createOnClickBtnAjout();
-
-        String ocrText = "a";
-        Intent intent =getIntent();
-        if(intent.hasExtra("ocrText"))
-            ocrText = intent.getStringExtra("ocrText");
-
-        if (!ocrText.equals("a")){
-            ZoneText.setText(ocrText);
-        }
-    }
-    //Initialisation de l'activity
-    private void initActivity(){
-        ZoneText = (EditText)findViewById(R.id.ZoneText);
-        button = (Button)findViewById(R.id.button);
-        //createOnClickBtnAjout();
-    }
-
-    //Gestion du button pour la recherche de l'estampille
-    private void createOnClickBtnAjout(){
+        //Add listener that allows to do the search of a stamp
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Faire la recherche de l'estampille
                 readCsv();
-
             }
         });
+
+        //
+        Intent intent = getIntent();
+        if(intent.hasExtra("ocrText")) {
+            String ocrText = intent.getStringExtra("ocrText");
+            this.zoneText.setText(ocrText);
+        }
     }
-    private List<estampilleCsv> estampilleCsv = new ArrayList<>();
+
+    /**
+     * Display information about the origins of the product
+     */
     private void readCsv() {
         InputStream is = getResources().openRawResource(R.raw.bdd);
-        String ocrText = "a";
-        Boolean etat = false;
-        String leTexte="o";
-        //Intent intent =getIntent();
-        //if(intent.hasExtra("ocrText"))
-        //ocrText = intent.getStringExtra("ocrText");
+        boolean etat = false;
+        String txt ="";
+
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(is, Charset.forName("UTF-8"))
         );
-        String line = "";
 
-        /*if (!ocrText.equals("a")){
-            ZoneText.setText(ocrText);
-        }*/
-        leTexte = ZoneText.getText().toString();
-        leTexte.replace("FR", "");
-        leTexte.replace("-", ".");
-        leTexte.replace("CE", "");
+        //Recover the stamp in the text field
+        txt = this.zoneText.getText().toString();
+        txt.replace("FR", "");
+        txt.replace("-", ".");
+        txt.replace("CE", "");
+
+        //Recover all text view used to display the origins of the product
         TextView view = (TextView) findViewById(R.id.textView);
         TextView view2 = (TextView) findViewById(R.id.textView2);
         TextView view3 = (TextView) findViewById(R.id.textView3);
@@ -99,15 +87,24 @@ public class EcritureEstampille extends AppCompatActivity {
         TextView view6 = (TextView) findViewById(R.id.textView6);
         TextView view7 = (TextView) findViewById(R.id.textView7);
 
-
+        String line = "";
         try {
             while ((line = reader.readLine()) != null) {
-                //split ';'
                 String[] tab = line.split(";");
 
-                //lire les données
+                if (txt.equals(tab[1])) {
+                    view.setText("Nom de l'entreprise : " + tab[3]);
+                    view2.setText("Le département où se situe l'entreprise est  : " + tab[0]);
+                    view3.setText("L'adresse entreprise: " + tab[4]);
+                    view4.setText("le Code postale est : " + tab[5]);
+                    view5.setText("Nom de la ville : " + tab[6]);
+                    view6.setText("Numero Siret : " + tab[2]);
+                    view7.setText("Code Estampille: " + tab[1]);
+                    etat = true;
+                }
 
-                estampilleCsv estampille = new estampilleCsv();
+                // Create an object for each csv file
+               /* EstampilleCsv estampille = new EstampilleCsv();
                 if(tab[0].length() >0 )
                     estampille.setDep(tab[0]);
                 else
@@ -138,33 +135,19 @@ public class EcritureEstampille extends AppCompatActivity {
                 if(tab.length >= 10 &&  tab[9].length() >0 )
                     estampille.setEspece(tab[9]);
                 else
-                    estampille.setEspece("0");
-
-                estampilleCsv.add(estampille);
-
-                if (leTexte.equals(tab[1])) {
-                    view.setText("Nom de l'entreprise : " + tab[3]);
-                    view2.setText("Le département ou ce situe l'entreprise est  : " + tab[0]);
-                    view3.setText("L'adresse entreprise: " + tab[4]);
-                    view4.setText("le Code postale est : " + tab[5]);
-                    view5.setText("Nom de la ville : " + tab[6]);
-                    view6.setText("Numero Siret : " + tab[2]);
-                    view7.setText("Code Estampille: " + tab[1]);
-                    etat = true;
-                }
-                Log.d("Estampille :" ,"Voici les informations de l'estampille" + estampille);
+                    estampille.setEspece("0");*/
             }
 
         } catch (IOException e){
-            Log.wtf("Erreur  dans la lecture du CSV " + line, e);
+            Log.wtf("Erreur dans la lecture du CSV " + line, e);
             e.printStackTrace();
         }
+
+        //If the stamp has no similarity in the CSV, the error page appears
         if (etat == false) {
             Intent otherActivity = new Intent(getApplicationContext(), PageErreur.class);
             startActivity(otherActivity);
             finish();
         }
-
-        Log.d("Test : ", "AFFICHE DE LA VARIABLE SRCTEST"+ ocrText);
     }
 }
