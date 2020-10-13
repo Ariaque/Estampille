@@ -9,7 +9,7 @@
         android:id="@+id/buttonRetourErreur"
         android:layout_width="218dp"
         android:layout_height="64dp"
-        android:text="Retour page principale"
+        android:text="@string/button_return_home"
         android:layout_centerInParent="true"/>
 
     <ImageView

@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">TextSave</string>
+    <string name="app_name">FoodOrigin</string>
+    <string name="button_search_estampille">Rechercher l\'estampille</string>
+    <string name="text_write_estampille">Ecrire l\'estampille</string>
+    <string name="button_return_home">Retour page principale</string>
+    <string name="button_scan">scan</string>
 </resources>

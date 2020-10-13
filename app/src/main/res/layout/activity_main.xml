@@ -22,13 +22,13 @@
                 android:layout_width="161dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="scan" />
+                android:text="@string/button_scan" />
 
             <Button
                 android:id="@+id/ecrire"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ecrire l'estampille"
+                android:text="@string/text_write_estampille"
                 android:layout_gravity="center" />
         </LinearLayout>
 

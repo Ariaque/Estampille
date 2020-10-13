@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPersonName"
-        android:hint="Ecrire l'estampille" />
+        android:hint="@string/text_write_estampille" />
 
     <TextView
         android:id="@+id/textView7"
@@ -65,7 +65,7 @@
         android:id="@+id/button"
         android:layout_width="219dp"
         android:layout_height="66dp"
-        android:text="Rechercher l'estampille"
+        android:text="@string/button_search_estampille"
         android:layout_alignParentRight="true"
         android:layout_below="@id/textView7"/>
 
@@ -73,7 +73,7 @@
         android:id="@+id/buttonRetour"
         android:layout_width="218dp"
         android:layout_height="64dp"
-        android:text="Retour page principale"
+        android:text="@string/button_return_home"
         android:layout_alignParentRight="true"
         android:layout_below="@id/button"/>
 
