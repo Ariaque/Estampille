@@ -20,8 +20,8 @@ public class TesseractOCR {
 
     /**
      * Class constructor
-     * @param context
-     * @param language
+     * @param context the application context
+     * @param language the user language
      */
     public TesseractOCR(Context context, String language) {
         mTess = new TessBaseAPI();
@@ -30,7 +30,6 @@ public class TesseractOCR {
         AssetManager assetManager = context.getAssets();
 
         String dstPathDir = "/tesseract/tessdata/";
-
         String srcFile = "eng.traineddata";
         InputStream inFile = null;
 
@@ -38,7 +37,6 @@ public class TesseractOCR {
         String dstInitPathDir = context.getFilesDir() + "/tesseract";
         String dstPathFile = dstPathDir + srcFile;
         FileOutputStream outFile = null;
-
 
         try {
             inFile = assetManager.open(srcFile);
@@ -98,7 +96,6 @@ public class TesseractOCR {
         mTess.setImage(bitmap);
         return mTess.getUTF8Text();
     }
-
 
     public void onDestroy() {
         if (mTess != null) mTess.end();

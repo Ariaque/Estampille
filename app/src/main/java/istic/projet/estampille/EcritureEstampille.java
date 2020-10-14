@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,7 +54,7 @@ public class EcritureEstampille extends AppCompatActivity {
             }
         });
 
-        //
+        //If a scan is done, the scan result is put in the text field
         Intent intent = getIntent();
         if(intent.hasExtra("ocrText")) {
             String ocrText = intent.getStringExtra("ocrText");
@@ -65,7 +67,7 @@ public class EcritureEstampille extends AppCompatActivity {
      */
     private void readCsv() {
         InputStream is = getResources().openRawResource(R.raw.bdd);
-        boolean etat = false;
+        boolean find = false;
         String txt ="";
 
         BufferedReader reader = new BufferedReader(
@@ -74,9 +76,9 @@ public class EcritureEstampille extends AppCompatActivity {
 
         //Recover the stamp in the text field
         txt = this.zoneText.getText().toString();
-        txt.replace("FR", "");
+        /*txt.replace("FR", " ");
         txt.replace("-", ".");
-        txt.replace("CE", "");
+        txt.replace("CE", " "); --> No consequence */
 
         //Recover all text view used to display the origins of the product
         TextView view = (TextView) findViewById(R.id.textView);
@@ -100,7 +102,7 @@ public class EcritureEstampille extends AppCompatActivity {
                     view5.setText("Nom de la ville : " + tab[6]);
                     view6.setText("Numero Siret : " + tab[2]);
                     view7.setText("Code Estampille: " + tab[1]);
-                    etat = true;
+                    find = true;
                 }
 
                 // Create an object for each csv file
@@ -144,7 +146,7 @@ public class EcritureEstampille extends AppCompatActivity {
         }
 
         //If the stamp has no similarity in the CSV, the error page appears
-        if (etat == false) {
+        if (!find) {
             Intent otherActivity = new Intent(getApplicationContext(), PageErreur.class);
             startActivity(otherActivity);
             finish();

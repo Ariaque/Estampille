@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private Uri oldPhotoURI;
     private Button ecrire;
 
-
     private static final String errorFileCreate = "Error file create!";
     private static final String errorConvert = "Error convert!";
     private static final int REQUEST_IMAGE1_CAPTURE = 1;
@@ -69,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
 
-        //Add listener to button
+        //Add listener to button which allows to type a stamp
         this.ecrire = findViewById(R.id.ecrire);
         ecrire.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,12 +80,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ButterKnife.bind(this);
-        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-        StrictMode.setVmPolicy(builder.build());
 
-        if (!flagPermissions) {
-            checkPermissions();
-        }
+        //Detect everything that's potentially suspect and write it in log
+        StrictMode.VmPolicy builder = new StrictMode.VmPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .build();
+        StrictMode.setVmPolicy(builder);
+
+        //Check permission to create the OCR access
+        checkPermissions();
         String language = "eng";
         mTessOCR = new TesseractOCR(this, language);
 
@@ -96,51 +99,51 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        //Manage the end of search product activity
-        if (requestCode == REQUEST_IMAGE1_CAPTURE) {
-            if (resultCode == RESULT_OK) {
-                Bitmap bmp = null;
-                try {
-                    InputStream is = context.getContentResolver().openInputStream(photoURI1);
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    bmp = BitmapFactory.decodeStream(is, null, options);
+        //Call after that user takes a photo
+        if (resultCode == RESULT_OK) {
+            Bitmap bmp = null;
+            try {
+                //Create a bitmap from the stamp image
+                InputStream is = context.getContentResolver().openInputStream(photoURI1);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                bmp = BitmapFactory.decodeStream(is, null, options);
 
-                } catch (Exception ex) {
-                    Log.i(getClass().getSimpleName(), ex.getMessage());
-                    Toast.makeText(context, errorConvert, Toast.LENGTH_SHORT).show();
-                }
-
-                firstImage.setImageBitmap(bmp);
-                doOCR(bmp);
-
-                OutputStream os;
-                try {
-                    os = new FileOutputStream(photoURI1.getPath());
-                    if (bmp != null) {
-                        bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
-                    }
-                    os.flush();
-                    os.close();
-                } catch (Exception ex) {
-                    Log.e(getClass().getSimpleName(), ex.getMessage());
-                    Toast.makeText(context, errorFileCreate, Toast.LENGTH_SHORT).show();
-                }
-
-            } else {
-                photoURI1 = oldPhotoURI;
-                firstImage.setImageURI(photoURI1);
+            } catch (Exception ex) {
+                Log.i(getClass().getSimpleName(), ex.getMessage());
+                Toast.makeText(context, errorConvert, Toast.LENGTH_SHORT).show();
             }
+
+            //Start the stamp recognition
+            firstImage.setImageBitmap(bmp);
+            doOCR(bmp);
+
+            OutputStream os;
+            try {
+                os = new FileOutputStream(photoURI1.getPath());
+                if (bmp != null) {
+                    bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                }
+                os.flush();
+                os.close();
+            } catch (Exception ex) {
+                Log.e(getClass().getSimpleName(), ex.getMessage());
+                Toast.makeText(context, errorFileCreate, Toast.LENGTH_SHORT).show();
+            }
+
+        } else {
+            photoURI1 = oldPhotoURI;
+            firstImage.setImageURI(photoURI1);
         }
     }
 
     @OnClick(R.id.scan_button)
     void onClickScanButton() {
-        // check permissions
+        // Check permissions
         if (!flagPermissions) {
-            checkPermissions();
             return;
         }
-        //prepare intent
+
+        //Intent to open the camera
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         if (takePictureIntent.resolveActivity(context.getPackageManager()) != null) {
@@ -161,8 +164,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * @return A file which represent the image of the stamp
+     * @throws IOException
+     */
     public File createImageFile() throws IOException {
-        // Create an image file name
         String timeStamp = new SimpleDateFormat("MMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -176,18 +182,25 @@ public class MainActivity extends AppCompatActivity {
         return image;
     }
 
-
+    /**
+     * Check if the user has all permissions. If the user has all permissions flagPermissions = true
+     * otherwise flagPermissions = false and a pop up appears to ask permission
+     */
     void checkPermissions() {
         if (!hasPermissions(context, PERMISSIONS)) {
-            requestPermissions(PERMISSIONS,
-                    PERMISSION_ALL);
+            requestPermissions(PERMISSIONS, PERMISSION_ALL);
             flagPermissions = false;
         }
         flagPermissions = true;
 
     }
 
-    public static boolean hasPermissions(Context context, String... permissions) {
+    /**
+     * @param context the application context
+     * @param permissions permissions asked by the application
+     * @return true if the user has these permissions false otherwise
+     */
+    private static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -198,24 +211,27 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Do a recognition stamp in the bitmap in parameter
+     * @param bitmap the stamp image
+     */
     private void doOCR(final Bitmap bitmap) {
+        //Open a waiting pop up during the treatment
         if (mProgressDialog == null) {
             mProgressDialog = ProgressDialog.show(this, "Processing",
                     "Doing OCR...", true);
-        } else {
-            mProgressDialog.show();
         }
         new Thread(new Runnable() {
             public void run() {
+                //Search the stamp present in the image
                 final String srcText = mTessOCR.getOCRResult(bitmap);
                 runOnUiThread(new Runnable() {
-                    private Button ecrire;
 
                     @Override
                     public void run() {
                         String tempText = srcText;
+                        //Text treatment to keep only the digit on the stamp, in the form : XX.XXX.XXX
                         if (srcText != null && !srcText.equals("")) {
-
                             tempText = tempText.replace("FR", "");
                             tempText = tempText.replace("-", ".");
                             tempText = tempText.replace("CE", "");
@@ -227,13 +243,15 @@ public class MainActivity extends AppCompatActivity {
                                 tempText = tempText.substring(0, 2) + "." + tempText.substring(2);
                                 tempText = tempText.substring(0, 6) + "." + tempText.substring(6);
                             }
+                            //Place the found text in the text field
                             ocrText.setText(tempText);
                         }
+                        //Close the waiting pop up
                         mProgressDialog.dismiss();
+
+                        //Open the activity which permit to search the product origin with a stamp in the text field
                         Intent otherActivity = new Intent(getApplicationContext(),EcritureEstampille.class);
-
                         otherActivity.putExtra("ocrText", tempText);
-
                         startActivity(otherActivity);
                         finish();
                     }
