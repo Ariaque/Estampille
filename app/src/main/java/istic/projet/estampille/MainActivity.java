@@ -220,7 +220,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                System.out.println("Failed");
                                                 // Task failed with an exception
                                                 // ...
                                             }
@@ -234,18 +233,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Text.TextBlock t = null;
         Iterator it = recognizedText.iterator();
         String tempText = null;
-        System.out.println("ici");
         while (!found && it.hasNext()) {
             t = (Text.TextBlock) it.next();
             t.getText().replace("(", "");
             t.getText().replace(")", "");
-            System.out.println(t.getText());
             if (t.getText().matches("(?s).*[0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || t.getText().matches("(?s).*[0-9][0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || t.getText().matches("(?s).*[0-9](A|B).[0-9][0-9][0-9].[0-9][0-9][0-9].*")) {
                 found = true;
                 tempText = t.getText();
             }
         }
-        System.out.println(t.getText());
         tempText = tempText.replace("FR", "");
         tempText = tempText.replace("-", ".");
         tempText = tempText.replace("CE", "");
