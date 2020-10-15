@@ -63,7 +63,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button scanButton;
 
     /**
-     * @param context     the application context
+     * Do a recognition stamp in the bitmap in parameter
+     *
+     * @param bitmap the stamp image
+     */
+    /**
+     * @param context the application context
      * @param permissions permissions asked by the application
      * @return true if the user has these permissions false otherwise
      */
@@ -182,27 +187,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         flagPermissions = true;
 
-    }
-
-    /**
-     * Do a recognition stamp in the bitmap in parameter
-     *
-     * @param bitmap the stamp image
-     */
-    /**
-     * @param context the application context
-     * @param permissions permissions asked by the application
-     * @return true if the user has these permissions false otherwise
-     */
-    private static boolean hasPermissions(Context context, String... permissions) {
-        if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     /**
