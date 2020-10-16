@@ -11,4 +11,6 @@
     <string name="company_city">Nom de la ville : %1$s</string>
     <string name="company_siret">Numero Siret : %1$s</string>
     <string name="company_estampille">Code estampille : %1$s</string>
+    <string name="no_match_toast">Pas de correspondances</string>
+    <string name="maps_api_key">AIzaSyCYasmitSEl9kMoj8Jsq0x6OOgPJTUvmKE</string>
 </resources>

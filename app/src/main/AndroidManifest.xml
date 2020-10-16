@@ -16,10 +16,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="istic.projet.estampille.PageErreur"></activity>
-        <activity android:name="istic.projet.estampille.EcritureEstampille"></activity>
-        <activity android:name="istic.projet.estampille.MainActivity">
 
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/maps_api_key" />
+
+        <activity android:name=".DisplayMap"></activity>
+        <activity android:name=".PageErreur" />
+        <activity android:name=".EcritureEstampille" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
@@ -28,4 +36,5 @@
         </activity>
 
     </application>
+
 </manifest>
