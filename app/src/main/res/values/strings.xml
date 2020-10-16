@@ -4,4 +4,6 @@
     <string name="text_write_estampille">Ecrire l\'estampille</string>
     <string name="button_return_home">Retour page principale</string>
     <string name="button_scan">scan</string>
+    <string name="no_match_toast">Pas de correspondances</string>
+    <string name="maps_api_key">AIzaSyCYasmitSEl9kMoj8Jsq0x6OOgPJTUvmKE</string>
 </resources>

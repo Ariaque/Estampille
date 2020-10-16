@@ -30,6 +30,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/text_write_estampille"
                 android:layout_gravity="center" />
+
         </LinearLayout>
 
         <LinearLayout

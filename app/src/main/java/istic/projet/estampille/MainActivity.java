@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         scanButton = findViewById(R.id.scan_button);
         scanButton.setOnClickListener(this);
 
-
         //Detect everything that's potentially suspect and write it in log
         StrictMode.VmPolicy builder = new StrictMode.VmPolicy.Builder()
                 .detectAll()
@@ -218,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 int rotationDegree = 0;
                 try {
-                    rotationDegree = getRotationCompensation("0",(Activity) context,false);
+                    rotationDegree = getRotationCompensation();
                 } catch (CameraAccessException e) {
                     e.printStackTrace();
                 }
@@ -252,26 +251,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Get the angle by which an image must be rotated given the device's current
      * orientation.
      */
-    private int getRotationCompensation(String cameraId, Activity activity, boolean isFrontFacing)
+    private int getRotationCompensation()
             throws CameraAccessException {
-        // Get the device's current rotation relative to its "native" orientation.
-        // Then, from the ORIENTATIONS table, look up the angle the image must be
-        // rotated to compensate for the device's rotation.
-        int deviceRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        int deviceRotation = getWindowManager().getDefaultDisplay().getRotation();
         int rotationCompensation = ORIENTATIONS.get(deviceRotation);
 
-        // Get the device's sensor orientation.
-        CameraManager cameraManager = (CameraManager) activity.getSystemService(CAMERA_SERVICE);
+        CameraManager cameraManager = (CameraManager) getSystemService(CAMERA_SERVICE);
         int sensorOrientation = cameraManager
-                .getCameraCharacteristics(cameraId)
+                .getCameraCharacteristics("0")
                 .get(CameraCharacteristics.SENSOR_ORIENTATION);
 
-        if (isFrontFacing) {
-            rotationCompensation = (sensorOrientation + rotationCompensation) % 360;
-        } else { // back-facing
-            rotationCompensation = (sensorOrientation - rotationCompensation + 360) % 360;
-        }
-        return rotationCompensation;
+        return (sensorOrientation + rotationCompensation) % 360;
     }
 
     private void extractCode(List<Text.TextBlock> recognizedText) {
