@@ -16,6 +16,8 @@ import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.View;
@@ -27,11 +29,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
@@ -47,7 +55,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final String errorFileCreate = "Error file create!";
     private static final String errorConvert = "Error convert!";
@@ -66,7 +74,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Uri photoURI1;
     private Uri oldPhotoURI;
     private Button ecrire;
-    private Button scanButton;
+    private FloatingActionButton scanButton;
+    private Toolbar mToolBar;
+    private FragmentPagerAdapter fragmentPagerAdapter;
+    private ViewPager viewPager;
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static {
@@ -105,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         context = MainActivity.this;
 
         //Add listener to button which allows to type a stamp
-        this.ecrire = findViewById(R.id.ecrire);
+        /*this.ecrire = findViewById(R.id.action_write_code);
         ecrire.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,12 +124,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(otherActivity);
                 finish();
             }
-        });
+        });*/
+        mToolBar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolBar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        viewPager = findViewById(R.id.pager);
+        fragmentPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        viewPager.setAdapter(fragmentPagerAdapter);
 
-        firstImage = findViewById(R.id.ocr_image);
-        ocrText = findViewById(R.id.ocr_text);
-        scanButton = findViewById(R.id.scan_button);
-        scanButton.setOnClickListener(this);
 
         //Detect everything that's potentially suspect and write it in log
         StrictMode.VmPolicy builder = new StrictMode.VmPolicy.Builder()
@@ -128,197 +141,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         StrictMode.setVmPolicy(builder);
 
         //Check permission to create the OCR access
-        checkPermissions();
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        //Call after that user takes a photo
-        if (resultCode == RESULT_OK) {
-            Bitmap bmp = null;
-            try {
-                //Create a bitmap from the stamp image
-                InputStream is = context.getContentResolver().openInputStream(photoURI1);
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                bmp = BitmapFactory.decodeStream(is, null, options);
-
-            } catch (Exception ex) {
-                Log.i(getClass().getSimpleName(), ex.getMessage());
-                Toast.makeText(context, errorConvert, Toast.LENGTH_SHORT).show();
-            }
-
-            //Start the stamp recognition
-            firstImage.setImageBitmap(bmp);
-            doOCR(bmp);
-
-            OutputStream os;
-            try {
-                os = new FileOutputStream(photoURI1.getPath());
-                if (bmp != null) {
-                    bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
-                }
-                os.flush();
-                os.close();
-            } catch (Exception ex) {
-                Log.e(getClass().getSimpleName(), ex.getMessage());
-                Toast.makeText(context, errorFileCreate, Toast.LENGTH_SHORT).show();
-            }
-
-        } else {
-            photoURI1 = oldPhotoURI;
-            firstImage.setImageURI(photoURI1);
-        }
-    }
-
-    /**
-     * @return A file which represent the image of the stamp
-     * @throws IOException
-     */
-    public File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("MMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    /**
-     * Check if the user has all permissions. If the user has all permissions flagPermissions = true
-     * otherwise flagPermissions = false and a pop up appears to ask permission
-     */
-    void checkPermissions() {
-        if (!hasPermissions(context, PERMISSIONS)) {
-            requestPermissions(PERMISSIONS, PERMISSION_ALL);
-            flagPermissions = false;
-        }
-        flagPermissions = true;
-
-    }
-
-    /**
-     * Do a recognition stamp in the bitmap in parameter
-     * @param bitmap the stamp image
-     */
-    private void doOCR(final Bitmap bitmap) {
-        //Open a waiting pop up during the treatment
-        if (mProgressDialog == null) {
-            mProgressDialog = ProgressDialog.show(this, "Processing",
-                    "Doing OCR...", true);
-        }
-        new Thread(new Runnable() {
-            public void run() {
-                int rotationDegree = 0;
-                try {
-                    rotationDegree = getRotationCompensation();
-                } catch (CameraAccessException e) {
-                    e.printStackTrace();
-                }
-                //Search the stamp present in the image
-                InputImage image = InputImage.fromBitmap(bitmap, rotationDegree);
-                //final String srcText = mTessOCR.getOCRResult(bitmap);
-                TextRecognizer recognizer = TextRecognition.getClient();
-                final Task<Text> result =
-                        recognizer.process(image)
-                                .addOnSuccessListener(new OnSuccessListener<Text>() {
-                                    @Override
-                                    public void onSuccess(Text visionText) {
-                                        List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
-                                        extractCode(recognizedText);
-
-                                    }
-                                })
-                                .addOnFailureListener(
-                                        new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                // Task failed with an exception
-                                                // ...
-                                            }
-                                        });
-            }
-        }).start();
-    }
-
-    /**
-     * Get the angle by which an image must be rotated given the device's current
-     * orientation.
-     */
-    private int getRotationCompensation()
-            throws CameraAccessException {
-        int deviceRotation = getWindowManager().getDefaultDisplay().getRotation();
-        int rotationCompensation = ORIENTATIONS.get(deviceRotation);
-
-        CameraManager cameraManager = (CameraManager) getSystemService(CAMERA_SERVICE);
-        int sensorOrientation = cameraManager
-                .getCameraCharacteristics("0")
-                .get(CameraCharacteristics.SENSOR_ORIENTATION);
-
-        return (sensorOrientation + rotationCompensation) % 360;
-    }
-
-    private void extractCode(List<Text.TextBlock> recognizedText) {
-        boolean found = false;
-        Text.TextBlock t = null;
-        Iterator it = recognizedText.iterator();
-        String tempText = null;
-        while (!found && it.hasNext()) {
-            t = (Text.TextBlock) it.next();
-            t.getText().replace("(", "");
-            t.getText().replace(")", "");
-            if (t.getText().matches("(?s).*[0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || t.getText().matches("(?s).*[0-9][0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || t.getText().matches("(?s).*[0-9](A|B).[0-9][0-9][0-9].[0-9][0-9][0-9].*")) {
-                found = true;
-                tempText = t.getText();
-            }
-        }
-        tempText = tempText.replace("FR", "");
-        tempText = tempText.replace("-", ".");
-        tempText = tempText.replace("CE", "");
-        tempText = tempText.replace("l", "1");
-        tempText = tempText.replace("I", "1");
-        tempText = tempText.replace(" ", "");
-        tempText = tempText.replace("\n", "");
-        ocrText.setText(tempText);
-        mProgressDialog.dismiss();
-        //Open the activity which permit to search the product origin with a stamp in the text field
-        Intent otherActivity = new Intent(getApplicationContext(), EcritureEstampille.class);
-        otherActivity.putExtra("ocrText", ocrText.getText());
-        startActivity(otherActivity);
-        finish();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
 
     @Override
-    public void onClick(View view) {
-        // Check permissions
-        if (!flagPermissions) {
-            return;
-        }
-
-        //Intent to open the camera
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        if (takePictureIntent.resolveActivity(context.getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                Toast.makeText(context, errorFileCreate, Toast.LENGTH_SHORT).show();
-                Log.i("File error", ex.toString());
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                oldPhotoURI = photoURI1;
-                photoURI1 = Uri.fromFile(photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI1);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE1_CAPTURE);
-            }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_history:
+                return true;
+            case R.id.action_write_code:
+                Intent otherActivity = new Intent(getApplicationContext(), EcritureEstampille.class);
+                startActivity(otherActivity);
+                finish();
+            case R.id.action_look_around:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
+
+
 }
