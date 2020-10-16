@@ -1,11 +1,15 @@
 package istic.projet.estampille;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -14,6 +18,8 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.util.SparseIntArray;
+import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -66,6 +72,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button ecrire;
     private FloatingActionButton scanButton;
     private Toolbar mToolBar;
+
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+    static {
+        ORIENTATIONS.append(Surface.ROTATION_0, 0);
+        ORIENTATIONS.append(Surface.ROTATION_90, 90);
+        ORIENTATIONS.append(Surface.ROTATION_180, 180);
+        ORIENTATIONS.append(Surface.ROTATION_270, 270);
+    }
+
 
     /**
      * Do a recognition stamp in the bitmap in parameter
@@ -233,6 +248,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         new Thread(new Runnable() {
             public void run() {
                 int rotationDegree = 0;
+                try {
+                    rotationDegree = getRotationCompensation("0",(Activity) context,false);
+                } catch (CameraAccessException e) {
+                    e.printStackTrace();
+                }
                 //Search the stamp present in the image
                 InputImage image = InputImage.fromBitmap(bitmap, rotationDegree);
                 //final String srcText = mTessOCR.getOCRResult(bitmap);
@@ -259,6 +279,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }).start();
     }
 
+    /**
+     * Get the angle by which an image must be rotated given the device's current
+     * orientation.
+     */
+    private int getRotationCompensation(String cameraId, Activity activity, boolean isFrontFacing)
+            throws CameraAccessException {
+        // Get the device's current rotation relative to its "native" orientation.
+        // Then, from the ORIENTATIONS table, look up the angle the image must be
+        // rotated to compensate for the device's rotation.
+        int deviceRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        int rotationCompensation = ORIENTATIONS.get(deviceRotation);
+
+        // Get the device's sensor orientation.
+        CameraManager cameraManager = (CameraManager) activity.getSystemService(CAMERA_SERVICE);
+        int sensorOrientation = cameraManager
+                .getCameraCharacteristics(cameraId)
+                .get(CameraCharacteristics.SENSOR_ORIENTATION);
+
+        if (isFrontFacing) {
+            rotationCompensation = (sensorOrientation + rotationCompensation) % 360;
+        } else { // back-facing
+            rotationCompensation = (sensorOrientation - rotationCompensation + 360) % 360;
+        }
+        return rotationCompensation;
+    }
+
     private void extractCode(List<Text.TextBlock> recognizedText) {
         boolean found = false;
         Text.TextBlock t = null;
@@ -273,7 +319,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 found = true;
             }
         }
-        System.out.println(tempText);
         tempText = tempText.replace("FR", "");
         tempText = tempText.replace("-", ".");
         tempText = tempText.replace("CE", "");
