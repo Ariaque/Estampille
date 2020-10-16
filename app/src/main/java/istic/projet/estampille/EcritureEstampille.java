@@ -2,14 +2,14 @@ package istic.projet.estampille;
 
 import android.content.Intent;
 import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import androidx.appcompat.app.AppCompatActivity;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -58,7 +58,7 @@ public class EcritureEstampille extends AppCompatActivity {
             }
         });
 
-        //
+        //If a scan is done, the scan result is put in the text field
         Intent intent = getIntent();
         if (intent.hasExtra("ocrText")) {
             String ocrText = intent.getStringExtra("ocrText");
@@ -86,11 +86,11 @@ public class EcritureEstampille extends AppCompatActivity {
                     new InputStreamReader(is, StandardCharsets.UTF_8)
             );
 
-            //Recover the stamp in the text field
+        //Recover the stamp in the text field
             productEstampille = this.zoneText.getText().toString();
-            productEstampille.replace("FR", "");
-            productEstampille.replace("-", ".");
-            productEstampille.replace("CE", "");
+        /*productEstampille.replace("FR", " ");
+        productEstampille.replace("-", ".");
+        productEstampille.replace("CE", " "); --> No consequence */
 
             //Recover all text view used to display the origins of the product
             TextView view = findViewById(R.id.textView);
