@@ -12,6 +12,8 @@ import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -21,11 +23,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
@@ -60,7 +64,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Uri photoURI1;
     private Uri oldPhotoURI;
     private Button ecrire;
-    private Button scanButton;
+    private FloatingActionButton scanButton;
+    private Toolbar mToolBar;
 
     /**
      * Do a recognition stamp in the bitmap in parameter
@@ -90,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         context = MainActivity.this;
 
         //Add listener to button which allows to type a stamp
-        this.ecrire = findViewById(R.id.ecrire);
+        /*this.ecrire = findViewById(R.id.action_write_code);
         ecrire.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,12 +103,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(otherActivity);
                 finish();
             }
-        });
+        });*/
 
         firstImage = findViewById(R.id.ocr_image);
         ocrText = findViewById(R.id.ocr_text);
         scanButton = findViewById(R.id.scan_button);
         scanButton.setOnClickListener(this);
+        mToolBar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolBar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
         //Detect everything that's potentially suspect and write it in log
@@ -115,6 +123,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //Check permission to create the OCR access
         checkPermissions();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_history:
+                return true;
+            case R.id.action_write_code:
+                Intent otherActivity = new Intent(getApplicationContext(), EcritureEstampille.class);
+                startActivity(otherActivity);
+                finish();
+            case R.id.action_look_around:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -235,13 +266,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String tempText = null;
         while (!found && it.hasNext()) {
             t = (Text.TextBlock) it.next();
-            t.getText().replace("(", "");
-            t.getText().replace(")", "");
-            if (t.getText().matches("(?s).*[0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || t.getText().matches("(?s).*[0-9][0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || t.getText().matches("(?s).*[0-9](A|B).[0-9][0-9][0-9].[0-9][0-9][0-9].*")) {
+            tempText = t.getText().replace("(", "");
+            tempText = tempText.replace(")", "");
+            System.out.println(tempText);
+            if (tempText.matches("(?s).*[0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9][0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9](A|B).[0-9][0-9][0-9].[0-9][0-9][0-9].*")) {
                 found = true;
-                tempText = t.getText();
             }
         }
+        System.out.println(tempText);
         tempText = tempText.replace("FR", "");
         tempText = tempText.replace("-", ".");
         tempText = tempText.replace("CE", "");
