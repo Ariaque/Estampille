@@ -2,17 +2,23 @@ package istic.projet.estampille;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This activity matches with the screen which permit to know the origins of the product
@@ -38,7 +44,7 @@ public class EcritureEstampille extends AppCompatActivity {
         buttonRetour.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent otherActivity = new Intent(getApplicationContext(),MainActivity.class);
+                Intent otherActivity = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(otherActivity);
                 finish();
             }
@@ -54,7 +60,7 @@ public class EcritureEstampille extends AppCompatActivity {
 
         //
         Intent intent = getIntent();
-        if(intent.hasExtra("ocrText")) {
+        if (intent.hasExtra("ocrText")) {
             String ocrText = intent.getStringExtra("ocrText");
             this.zoneText.setText(ocrText);
         }
@@ -64,46 +70,53 @@ public class EcritureEstampille extends AppCompatActivity {
      * Display information about the origins of the product
      */
     private void readCsv() {
-        InputStream is = getResources().openRawResource(R.raw.bdd);
-        boolean etat = false;
-        String txt ="";
-
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(is, Charset.forName("UTF-8"))
-        );
-
-        //Recover the stamp in the text field
-        txt = this.zoneText.getText().toString();
-        txt.replace("FR", "");
-        txt.replace("-", ".");
-        txt.replace("CE", "");
-
-        //Recover all text view used to display the origins of the product
-        TextView view = (TextView) findViewById(R.id.textView);
-        TextView view2 = (TextView) findViewById(R.id.textView2);
-        TextView view3 = (TextView) findViewById(R.id.textView3);
-        TextView view4 = (TextView) findViewById(R.id.textView4);
-        TextView view5 = (TextView) findViewById(R.id.textView5);
-        TextView view6 = (TextView) findViewById(R.id.textView6);
-        TextView view7 = (TextView) findViewById(R.id.textView7);
-
-        String line = "";
+//        InputStream is = getResources().openRawResource(R.raw.bdd);
+        InputStream is = null;
         try {
-            while ((line = reader.readLine()) != null) {
-                String[] tab = line.split(";");
+            is = new FileInputStream(new File(Environment
+                    .getExternalStorageDirectory().toString()
+                    + "/data/foodorigin_datagouv.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        boolean found = false;
+        String productEstampille = "";
+        if (is != null) {
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(is, StandardCharsets.UTF_8)
+            );
 
-                if (txt.equals(tab[1])) {
-                    view.setText("Nom de l'entreprise : " + tab[3]);
-                    view2.setText("Le département où se situe l'entreprise est  : " + tab[0]);
-                    view3.setText("L'adresse entreprise: " + tab[4]);
-                    view4.setText("le Code postale est : " + tab[5]);
-                    view5.setText("Nom de la ville : " + tab[6]);
-                    view6.setText("Numero Siret : " + tab[2]);
-                    view7.setText("Code Estampille: " + tab[1]);
-                    etat = true;
-                }
+            //Recover the stamp in the text field
+            productEstampille = this.zoneText.getText().toString();
+            productEstampille.replace("FR", "");
+            productEstampille.replace("-", ".");
+            productEstampille.replace("CE", "");
 
-                // Create an object for each csv file
+            //Recover all text view used to display the origins of the product
+            TextView view = findViewById(R.id.textView);
+            TextView view2 = findViewById(R.id.textView2);
+            TextView view3 = findViewById(R.id.textView3);
+            TextView view4 = findViewById(R.id.textView4);
+            TextView view5 = findViewById(R.id.textView5);
+            TextView view6 = findViewById(R.id.textView6);
+            TextView view7 = findViewById(R.id.textView7);
+
+            String line = "";
+            int estampIndex = 0;
+            try {
+                while ((line = reader.readLine()) != null && !found) {
+                    String[] tab = line.split(";");
+                    if (productEstampille.equals(tab[estampIndex])) {
+                        view.setText(getString(R.string.company_name, tab[estampIndex + 2]));
+                        view2.setText(getString(R.string.company_dept, tab[estampIndex].substring(0, tab[estampIndex].indexOf("."))));
+                        view3.setText(getString(R.string.company_address, tab[estampIndex + 3]));
+                        view4.setText(getString(R.string.company_cp, tab[estampIndex + 4]));
+                        view5.setText(getString(R.string.company_city, tab[estampIndex + 5]));
+                        view6.setText(getString(R.string.company_siret, tab[estampIndex + 1]));
+                        view7.setText(getString(R.string.company_estampille, tab[estampIndex]));
+                        found = true;
+                    }
+                    // Create an object for each csv file
                /* EstampilleCsv estampille = new EstampilleCsv();
                 if(tab[0].length() >0 )
                     estampille.setDep(tab[0]);
@@ -136,15 +149,15 @@ public class EcritureEstampille extends AppCompatActivity {
                     estampille.setEspece(tab[9]);
                 else
                     estampille.setEspece("0");*/
+                }
+
+            } catch (IOException e) {
+                Log.wtf("Erreur dans la lecture du CSV " + line, e);
+                e.printStackTrace();
             }
-
-        } catch (IOException e){
-            Log.wtf("Erreur dans la lecture du CSV " + line, e);
-            e.printStackTrace();
         }
-
         //If the stamp has no similarity in the CSV, the error page appears
-        if (etat == false) {
+        if (!found) {
             Intent otherActivity = new Intent(getApplicationContext(), PageErreur.class);
             startActivity(otherActivity);
             finish();

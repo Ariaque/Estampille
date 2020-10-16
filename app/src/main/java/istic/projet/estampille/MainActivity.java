@@ -3,23 +3,30 @@ package istic.projet.estampille;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,6 +35,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,33 +43,39 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ProgressDialog mProgressDialog;
-    private TesseractOCR mTessOCR;
-    private Context context;
-    protected String mCurrentPhotoPath;
-    private Uri photoURI1;
-    private Uri oldPhotoURI;
-    private Button ecrire;
-
-
     private static final String errorFileCreate = "Error file create!";
     private static final String errorConvert = "Error convert!";
     private static final int REQUEST_IMAGE1_CAPTURE = 1;
-
+    private final SharedPreferences prefs = null;
+    protected String mCurrentPhotoPath;
     @BindView(R.id.ocr_image)
     ImageView firstImage;
-
     @BindView(R.id.ocr_text)
     TextView ocrText;
-
-
     int PERMISSION_ALL = 1;
     boolean flagPermissions = false;
-
     String[] PERMISSIONS = {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.CAMERA
     };
+    private ProgressDialog mProgressDialog;
+    private TesseractOCR mTessOCR;
+    private Context context;
+    private Uri photoURI1;
+    private Uri oldPhotoURI;
+    private Button ecrire;
+    private Button alim_db;
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,12 +83,31 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
 
+
+        if (!hasPermissions(context, PERMISSIONS)) {
+            askPermissions();
+        }
+        // Downloading of the lists of CE-approved establishments every 7 days
+        setContentView(R.layout.activity_main);
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+        final long repeatInterval = 15;
+        PeriodicWorkRequest downloadDataGouv =
+                // TODO : change interval to 7 days
+                new PeriodicWorkRequest.Builder(DownloadDataWorker.class, repeatInterval, TimeUnit.MINUTES)
+                        .setConstraints(constraints)
+                        .setInputData(createInputDataForDownloadWorker())
+                        .build();
+        WorkManager.getInstance(getApplicationContext())
+                .enqueue(downloadDataGouv);
+
         //Add listener to button
         this.ecrire = findViewById(R.id.ecrire);
         ecrire.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent otherActivity = new Intent(getApplicationContext(),EcritureEstampille.class);
+                Intent otherActivity = new Intent(getApplicationContext(), EcritureEstampille.class);
                 startActivity(otherActivity);
                 finish();
             }
@@ -84,12 +117,14 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
-        if (!flagPermissions) {
-            checkPermissions();
-        }
         String language = "eng";
         mTessOCR = new TesseractOCR(this, language);
+    }
 
+    private Data createInputDataForDownloadWorker() {
+        Data.Builder builder = new Data.Builder();
+        builder.putStringArray(Constants.KEY_DATA_GOUV_URLS, Constants.urls_data_gouv_array);
+        return builder.build();
     }
 
     @Override
@@ -136,8 +171,8 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.scan_button)
     void onClickScanButton() {
         // check permissions
-        if (!flagPermissions) {
-            checkPermissions();
+        if (!hasPermissions(context, PERMISSIONS)) {
+            askPermissions();
             return;
         }
         //prepare intent
@@ -176,26 +211,9 @@ public class MainActivity extends AppCompatActivity {
         return image;
     }
 
-
-    void checkPermissions() {
-        if (!hasPermissions(context, PERMISSIONS)) {
-            requestPermissions(PERMISSIONS,
-                    PERMISSION_ALL);
-            flagPermissions = false;
-        }
-        flagPermissions = true;
-
-    }
-
-    public static boolean hasPermissions(Context context, String... permissions) {
-        if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
+    void askPermissions() {
+        requestPermissions(PERMISSIONS,
+                PERMISSION_ALL);
     }
 
     private void doOCR(final Bitmap bitmap) {
@@ -223,14 +241,14 @@ public class MainActivity extends AppCompatActivity {
                             tempText = tempText.replace("I", "1");
                             tempText = tempText.replace(" ", "");
                             tempText = tempText.replace("\n", "");
-                            if(tempText.indexOf(".") == -1) {
+                            if (tempText.indexOf(".") == -1) {
                                 tempText = tempText.substring(0, 2) + "." + tempText.substring(2);
                                 tempText = tempText.substring(0, 6) + "." + tempText.substring(6);
                             }
                             ocrText.setText(tempText);
                         }
                         mProgressDialog.dismiss();
-                        Intent otherActivity = new Intent(getApplicationContext(),EcritureEstampille.class);
+                        Intent otherActivity = new Intent(getApplicationContext(), EcritureEstampille.class);
 
                         otherActivity.putExtra("ocrText", tempText);
 
