@@ -67,7 +67,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private Context context;
     private Uri photoURI1;
     private Uri oldPhotoURI;
-    private Button ecrire;
     private FloatingActionButton scanButton;
 
 
@@ -316,6 +315,5 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             flagPermissions = false;
         }
         flagPermissions = true;
-
     }
 }
