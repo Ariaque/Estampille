@@ -4,7 +4,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,7 +11,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -20,6 +18,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
 
@@ -27,7 +26,7 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
     double lat = 0;
     String[] tab = new String[0];
     String address = "";
-    String ciret = "";
+    String siret = "";
     String name = "";
 
     @Override
@@ -38,9 +37,10 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
         Bundle mapBundle = getIntent().getExtras();
         if(mapBundle != null){
             tab = mapBundle.getStringArray("Infos");
-            ciret = tab[2];
-            name = tab[3];
-            address = tab[4] + ", " + tab[5] + " " + tab[6];
+            assert tab != null;
+            siret = tab[1];
+            name = tab[2];
+            address = tab[3] + ", " + tab[4] + " " + tab[5];
             LatLng latLng = getCoords(address);
             lon = latLng.longitude;
             lat = latLng.latitude;
@@ -52,10 +52,10 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
 
         view8.setText(name);
         view9.setText(address);
-        view10.setText(ciret);
+        view10.setText(siret);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        Objects.requireNonNull(mapFragment).getMapAsync(this);
     }
 
     @Override

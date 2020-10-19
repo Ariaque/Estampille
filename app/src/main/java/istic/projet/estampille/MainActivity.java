@@ -1,22 +1,89 @@
 package istic.projet.estampille;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.StrictMode;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.util.SparseIntArray;
 import android.view.Surface;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String errorFileCreate = "Error file create!";
+    private static final String errorConvert = "Error convert!";
+    private static final int REQUEST_IMAGE1_CAPTURE = 1;
+    protected String mCurrentPhotoPath;
+    ImageView firstImage;
+    TextView ocrText;
+    int PERMISSION_ALL = 1;
+    String[] PERMISSIONS = {
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.CAMERA
+    };
+    private ProgressDialog mProgressDialog;
+    private Context context;
+    private Uri photoURI1;
+    private Uri oldPhotoURI;
+    private Button ecrire;
+    private FloatingActionButton scanButton;
     private Toolbar mToolBar;
     private FragmentPagerAdapter fragmentPagerAdapter;
     private ViewPager viewPager;
@@ -29,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
         ORIENTATIONS.append(Surface.ROTATION_270, 270);
     }
 
-
     /**
      * Do a recognition stamp in the bitmap in parameter
      *
@@ -40,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
      * @param permissions permissions asked by the application
      * @return true if the user has these permissions false otherwise
      */
-    private static boolean hasPermissions(Context context, String... permissions) {
+    private boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -55,9 +121,29 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = MainActivity.this;
 
-        //Add listener to button which allows to type a stamp
-        /*this.ecrire = findViewById(R.id.action_write_code);
+
+        if (!hasPermissions(context, PERMISSIONS)) {
+            askPermissions();
+        }
+        // Downloading of the lists of CE-approved establishments every 7 days
+        setContentView(R.layout.activity_main);
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+        final long repeatInterval = 15;
+        PeriodicWorkRequest downloadDataGouv =
+                // TODO : change interval to 7 days
+                new PeriodicWorkRequest.Builder(DownloadDataWorker.class, repeatInterval, TimeUnit.MINUTES)
+                        .setConstraints(constraints)
+                        .setInputData(createInputDataForDownloadWorker())
+                        .build();
+        WorkManager.getInstance(getApplicationContext())
+                .enqueue(downloadDataGouv);
+
+        //Add listener to button
+        /*this.ecrire = findViewById(R.id.ecrire);
         ecrire.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,6 +166,14 @@ public class MainActivity extends AppCompatActivity {
                 .penaltyLog()
                 .build();
         StrictMode.setVmPolicy(builder);
+
+        //Check permission to create the OCR access
+    }
+
+    private Data createInputDataForDownloadWorker() {
+        Data.Builder builder = new Data.Builder();
+        builder.putStringArray(Constants.KEY_DATA_GOUV_URLS, Constants.urls_data_gouv_array);
+        return builder.build();
     }
 
     @Override
@@ -104,4 +198,13 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+    /**
+     * Ask permissions if it's not already done.
+     */
+    void askPermissions() {
+        if (!hasPermissions(context, PERMISSIONS)) {
+            requestPermissions(PERMISSIONS, PERMISSION_ALL);
+        }
+    }
+
 }
