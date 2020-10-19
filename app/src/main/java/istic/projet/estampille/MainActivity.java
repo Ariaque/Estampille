@@ -63,6 +63,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -73,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
     ImageView firstImage;
     TextView ocrText;
     int PERMISSION_ALL = 1;
-    boolean flagPermissions = false;
     String[] PERMISSIONS = {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.CAMERA
@@ -198,6 +198,13 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
+    /**
+     * Ask permissions if it's not already done.
+     */
+    void askPermissions() {
+        if (!hasPermissions(context, PERMISSIONS)) {
+            requestPermissions(PERMISSIONS, PERMISSION_ALL);
+        }
+    }
 
 }
