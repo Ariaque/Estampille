@@ -26,6 +26,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,6 +63,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -90,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
      * @param permissions permissions asked by the application
      * @return true if the user has these permissions false otherwise
      */
-    private static boolean hasPermissions(Context context, String... permissions) {
+    private boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -107,8 +117,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
 
-        //Add listener to button which allows to type a stamp
-        /*this.ecrire = findViewById(R.id.action_write_code);
+
+        if (!hasPermissions(context, PERMISSIONS)) {
+            askPermissions();
+        }
+        // Downloading of the lists of CE-approved establishments every 7 days
+        setContentView(R.layout.activity_main);
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+        final long repeatInterval = 15;
+        PeriodicWorkRequest downloadDataGouv =
+                // TODO : change interval to 7 days
+                new PeriodicWorkRequest.Builder(DownloadDataWorker.class, repeatInterval, TimeUnit.MINUTES)
+                        .setConstraints(constraints)
+                        .setInputData(createInputDataForDownloadWorker())
+                        .build();
+        WorkManager.getInstance(getApplicationContext())
+                .enqueue(downloadDataGouv);
+
+        //Add listener to button
+        /*this.ecrire = findViewById(R.id.ecrire);
         ecrire.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -135,6 +164,12 @@ public class MainActivity extends AppCompatActivity {
         //Check permission to create the OCR access
     }
 
+    private Data createInputDataForDownloadWorker() {
+        Data.Builder builder = new Data.Builder();
+        builder.putStringArray(Constants.KEY_DATA_GOUV_URLS, Constants.urls_data_gouv_array);
+        return builder.build();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -157,6 +192,13 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
+    /**
+     * Ask permissions if it's not already done.
+     */
+    void askPermissions() {
+        if (!hasPermissions(context, PERMISSIONS)) {
+            requestPermissions(PERMISSIONS, PERMISSION_ALL);
+        }
+    }
 
 }

@@ -2,6 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 30
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     defaultConfig {
         applicationId "istic.projet.estampille"
         minSdkVersion 23
@@ -30,4 +34,5 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:16.1.1'
     implementation 'com.rmtheis:tess-two:9.0.0'
+    implementation "androidx.work:work-runtime:2.4.0"
 }

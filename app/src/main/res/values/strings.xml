@@ -4,6 +4,13 @@
     <string name="text_write_estampille">Ecrire l\'estampille</string>
     <string name="button_return_home">Retour page principale</string>
     <string name="button_scan">scan</string>
+    <string name="company_name">Nom de l\'entreprise : %1$s</string>
+    <string name="company_dept">Département : %1$s</string>
+    <string name="company_address">Adresse : %1$s</string>
+    <string name="company_cp">Code postal : %1$s</string>
+    <string name="company_city">Nom de la ville : %1$s</string>
+    <string name="company_siret">Numero Siret : %1$s</string>
+    <string name="company_estampille">Code estampille : %1$s</string>
     <string name="no_match_toast">Pas de correspondances</string>
     <string name="maps_api_key">AIzaSyCYasmitSEl9kMoj8Jsq0x6OOgPJTUvmKE</string>
 </resources>
