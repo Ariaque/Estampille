@@ -24,10 +24,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/maps_api_key" />
 
-        <activity android:name=".DisplayMap" android:configChanges="orientation|screenSize"/>
+        <activity android:name=".DisplayMap" android:screenOrientation="portrait"/>
         <activity android:name=".PageErreur"/>
-        <activity android:name=".EcritureEstampille" android:configChanges="orientation|screenSize"/>
-        <activity android:name=".MainActivity" android:configChanges="orientation|screenSize">
+        <activity android:name=".EcritureEstampille" android:screenOrientation="portrait"/>
+        <activity android:name=".MainActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
