@@ -218,62 +218,32 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         }
         new Thread(new Runnable() {
             public void run() {
-                int rotationDegree = 0;
-                try {
-                    rotationDegree = getRotationCompensation("0",(Activity) context,false);
-                } catch (CameraAccessException e) {
-                    e.printStackTrace();
-                }
-                //Search the stamp present in the image
-                InputImage image = InputImage.fromBitmap(bitmap, rotationDegree);
-                //final String srcText = mTessOCR.getOCRResult(bitmap);
-                TextRecognizer recognizer = TextRecognition.getClient();
-                final Task<Text> result =
-                        recognizer.process(image)
-                                .addOnSuccessListener(new OnSuccessListener<Text>() {
-                                    @Override
-                                    public void onSuccess(Text visionText) {
-                                        List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
-                                        extractCode(recognizedText);
 
-                                    }
-                                })
-                                .addOnFailureListener(
-                                        new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                // Task failed with an exception
-                                                // ...
-                                            }
-                                        });
+                int rotationDegree = 90;
+                TextRecognizer recognizer = TextRecognition.getClient();
+
+                for(int i = 0; i < 4; i++){
+                    InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
+
+                    final Task<Text> result =
+                            recognizer.process(image)
+                                    .addOnSuccessListener(new OnSuccessListener<Text>() {
+                                        @Override
+                                        public void onSuccess(Text visionText) {
+                                            List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
+                                            extractCode(recognizedText);
+                                        }
+                                    })
+                                    .addOnFailureListener(
+                                            new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                }
+                                            });
+                }
+
             }
         }).start();
-    }
-
-    /**
-     * Get the angle by which an image must be rotated given the device's current
-     * orientation.
-     */
-    private int getRotationCompensation(String cameraId, Activity activity, boolean isFrontFacing)
-            throws CameraAccessException {
-        // Get the device's current rotation relative to its "native" orientation.
-        // Then, from the ORIENTATIONS table, look up the angle the image must be
-        // rotated to compensate for the device's rotation.
-        int deviceRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-        int rotationCompensation = ORIENTATIONS.get(deviceRotation);
-
-        // Get the device's sensor orientation.
-        CameraManager cameraManager = (CameraManager) activity.getSystemService(Activity.CAMERA_SERVICE);
-        int sensorOrientation = cameraManager
-                .getCameraCharacteristics(cameraId)
-                .get(CameraCharacteristics.SENSOR_ORIENTATION);
-
-        if (isFrontFacing) {
-            rotationCompensation = (sensorOrientation + rotationCompensation) % 360;
-        } else { // back-facing
-            rotationCompensation = (sensorOrientation - rotationCompensation + 360) % 360;
-        }
-        return rotationCompensation;
     }
 
     private void extractCode(List<Text.TextBlock> recognizedText) {
@@ -290,6 +260,11 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 found = true;
             }
         }
+
+        if(!found){
+            return;
+        }
+
         tempText = tempText.replace("FR", "");
         tempText = tempText.replace("-", ".");
         tempText = tempText.replace("CE", "");
