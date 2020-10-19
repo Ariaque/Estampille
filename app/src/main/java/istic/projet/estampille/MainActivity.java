@@ -1,5 +1,6 @@
 package istic.projet.estampille;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -30,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
     int PERMISSION_ALL = 1;
     String[] PERMISSIONS = {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            android.Manifest.permission.CAMERA
+            android.Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION
     };
     private Context context;
     private Toolbar mToolBar;
