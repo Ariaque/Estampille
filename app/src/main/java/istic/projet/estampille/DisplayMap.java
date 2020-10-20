@@ -64,7 +64,7 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
         googleMap.addMarker(new MarkerOptions()
                 .position(coords)
                 .title(name));
-        CameraPosition camPos = new CameraPosition.Builder().target(coords).zoom(8).build();
+        CameraPosition camPos = new CameraPosition.Builder().target(coords).zoom(9).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
     }
 

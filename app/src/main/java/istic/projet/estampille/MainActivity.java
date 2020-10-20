@@ -1,21 +1,15 @@
 package istic.projet.estampille;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
+import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
-import android.net.Uri;
+import android.graphics.BlendMode;
+import android.graphics.BlendModeColorFilter;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.StrictMode;
-import android.provider.MediaStore;
-import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.util.SparseIntArray;
@@ -27,70 +21,41 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import androidx.viewpager2.widget.ViewPager2;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.text.Text;
-import com.google.mlkit.vision.text.TextRecognition;
-import com.google.mlkit.vision.text.TextRecognizer;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
-    private static final String errorFileCreate = "Error file create!";
-    private static final String errorConvert = "Error convert!";
-    private static final int REQUEST_IMAGE1_CAPTURE = 1;
-    protected String mCurrentPhotoPath;
-    ImageView firstImage;
-    TextView ocrText;
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     int PERMISSION_ALL = 1;
     boolean flagPermissions = false;
     ListView list;
 
     String[] PERMISSIONS = {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            android.Manifest.permission.CAMERA
+            android.Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION
     };
-    private ProgressDialog mProgressDialog;
     private Context context;
-    private Uri photoURI1;
-    private Uri oldPhotoURI;
-    private Button ecrire;
-    private FloatingActionButton scanButton;
     private Toolbar mToolBar;
     private FragmentPagerAdapter fragmentPagerAdapter;
     private ViewPager viewPager;
+    private MenuItem historyMenuItem;
+    private MenuItem searchMenuItem;
+    private MenuItem lookAroundMenuItem;
+    private int foodOriginDarkBlue;
+    private int foodOriginWhite;
 
 
     /**
@@ -98,8 +63,9 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param bitmap the stamp image
      */
+
     /**
-     * @param context the application context
+     * @param context     the application context
      * @param permissions permissions asked by the application
      * @return true if the user has these permissions false otherwise
      */
@@ -155,8 +121,8 @@ public class MainActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.pager);
         fragmentPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPager.setAdapter(fragmentPagerAdapter);
-
-
+        foodOriginDarkBlue = ResourcesCompat.getColor(getResources(), R.color.FoodOriginDarkBlue, null);
+        foodOriginWhite = ResourcesCompat.getColor(getResources(), R.color.FoodOriginWhite, null);
         //Detect everything that's potentially suspect and write it in log
         StrictMode.VmPolicy builder = new StrictMode.VmPolicy.Builder()
                 .detectAll()
@@ -164,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         StrictMode.setVmPolicy(builder);
 
-        //Check permission to create the OCR access
     }
 
     private Data createInputDataForDownloadWorker() {
@@ -177,6 +142,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        historyMenuItem = menu.findItem(R.id.action_history);
+        searchMenuItem = menu.findItem(R.id.action_write_code);
+        lookAroundMenuItem = menu.findItem(R.id.action_look_around);
+        setFocusOnHistoryItem();
+        viewPager.addOnPageChangeListener(this);
         return true;
     }
 
@@ -184,17 +154,25 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_history:
+                setFocusOnHistoryItem();
+                viewPager.setCurrentItem(0);
+
                 return true;
             case R.id.action_write_code:
-                Intent otherActivity = new Intent(getApplicationContext(), EcritureEstampille.class);
-                startActivity(otherActivity);
-                finish();
+                setFocusOnSearchItem();
+                viewPager.setCurrentItem(1);
+
+                return true;
             case R.id.action_look_around:
+                setFocusOnLookAroundItem();
+                viewPager.setCurrentItem(2);
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
     /**
      * Ask permissions if it's not already done.
      */
@@ -204,4 +182,60 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        if (position == 0) {
+            setFocusOnHistoryItem();
+        } else if (position == 1) {
+            setFocusOnSearchItem();
+        } else if (position == 2) {
+            setFocusOnLookAroundItem();
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
+    private void setFocusOnHistoryItem() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginWhite, BlendMode.SRC_ATOP));
+            searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
+            lookAroundMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
+        } else {
+            historyMenuItem.getIcon().setColorFilter(foodOriginWhite, PorterDuff.Mode.SRC_ATOP);
+            searchMenuItem.getIcon().setColorFilter(foodOriginDarkBlue, PorterDuff.Mode.SRC_ATOP);
+            lookAroundMenuItem.getIcon().setColorFilter(foodOriginDarkBlue, PorterDuff.Mode.SRC_ATOP);
+        }
+    }
+
+    private void setFocusOnSearchItem() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
+            searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginWhite, BlendMode.SRC_ATOP));
+            lookAroundMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
+        } else {
+            historyMenuItem.getIcon().setColorFilter(foodOriginDarkBlue, PorterDuff.Mode.SRC_ATOP);
+            searchMenuItem.getIcon().setColorFilter(foodOriginWhite, PorterDuff.Mode.SRC_ATOP);
+            lookAroundMenuItem.getIcon().setColorFilter(foodOriginDarkBlue, PorterDuff.Mode.SRC_ATOP);
+        }
+    }
+
+    private void setFocusOnLookAroundItem() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
+            searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
+            lookAroundMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginWhite, BlendMode.SRC_ATOP));
+        } else {
+            historyMenuItem.getIcon().setColorFilter(foodOriginDarkBlue, PorterDuff.Mode.SRC_ATOP);
+            searchMenuItem.getIcon().setColorFilter(foodOriginDarkBlue, PorterDuff.Mode.SRC_ATOP);
+            lookAroundMenuItem.getIcon().setColorFilter(foodOriginWhite, PorterDuff.Mode.SRC_ATOP);
+        }
+    }
 }

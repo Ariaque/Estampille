@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">FoodOrigin</string>
-    <string name="button_search_estampille">Rechercher l\'estampille</string>
+    <string name="button_search_estampille">Rechercher</string>
+    <string name="tf_write_estampille">Entrer le code emballage</string>
     <string name="text_write_estampille">Ecrire l\'estampille</string>
     <string name="button_return_home">Retour page principale</string>
     <string name="button_scan">scan</string>
@@ -13,4 +14,5 @@
     <string name="company_estampille">Code estampille : %1$s</string>
     <string name="no_match_toast">Pas de correspondances</string>
     <string name="maps_api_key">AIzaSyCYasmitSEl9kMoj8Jsq0x6OOgPJTUvmKE</string>
+    <string name="no_gps_marker_name">Pyramide du Louvre</string>
 </resources>
