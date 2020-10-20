@@ -50,51 +50,59 @@ public class LookAroundFragment extends Fragment {
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_look_around, container, false);
-
+        Log.e("NearMeTest", "Début");
         if (mapFragment == null) {
+            Log.e("NearMeTest", "FragmentExist");
             mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_test);
-            //mapFragment = SupportMapFragment.newInstance();
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
+                    Log.e("NearMeTest", "DébutOnMapReady");
                     if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(),
                             Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                             ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(),
                                     Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         return;
                     }
+
                     Criteria criteria = new Criteria();
                     LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
                     Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
                     googleMap.setMyLocationEnabled(true);
 
                     if (location != null) {
-                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
-
+                        Log.e("NearMeTest", "LocationExist");
                         CameraPosition cameraPosition = new CameraPosition.Builder()
                                 .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
                                 .zoom(9)                   // Sets the zoom
                                 .build();                   // Creates a CameraPosition from the builder
-                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                     }
 
+
+                    Log.e("NearMeTest", "AvantFindNearMe");
                     //Find near me
-                    /*InputStream is = null;
+                    InputStream is = null;
                     try {
+                        Log.e("NearMeTest", "tryis");
                         is = new FileInputStream(new File(Environment
                                 .getExternalStorageDirectory().toString()
                                 + "/data/foodorigin_datagouv.txt"));
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
+                        Log.e("NearMeTest", "catchis : " + e.toString());
                     }
                     if (is != null) {
+                        Log.e("NearMeTest", "isExist");
                         BufferedReader reader = new BufferedReader(
                                 new InputStreamReader(is, StandardCharsets.UTF_8)
                         );
 
+                        Log.e("NearMeTest", "avantwhile");
                         String aCompanyLine = "";
                         try {
                             while ((aCompanyLine = reader.readLine()) != null) {
+                                Log.e("NearMeTest", "while");
                                 String[] tab = aCompanyLine.split(";");
                                 String cedex = tab[4].substring(0,2);
                                 int cedexInt = Integer.parseInt(cedex);
@@ -126,7 +134,6 @@ public class LookAroundFragment extends Fragment {
                             e.printStackTrace();
                         }
                     }
-                    */
                 }
             });
         }
