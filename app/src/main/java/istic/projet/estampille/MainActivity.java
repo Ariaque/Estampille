@@ -45,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
     boolean flagPermissions = false;
     String[] PERMISSIONS = {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            android.Manifest.permission.CAMERA
+            android.Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION
     };
     private ProgressDialog mProgressDialog;
     private Context context;
