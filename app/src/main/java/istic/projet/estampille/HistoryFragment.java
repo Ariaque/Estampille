@@ -71,8 +71,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private static final String errorConvert = "Error convert!";
     private static final int REQUEST_IMAGE1_CAPTURE = 1;
     protected String mCurrentPhotoPath;
-    ImageView firstImage;
-    TextView ocrText;
     int PERMISSION_ALL = 1;
     boolean flagPermissions = false;
     String[] PERMISSIONS = {
@@ -85,10 +83,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private Uri oldPhotoURI;
     private FloatingActionButton scanButton;
 
-
-
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -98,25 +92,17 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         scanButton = rootView.findViewById(R.id.scan_button);
         scanButton.setOnClickListener(this);
         checkPermissions();
-        ArrayList<String> List = new ArrayList<>();
+        ArrayList<String> list = new ArrayList<>();
 
         try {
-            List = this.ReadFile();
+            list = this.ReadFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ListView list = (ListView)rootView.findViewById(R.id.listView);
-            ArrayAdapter adapter = new ArrayAdapter(getActivity(),R.layout.list_item_layout, List);
-            list.setAdapter(adapter);
-
-        /*ListView list = (ListView)rootView.findViewById(R.id.listView);
-        ArrayList<String> mylist = new ArrayList<>();
-        mylist.add("test1");
-        mylist.add("test2");
-        mylist.add("test3");
-        ArrayAdapter adapter = new ArrayAdapter(getActivity(),R.layout.list_item_layout, mylist);
-        list.setAdapter(adapter);
-*/
+        ListView listH = (ListView)rootView.findViewById(R.id.listView);
+            ArrayAdapter adapter = new ArrayAdapter(getActivity(),R.layout.list_item_layout, list);
+            listH.setAdapter(adapter);
+            
         return rootView;
     }
 
@@ -186,7 +172,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             }
 
             //Start the stamp recognition
-            firstImage.setImageBitmap(bmp);
             doOCR(bmp);
 
             OutputStream os;
@@ -204,7 +189,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
         } else {
             photoURI1 = oldPhotoURI;
-            firstImage.setImageURI(photoURI1);
         }
     }
 
@@ -320,11 +304,10 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         tempText = tempText.replace("I", "1");
         tempText = tempText.replace(" ", "");
         tempText = tempText.replace("\n", "");
-        ocrText.setText(tempText);
         mProgressDialog.dismiss();
         //Open the activity which permit to search the product origin with a stamp in the text field
         Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
-        otherActivity.putExtra("ocrText", ocrText.getText());
+        otherActivity.putExtra("ocrText", tempText);
         startActivity(otherActivity);
         getActivity().finish();
     }
