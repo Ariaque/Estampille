@@ -1,13 +1,10 @@
 package istic.projet.estampille;
 
+import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
-import android.graphics.BlendMode;
-import android.graphics.BlendModeColorFilter;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.SparseIntArray;
@@ -15,33 +12,43 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Surface;
 
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.Constraints;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+    int PERMISSION_ALL = 1;
+    String[] PERMISSIONS = {
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION
+    };
     private Context context;
+    private Toolbar mToolBar;
+    private FragmentPagerAdapter fragmentPagerAdapter;
+    private ViewPager viewPager;
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private MenuItem historyMenuItem;
     private MenuItem searchMenuItem;
     private MenuItem lookAroundMenuItem;
     private int foodOriginDarkBlue;
     private int foodOriginWhite;
-
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 0);
-        ORIENTATIONS.append(Surface.ROTATION_90, 90);
-        ORIENTATIONS.append(Surface.ROTATION_180, 180);
-        ORIENTATIONS.append(Surface.ROTATION_270, 270);
-    }
-
-    private Toolbar mToolBar;
-    private FragmentPagerAdapter fragmentPagerAdapter;
-    private ViewPager viewPager;
 
 
     /**
@@ -55,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
      * @param permissions permissions asked by the application
      * @return true if the user has these permissions false otherwise
      */
-    private static boolean hasPermissions(Context context, String... permissions) {
+    private boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -71,6 +78,36 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
+
+
+        if (!hasPermissions(context, PERMISSIONS)) {
+            askPermissions();
+        }
+        // Downloading of the lists of CE-approved establishments every 7 days
+        setContentView(R.layout.activity_main);
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+        final long repeatInterval = 15;
+        PeriodicWorkRequest downloadDataGouv =
+                // TODO : change interval to 7 days
+                new PeriodicWorkRequest.Builder(DownloadDataWorker.class, repeatInterval, TimeUnit.MINUTES)
+                        .setConstraints(constraints)
+                        .setInputData(createInputDataForDownloadWorker())
+                        .build();
+        WorkManager.getInstance(getApplicationContext())
+                .enqueue(downloadDataGouv);
+
+        //Add listener to button
+        /*this.ecrire = findViewById(R.id.ecrire);
+        ecrire.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent otherActivity = new Intent(getApplicationContext(), EcritureEstampille.class);
+                startActivity(otherActivity);
+                finish();
+            }
+        });*/
         mToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -86,7 +123,12 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 .build();
         StrictMode.setVmPolicy(builder);
 
-        //Check permission to create the OCR access
+    }
+
+    private Data createInputDataForDownloadWorker() {
+        Data.Builder builder = new Data.Builder();
+        builder.putStringArray(Constants.KEY_DATA_GOUV_URLS, Constants.urls_data_gouv_array);
+        return builder.build();
     }
 
     @Override
@@ -123,7 +165,14 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 return super.onOptionsItemSelected(item);
         }
     }
-
+    /**
+     * Ask permissions if it's not already done.
+     */
+    void askPermissions() {
+        if (!hasPermissions(context, PERMISSIONS)) {
+            requestPermissions(PERMISSIONS, PERMISSION_ALL);
+        }
+    }
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
