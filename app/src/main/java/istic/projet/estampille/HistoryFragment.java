@@ -20,8 +20,10 @@ import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,15 +41,21 @@ import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
@@ -82,13 +90,46 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         context = rootView.getContext();
         scanButton = rootView.findViewById(R.id.scan_button);
         scanButton.setOnClickListener(this);
-        firstImage = rootView.findViewById(R.id.ocr_image);
-        ocrText = rootView.findViewById(R.id.ocr_text);
         checkPermissions();
+        ArrayList<String> List = new ArrayList<>();
 
+        try {
+            List = this.ReadFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ListView list = (ListView)rootView.findViewById(R.id.listView);
+            ArrayAdapter adapter = new ArrayAdapter(getActivity(),R.layout.list_item_layout, List);
+            list.setAdapter(adapter);
+
+        /*ListView list = (ListView)rootView.findViewById(R.id.listView);
+        ArrayList<String> mylist = new ArrayList<>();
+        mylist.add("test1");
+        mylist.add("test2");
+        mylist.add("test3");
+        ArrayAdapter adapter = new ArrayAdapter(getActivity(),R.layout.list_item_layout, mylist);
+        list.setAdapter(adapter);
+*/
         return rootView;
     }
 
+    public ArrayList<String> ReadFile() throws IOException {
+        String FILE_NAME = "myFile.txt";
+        ArrayList<String> List = new ArrayList<>();
+
+            BufferedReader br = new BufferedReader((new InputStreamReader(new FileInputStream(FILE_NAME))));
+            String line;
+            StringBuffer buffer = new StringBuffer();
+            while ((line = br.readLine()) != null){
+                buffer.append(line).append("\n");
+                List.add(line);
+            }
+            // Créer une liste de contenu unique basée sur les éléments de ArrayList
+            Set<String> mySet = new HashSet<String>(List);
+            // Créer une Nouvelle ArrayList à partir de Set
+             List= new ArrayList<>(mySet);
+        return List;
+    }
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 0);

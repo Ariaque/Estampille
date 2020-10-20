@@ -23,6 +23,7 @@ import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
     TextView ocrText;
     int PERMISSION_ALL = 1;
     boolean flagPermissions = false;
+    ListView list;
+
     String[] PERMISSIONS = {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.CAMERA
