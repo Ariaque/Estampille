@@ -14,6 +14,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.util.SparseIntArray;
+import android.view.Surface;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -33,6 +41,9 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     int PERMISSION_ALL = 1;
+    boolean flagPermissions = false;
+    ListView list;
+
     String[] PERMISSIONS = {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.CAMERA,

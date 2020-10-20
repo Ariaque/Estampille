@@ -1,43 +1,29 @@
 package istic.projet.estampille;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Insets;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowInsets;
-import android.view.WindowMetrics;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -46,24 +32,26 @@ import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
-
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.time.Duration;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     private static final int REQUEST_IMAGE1_CAPTURE = 1;
     protected String mCurrentPhotoPath;
-    ImageView firstImage;
-    TextView ocrText;
     int PERMISSION_ALL = 1;
     boolean flagPermissions = false;
     String[] PERMISSIONS = {
@@ -81,22 +69,48 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
 
 
+    private ListView listView;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_history, container, false);
         context = rootView.getContext();
         scanButton = rootView.findViewById(R.id.scan_button);
+        listView = rootView.findViewById(R.id.listView);
         scanButton.setOnClickListener(this);
-        firstImage = rootView.findViewById(R.id.ocr_image);
-        ocrText = rootView.findViewById(R.id.ocr_text);
         checkPermissions();
+
+
+        ArrayList<String> list = new ArrayList<>();
+        try {
+            list = this.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ArrayAdapter adapter = new ArrayAdapter(getActivity(),R.layout.list_item_layout, list);
+        listView.setAdapter(adapter);
 
         return rootView;
     }
 
+    public ArrayList<String> readFile() throws IOException {
+        String fileName = "historyFile.txt";
+        ArrayList<String> list = new ArrayList<>();
+
+        BufferedReader br = new BufferedReader((new InputStreamReader(getActivity().openFileInput(fileName))));
+            String line;
+            StringBuffer buffer = new StringBuffer();
+            while ((line = br.readLine()) != null){
+                buffer.append(line).append("\n");
+                list.add(line);
+            }
+            // Créer une liste de contenu unique basée sur les éléments de ArrayList
+            Set<String> mySet = new HashSet<String>(list);
+            // Créer une Nouvelle ArrayList à partir de Set
+             list= new ArrayList<>(mySet);
+        return list;
+    }
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 0);
@@ -146,7 +160,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 Toast.makeText(context, R.string.conversion_fail_toast, Toast.LENGTH_SHORT).show();
             }
             //Start the stamp recognition
-            firstImage.setImageBitmap(bmp);
             doOCR(bmp);
 
             OutputStream os;
@@ -164,7 +177,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
         } else {
             photoURI1 = oldPhotoURI;
-            firstImage.setImageURI(photoURI1);
         }
     }
 
@@ -271,11 +283,10 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             tempText = tempText.replace("I", "1");
             tempText = tempText.replace(" ", "");
             tempText = tempText.replace("\n", "");
-            ocrText.setText(tempText);
             mProgressDialog.dismiss();
             //Open the activity which permit to search the product origin with a stamp in the text field
             Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
-            otherActivity.putExtra("ocrText", ocrText.getText());
+            otherActivity.putExtra("ocrText", tempText);
             startActivity(otherActivity);
             getActivity().finish();
         }
