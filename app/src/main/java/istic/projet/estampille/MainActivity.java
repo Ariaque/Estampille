@@ -12,6 +12,8 @@ import android.os.StrictMode;
 import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.View;
@@ -121,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         viewPager = findViewById(R.id.pager);
         fragmentPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPager.setAdapter(fragmentPagerAdapter);
+        viewPager.setOffscreenPageLimit(2);
         foodOriginDarkBlue = ResourcesCompat.getColor(getResources(), R.color.FoodOriginDarkBlue, null);
         foodOriginWhite = ResourcesCompat.getColor(getResources(), R.color.FoodOriginWhite, null);
         //Detect everything that's potentially suspect and write it in log
