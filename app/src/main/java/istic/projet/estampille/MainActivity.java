@@ -1,38 +1,35 @@
 package istic.projet.estampille;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.net.Uri;
+import android.graphics.BlendMode;
+import android.graphics.BlendModeColorFilter;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Surface;
 
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.Constraints;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     int PERMISSION_ALL = 1;
     String[] PERMISSIONS = {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -43,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private Toolbar mToolBar;
     private FragmentPagerAdapter fragmentPagerAdapter;
     private ViewPager viewPager;
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private MenuItem historyMenuItem;
     private MenuItem searchMenuItem;
     private MenuItem lookAroundMenuItem;
@@ -165,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 return super.onOptionsItemSelected(item);
         }
     }
+
     /**
      * Ask permissions if it's not already done.
      */
@@ -181,13 +178,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onPageSelected(int position) {
-        if(position == 0) {
+        if (position == 0) {
             setFocusOnHistoryItem();
-        }
-        else if(position == 1) {
+        } else if (position == 1) {
             setFocusOnSearchItem();
-        }
-        else if(position == 2) {
+        } else if (position == 2) {
             setFocusOnLookAroundItem();
         }
     }
