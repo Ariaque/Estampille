@@ -103,7 +103,7 @@ public class EcritureEstampille extends AppCompatActivity {
                     if (productEstamp.equals(tab[1])) {
                        try {
                             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(fileName, Context.MODE_APPEND)));
-                            bw.write(tab[3]+"\n");
+                            bw.write(tab[3]+ ";" + tab[6]+ "\n");
                             bw.close();
                         }
                         catch (Exception e){
