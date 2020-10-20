@@ -13,4 +13,5 @@
     <string name="company_estampille">Code estampille : %1$s</string>
     <string name="no_match_toast">Pas de correspondances</string>
     <string name="maps_api_key">AIzaSyCYasmitSEl9kMoj8Jsq0x6OOgPJTUvmKE</string>
+    <string name="no_gps_marker_name">Pyramide du Louvre</string>
 </resources>
