@@ -21,7 +21,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.work.Constraints;
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private MenuItem lookAroundMenuItem;
     private int foodOriginDarkBlue;
     private int foodOriginWhite;
+    private ConstraintLayout containerView;
 
 
     /**
@@ -95,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
         setContentView(R.layout.activity_main);
+        this.containerView = findViewById(R.id.main_container);
 
         mToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolBar);
@@ -102,6 +106,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         viewPager = findViewById(R.id.pager);
         fragmentPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPager.setAdapter(fragmentPagerAdapter);
+        foodOriginDarkBlue = ResourcesCompat.getColor(getResources(), R.color.FoodOriginDarkBlue, null);
+        foodOriginWhite = ResourcesCompat.getColor(getResources(), R.color.FoodOriginWhite, null);
 
         //Detect everything that's potentially suspect and write it in log
         StrictMode.VmPolicy builder = new StrictMode.VmPolicy.Builder()
@@ -111,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         StrictMode.setVmPolicy(builder);
 
         if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            PermissionsUtils.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, "L'écriture en mémoire est requise pour le chargment des données", Constants.REQUEST_PERMISSION_EXTERNAL_STORAGE);
+            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, "L'écriture en mémoire est requise pour le chargment des données", Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
         } else {
             launchDownloadWorker();
         }
@@ -186,19 +192,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == Constants.REQUEST_PERMISSION_EXTERNAL_STORAGE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                launchDownloadWorker();
-            } else {
-                Toast.makeText(this, "Write external storage permission was not granted", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
     }
@@ -254,4 +247,22 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             lookAroundMenuItem.getIcon().setColorFilter(foodOriginWhite, PorterDuff.Mode.SRC_ATOP);
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                launchDownloadWorker();
+            } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
+                PermissionsUtils.displayOptions(this, containerView, "La permission d'accès au stockage est désactivée");
+            } else {
+                PermissionsUtils.explain(this, containerView, permissions[0], requestCode, "Cette permission est nécessaire pour charger les données");
+                Toast.makeText(this, "Write external storage permission was not granted", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+
 }

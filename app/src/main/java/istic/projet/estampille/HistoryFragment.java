@@ -74,6 +74,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private Uri photoURI1;
     private Uri oldPhotoURI;
     private FloatingActionButton scanButton;
+    private ViewGroup containerView;
 
     /**
      * @param context     the application context
@@ -101,8 +102,8 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         scanButton.setOnClickListener(this);
         firstImage = rootView.findViewById(R.id.ocr_image);
         ocrText = rootView.findViewById(R.id.ocr_text);
-//        checkPermissions();
-
+//        this.containerView = (ConstraintLayout) rootView.findViewById(R.id.main_container);
+        this.containerView = rootView;
         return rootView;
     }
 
@@ -168,7 +169,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (this.getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            PermissionsUtils.checkPermission(this, Manifest.permission.CAMERA, "la caméra est nécessaire pour scanner les estmapilles", Constants.REQUEST_PERMISSION_CAMERA);
+            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.CAMERA}, "la caméra est nécessaire pour scanner les estmapilles", Constants.REQUEST_CODE_PERMISSION_CAMERA);
         } else {
             openCamera();
         }
@@ -273,26 +274,16 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         getActivity().finish();
     }
 
-    /**
-     * Check if the user has all permissions. If the user has all permissions flagPermissions = true
-     * otherwise flagPermissions = false and a pop up appears to ask permission
-     */
-    void checkPermissions() {
-        if (!hasPermissions(context, PERMISSIONS)) {
-            requestPermissions(PERMISSIONS, PERMISSION_ALL);
-            flagPermissions = false;
-        }
-        flagPermissions = true;
-    }
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (requestCode == Constants.REQUEST_PERMISSION_CAMERA) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == Constants.REQUEST_CODE_PERMISSION_CAMERA) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera();
+            } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
+                PermissionsUtils.displayOptions(this.getActivity(), containerView, "La permission d'accès à la caméra est désactivée");
             } else {
-                Toast.makeText(this.getActivity(), "Camera permission was not granted", Toast.LENGTH_SHORT).show();
+                PermissionsUtils.explain(this.getActivity(), containerView, permissions[0], requestCode, "Cette permission est nécessaire pour scanner les estampilles");
+                Toast.makeText(this.getActivity(), "Write external storage permission was not granted", Toast.LENGTH_SHORT).show();
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);

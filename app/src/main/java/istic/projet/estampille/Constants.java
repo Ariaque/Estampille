@@ -2,8 +2,9 @@ package istic.projet.estampille;
 
 public class Constants {
 
-    static final int REQUEST_PERMISSION_CAMERA = 1;
-    static final int REQUEST_PERMISSION_EXTERNAL_STORAGE = 2;
+    static final int REQUEST_CODE_PERMISSION_CAMERA = 1;
+    static final int REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE = 2;
+    static final int REQUEST_CODE_LOCATION = 3;
 
     static final String KEY_DATA_GOUV_URLS = "KEY_DATA_GOUV_URLs";
     static final String[] urls_data_gouv_array =
