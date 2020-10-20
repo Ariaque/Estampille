@@ -53,14 +53,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
-    private static final String errorFileCreate = "Error file create!";
-    private static final String errorConvert = "Error convert!";
     private static final int REQUEST_IMAGE1_CAPTURE = 1;
     protected String mCurrentPhotoPath;
     ImageView firstImage;
@@ -76,6 +75,8 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private Uri photoURI1;
     private Uri oldPhotoURI;
     private FloatingActionButton scanButton;
+    private boolean success;
+
 
 
 
@@ -138,12 +139,12 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 InputStream is = context.getContentResolver().openInputStream(photoURI1);
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 bmp = BitmapFactory.decodeStream(is, null, options);
+                is.close();
 
             } catch (Exception ex) {
                 Log.i(getClass().getSimpleName(), ex.getMessage());
-                Toast.makeText(context, errorConvert, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.conversion_fail_toast, Toast.LENGTH_SHORT).show();
             }
-
             //Start the stamp recognition
             firstImage.setImageBitmap(bmp);
             doOCR(bmp);
@@ -158,7 +159,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 os.close();
             } catch (Exception ex) {
                 Log.e(getClass().getSimpleName(), ex.getMessage());
-                Toast.makeText(context, errorFileCreate, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.file_creation_fail_toast, Toast.LENGTH_SHORT).show();
             }
 
         } else {
@@ -200,7 +201,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
-                Toast.makeText(context, errorFileCreate, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.file_creation_fail_toast, Toast.LENGTH_SHORT).show();
                 Log.i("File error", ex.toString());
             }
             // Continue only if the File was successfully created
@@ -219,41 +220,36 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
      */
     private void doOCR(final Bitmap bitmap) {
         //Open a waiting pop up during the treatment
-        if (mProgressDialog == null) {
-            mProgressDialog = ProgressDialog.show(getActivity(), "Processing",
-                    "Doing OCR...", true);
-        }
-        new Thread(new Runnable() {
-            public void run() {
+        mProgressDialog = ProgressDialog.show(getActivity(), "Processing",
+                "Doing OCR...", true);
+        int rotationDegree = 90;
+        TextRecognizer recognizer = TextRecognition.getClient();
 
-                int rotationDegree = 90;
-                TextRecognizer recognizer = TextRecognition.getClient();
-
-                for(int i = 0; i < 4; i++){
-                    InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
-
-                    final Task<Text> result =
-                            recognizer.process(image)
-                                    .addOnSuccessListener(new OnSuccessListener<Text>() {
+        for(int i = 0; i < 4; i++){
+            InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
+            final Task<Text> result =
+                    recognizer.process(image)
+                            .addOnSuccessListener(new OnSuccessListener<Text>() {
+                                @Override
+                                public void onSuccess(Text visionText) {
+                                    List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
+                                    success = extractCode(recognizedText);
+                                }
+                            })
+                            .addOnFailureListener(
+                                    new OnFailureListener() {
                                         @Override
-                                        public void onSuccess(Text visionText) {
-                                            List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
-                                            extractCode(recognizedText);
+                                        public void onFailure(@NonNull Exception e) {
                                         }
-                                    })
-                                    .addOnFailureListener(
-                                            new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                }
-                                            });
-                }
-
-            }
-        }).start();
+                                    });
+        }
+        mProgressDialog.cancel();
+        if(!success) {
+            Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private void extractCode(List<Text.TextBlock> recognizedText) {
+    private boolean extractCode(List<Text.TextBlock> recognizedText) {
         boolean found = false;
         Text.TextBlock t = null;
         Iterator it = recognizedText.iterator();
@@ -262,30 +258,30 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             t = (Text.TextBlock) it.next();
             tempText = t.getText().replace("(", "");
             tempText = tempText.replace(")", "");
-            System.out.println(tempText);
             if (tempText.matches("(?s).*[0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9][0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9](A|B).[0-9][0-9][0-9].[0-9][0-9][0-9].*")) {
                 found = true;
             }
         }
 
-        if(!found){
-            return;
+        if(found){
+            tempText = tempText.replace("FR", "");
+            tempText = tempText.replace("-", ".");
+            tempText = tempText.replace("CE", "");
+            tempText = tempText.replace("l", "1");
+            tempText = tempText.replace("I", "1");
+            tempText = tempText.replace(" ", "");
+            tempText = tempText.replace("\n", "");
+            ocrText.setText(tempText);
+            mProgressDialog.dismiss();
+            //Open the activity which permit to search the product origin with a stamp in the text field
+            Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
+            otherActivity.putExtra("ocrText", ocrText.getText());
+            startActivity(otherActivity);
+            getActivity().finish();
         }
+        return found;
 
-        tempText = tempText.replace("FR", "");
-        tempText = tempText.replace("-", ".");
-        tempText = tempText.replace("CE", "");
-        tempText = tempText.replace("l", "1");
-        tempText = tempText.replace("I", "1");
-        tempText = tempText.replace(" ", "");
-        tempText = tempText.replace("\n", "");
-        ocrText.setText(tempText);
-        mProgressDialog.dismiss();
-        //Open the activity which permit to search the product origin with a stamp in the text field
-        Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
-        otherActivity.putExtra("ocrText", ocrText.getText());
-        startActivity(otherActivity);
-        getActivity().finish();
+
     }
 
     /**
