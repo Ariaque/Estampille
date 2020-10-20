@@ -50,14 +50,11 @@ public class LookAroundFragment extends Fragment {
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_look_around, container, false);
-        Log.e("NearMeTest", "Début");
         if (mapFragment == null) {
-            Log.e("NearMeTest", "FragmentExist");
             mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_test);
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-                    Log.e("NearMeTest", "DébutOnMapReady");
                     if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(),
                             Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                             ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(),
@@ -71,7 +68,6 @@ public class LookAroundFragment extends Fragment {
                     googleMap.setMyLocationEnabled(true);
 
                     if (location != null) {
-                        Log.e("NearMeTest", "LocationExist");
                         CameraPosition cameraPosition = new CameraPosition.Builder()
                                 .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
                                 .zoom(9)                   // Sets the zoom
@@ -80,18 +76,9 @@ public class LookAroundFragment extends Fragment {
                     }
 
 
-                    Log.e("NearMeTest", "AvantFindNearMe");
                     //Find near me
-                    InputStream is = null;
-                    try {
-                        Log.e("NearMeTest", "tryis");
-                        is = new FileInputStream(new File(Environment
-                                .getExternalStorageDirectory().toString()
-                                + "/data/foodorigin_datagouv.txt"));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                        Log.e("NearMeTest", "catchis : " + e.toString());
-                    }
+                    InputStream is = getActivity().getResources().openRawResource(R.raw.bdd_test);
+
                     if (is != null) {
                         Log.e("NearMeTest", "isExist");
                         BufferedReader reader = new BufferedReader(
@@ -102,12 +89,13 @@ public class LookAroundFragment extends Fragment {
                         String aCompanyLine = "";
                         try {
                             while ((aCompanyLine = reader.readLine()) != null) {
-                                Log.e("NearMeTest", "while");
+                                Log.e("NearMeTest", "while : " + aCompanyLine);
                                 String[] tab = aCompanyLine.split(";");
-                                String cedex = tab[4].substring(0,2);
+                                String cedex = tab[1].substring(0,2);
                                 int cedexInt = Integer.parseInt(cedex);
                                 if(cedexInt == 35)
                                 {
+                                    Log.e("NearMeTest", "cedex = 35");
                                     String address = tab[3] + ", " + tab[4] + " " + tab[5];
                                     LatLng latLng = getCoords(address);
                                     double lonProd = latLng.longitude;
@@ -126,9 +114,7 @@ public class LookAroundFragment extends Fragment {
                                                 .title(tab[2]));
                                     }
                                 }
-
                             }
-
                         } catch (IOException e) {
                             Log.wtf("Erreur dans la lecture du CSV " + aCompanyLine, e);
                             e.printStackTrace();
