@@ -1,45 +1,29 @@
 package istic.projet.estampille;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Insets;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowInsets;
-import android.view.WindowMetrics;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -48,10 +32,8 @@ import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
-
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,46 +64,47 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private Uri photoURI1;
     private Uri oldPhotoURI;
     private FloatingActionButton scanButton;
+    private ListView listView;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_history, container, false);
         context = rootView.getContext();
         scanButton = rootView.findViewById(R.id.scan_button);
+        listView = rootView.findViewById(R.id.listView);
         scanButton.setOnClickListener(this);
         checkPermissions();
-        ArrayList<String> list = new ArrayList<>();
 
+
+        ArrayList<String> list = new ArrayList<>();
         try {
-            list = this.ReadFile();
+            list = this.readFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ListView listH = (ListView)rootView.findViewById(R.id.listView);
-            ArrayAdapter adapter = new ArrayAdapter(getActivity(),R.layout.list_item_layout, list);
-            listH.setAdapter(adapter);
-            
+        ArrayAdapter adapter = new ArrayAdapter(getActivity(),R.layout.list_item_layout, list);
+        listView.setAdapter(adapter);
+
         return rootView;
     }
 
-    public ArrayList<String> ReadFile() throws IOException {
-        String FILE_NAME = "myFile.txt";
-        ArrayList<String> List = new ArrayList<>();
+    public ArrayList<String> readFile() throws IOException {
+        String fileName = "historyFile.txt";
+        ArrayList<String> list = new ArrayList<>();
 
-            BufferedReader br = new BufferedReader((new InputStreamReader(new FileInputStream(FILE_NAME))));
+        BufferedReader br = new BufferedReader((new InputStreamReader(getActivity().openFileInput(fileName))));
             String line;
             StringBuffer buffer = new StringBuffer();
             while ((line = br.readLine()) != null){
                 buffer.append(line).append("\n");
-                List.add(line);
+                list.add(line);
             }
             // Créer une liste de contenu unique basée sur les éléments de ArrayList
-            Set<String> mySet = new HashSet<String>(List);
+            Set<String> mySet = new HashSet<String>(list);
             // Créer une Nouvelle ArrayList à partir de Set
-             List= new ArrayList<>(mySet);
-        return List;
+             list= new ArrayList<>(mySet);
+        return list;
     }
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static {
