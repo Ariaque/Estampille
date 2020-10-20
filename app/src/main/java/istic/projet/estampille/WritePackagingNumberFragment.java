@@ -55,7 +55,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
      * Display information about the origins of the product
      */
     private void readCsv() {
-        InputStream is = getResources().openRawResource(R.raw.bdd);
+        InputStream is = getResources().openRawResource(R.raw.bdd_test);
         boolean find = false;
         String txt ="";
 
