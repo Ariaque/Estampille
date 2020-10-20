@@ -1,5 +1,6 @@
 package istic.projet.estampille;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -7,9 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,7 +18,6 @@ import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,6 +51,15 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private static final String errorFileCreate = "Error file create!";
     private static final String errorConvert = "Error convert!";
     private static final int REQUEST_IMAGE1_CAPTURE = 1;
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+
+    static {
+        ORIENTATIONS.append(Surface.ROTATION_0, 0);
+        ORIENTATIONS.append(Surface.ROTATION_90, 90);
+        ORIENTATIONS.append(Surface.ROTATION_180, 180);
+        ORIENTATIONS.append(Surface.ROTATION_270, 270);
+    }
+
     protected String mCurrentPhotoPath;
     ImageView firstImage;
     TextView ocrText;
@@ -69,41 +75,8 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private Uri oldPhotoURI;
     private FloatingActionButton scanButton;
 
-
-
-
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        ViewGroup rootView = (ViewGroup) inflater.inflate(
-                R.layout.fragment_history, container, false);
-        context = rootView.getContext();
-        scanButton = rootView.findViewById(R.id.scan_button);
-        scanButton.setOnClickListener(this);
-        firstImage = rootView.findViewById(R.id.ocr_image);
-        ocrText = rootView.findViewById(R.id.ocr_text);
-        checkPermissions();
-
-        return rootView;
-    }
-
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 0);
-        ORIENTATIONS.append(Surface.ROTATION_90, 90);
-        ORIENTATIONS.append(Surface.ROTATION_180, 180);
-        ORIENTATIONS.append(Surface.ROTATION_270, 270);
-    }
-
-
     /**
-     * Do a recognition stamp in the bitmap in parameter
-     *
-     * @param bitmap the stamp image
-     */
-    /**
-     * @param context the application context
+     * @param context     the application context
      * @param permissions permissions asked by the application
      * @return true if the user has these permissions false otherwise
      */
@@ -116,6 +89,21 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             }
         }
         return true;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        ViewGroup rootView = (ViewGroup) inflater.inflate(
+                R.layout.fragment_history, container, false);
+        context = rootView.getContext();
+        scanButton = rootView.findViewById(R.id.scan_button);
+        scanButton.setOnClickListener(this);
+        firstImage = rootView.findViewById(R.id.ocr_image);
+        ocrText = rootView.findViewById(R.id.ocr_text);
+//        checkPermissions();
+
+        return rootView;
     }
 
     @Override
@@ -179,17 +167,21 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        // Check permissions
-        if (!flagPermissions) {
-            return;
+        if (this.getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            PermissionsUtils.checkPermission(this, Manifest.permission.CAMERA, "la caméra est nécessaire pour scanner les estmapilles", Constants.REQUEST_PERMISSION_CAMERA);
+        } else {
+            openCamera();
         }
+    }
 
+    public void openCamera() {
         //Intent to open the camera
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         if (takePictureIntent.resolveActivity(context.getPackageManager()) != null) {
             File photoFile = null;
             try {
+                // TODO : check permission
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 Toast.makeText(context, errorFileCreate, Toast.LENGTH_SHORT).show();
@@ -207,6 +199,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Do a recognition stamp in the bitmap in parameter
+     *
      * @param bitmap the stamp image
      */
     private void doOCR(final Bitmap bitmap) {
@@ -221,7 +214,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 int rotationDegree = 90;
                 TextRecognizer recognizer = TextRecognition.getClient();
 
-                for(int i = 0; i < 4; i++){
+                for (int i = 0; i < 4; i++) {
                     InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
 
                     final Task<Text> result =
@@ -260,7 +253,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             }
         }
 
-        if(!found){
+        if (!found) {
             return;
         }
 
@@ -290,5 +283,19 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             flagPermissions = false;
         }
         flagPermissions = true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == Constants.REQUEST_PERMISSION_CAMERA) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera();
+            } else {
+                Toast.makeText(this.getActivity(), "Camera permission was not granted", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 }

@@ -70,8 +70,8 @@ public class EcritureEstampille extends AppCompatActivity {
      * Display information about the origins of the product
      */
     private void readCsv() {
-//        InputStream is = getResources().openRawResource(R.raw.bdd);
         InputStream is = null;
+//        InputStream is = getResources().openRawResource(R.raw.bdd);
         try {
             is = new FileInputStream(new File(Environment
                     .getExternalStorageDirectory().toString()

@@ -1,6 +1,10 @@
 package istic.projet.estampille;
 
 public class Constants {
+
+    static final int REQUEST_PERMISSION_CAMERA = 1;
+    static final int REQUEST_PERMISSION_EXTERNAL_STORAGE = 2;
+
     static final String KEY_DATA_GOUV_URLS = "KEY_DATA_GOUV_URLs";
     static final String[] urls_data_gouv_array =
             {"https://www.data.gouv.fr/fr/datasets/r/c2d33407-ce1a-4f34-8c6e-72066ce05c2b",
@@ -36,5 +40,26 @@ public class Constants {
             "https://www.data.gouv.fr/fr/datasets/r/6b71b282-9f87-4205-a6aa-f582ddfbc902",
             "https://www.data.gouv.fr/fr/datasets/r/c4fc7247-7f2c-4b75-9255-44fd31606859",
             "https://www.data.gouv.fr/fr/datasets/r/3d3c933b-56de-4076-971d-93961f497302"};
+
+    static final String[] urls_data_gouv_array_2 =
+            {"https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA1_ACTIV_GEN.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA1_VIAN_ONG_DOM.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA1_VIAN_COL_LAGO.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA1_VIAN_GIB_ELEV.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA1_VIAN_GIB_SAUV.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA1_VIAND_HACHE_VSM.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA4_AGSANPROBASEVDE_PRV.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA4B_AS_CE_PRODCOQUI_COV.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA4B_AS_CE_PRODPECHE_COV.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA1_LAIT.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA1_OEUF.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA1_GREN_ESCARG.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA4_AGSANGREXPR_PRV.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA4_AGR_ESVEBO_PRV.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA4_AGSANGELAT_PRV.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA4_AGSANCOLL_PRV.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA_PROD_RAFF.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA4_ASCCC_PRV.txt",
+            "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA4_AGSANLPL_PRV2.txt"};
 
 }
