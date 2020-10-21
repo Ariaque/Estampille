@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -42,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,24 +73,11 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private ViewPager viewPager;
     private int i = 0;
 
+    private int OCRcounter = 0;
+
+
 
     private ListView listView;
-
-    /**
-     * @param context     the application context
-     * @param permissions permissions asked by the application
-     * @return true if the user has these permissions false otherwise
-     */
-    private static boolean hasPermissions(Context context, String... permissions) {
-        if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -142,6 +131,26 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         System.out.println("taille" + list.size());
 
         return list;
+    }
+    /**
+     * Do a recognition stamp in the bitmap in parameter
+     *
+     * @param bitmap the stamp image
+     */
+    /**
+     * @param context the application context
+     * @param permissions permissions asked by the application
+     * @return true if the user has these permissions false otherwise
+     */
+    private static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     @Override
@@ -236,14 +245,13 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
      */
     private void doOCR(final Bitmap bitmap) {
         //Open a waiting pop up during the treatment
+        OCRcounter = 0;
         mProgressDialog = ProgressDialog.show(getActivity(), "Processing",
                 "Doing OCR...", true);
         success = false;
         int rotationDegree = 90;
-        i = 0;
         TextRecognizer recognizer = TextRecognition.getClient();
-        while(i < 4 && !success) {
-            System.out.println(i);
+        for (int i = 0; i < 4; i++){
             InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
             final Task<Text> result =
                     recognizer.process(image)
@@ -252,15 +260,14 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                                 public void onSuccess(Text visionText) {
                                     List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
                                     success = extractCode(recognizedText);
-                                    if(i == 3 && !success) {
-                                        mProgressDialog.cancel();
-                                        Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
+                                    mProgressDialog.cancel();
+                                    if(!success) {
+                                        imageResult(false);
                                     }
-                                    else if(success){
-                                        mProgressDialog.cancel();
-                                        viewPager.setCurrentItem(1);
+                                    else {
+                                        imageResult(true);
+
                                     }
-                                    i++;
                                 }
                             })
                             .addOnFailureListener(
@@ -271,8 +278,19 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                                     });
 
         }
-        System.out.println("HERE");
+    }
 
+    private void imageResult(boolean ocrSuccess)
+    {
+        if(ocrSuccess){
+            viewPager.setCurrentItem(1);
+        }
+        else{
+            OCRcounter++;
+            if(OCRcounter == 4){
+                Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private boolean extractCode(List<Text.TextBlock> recognizedText) {
@@ -304,10 +322,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             startActivity(otherActivity);
             getActivity().finish();*/
         }
-
         return found;
-
-
     }
 
     /**
@@ -320,5 +335,26 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             flagPermissions = false;
         }
         flagPermissions = true;
+    }
+
+    /**
+     * Clear the file which contains the search history
+     */
+    private void clearFile () {
+        List <String> list = new ArrayList<>();
+        ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.list_item_layout, list);
+        listView.setAdapter(adapter);
+
+        File file = new File (getActivity().getFilesDir()+"/historyFile.txt");
+        try {
+            if (file.exists()) {
+                PrintWriter writer = new PrintWriter(file);
+                writer.print("");
+                writer.close();
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
