@@ -37,24 +37,17 @@ import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.time.Duration;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
@@ -74,6 +67,11 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private ViewGroup containerView;
     private boolean success;
     private ViewPager viewPager;
+
+    private int OCRcounter = 0;
+
+
+
     private ListView listView;
 
     @Override
@@ -87,48 +85,28 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         this.containerView = rootView;
         viewPager = getActivity().findViewById(R.id.pager);
 
-
-        ArrayList<Map<String, String>> list = new ArrayList<>();
-        try {
-            list = this.readFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        SimpleAdapter adapter = new SimpleAdapter(getContext(), list, R.layout.list_item_layout, new String[] {"entreprise", "adresse"}, new int[] {R.id.item1, R.id.item2});
-        listView.setAdapter(adapter);
-
         return rootView;
     }
 
-    public ArrayList<Map<String, String>> readFile() throws IOException {
-        String fileName = "historyFile.txt";
-        ArrayList<Map<String, String>> list = new ArrayList<>();
-
-        BufferedReader br = new BufferedReader((new InputStreamReader(getActivity().openFileInput(fileName))));
-        String line;
-        StringBuffer buffer = new StringBuffer();
-        while ((line = br.readLine()) != null){
-            Map <String, String> data = new HashMap<>();
-            buffer.append(line).append("\n");
-            String[] infos = line.split(";");
-            data.put("entreprise",infos[0]);
-            data.put("adresse", infos[1]);
-            list.add(data);
+    /**
+     * Do a recognition stamp in the bitmap in parameter
+     *
+     * @param bitmap the stamp image
+     */
+    /**
+     * @param context the application context
+     * @param permissions permissions asked by the application
+     * @return true if the user has these permissions false otherwise
+     */
+    private static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
         }
-        br.close();
-        Set<Map<String, String>> mySet = new LinkedHashSet<>();
-        mySet.addAll(list);
-        list = new ArrayList<>(mySet);
-        System.out.println("taille"+list.size());
-        return list;
-    }
-
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 0);
-        ORIENTATIONS.append(Surface.ROTATION_90, 90);
-        ORIENTATIONS.append(Surface.ROTATION_180, 180);
-        ORIENTATIONS.append(Surface.ROTATION_270, 270);
+        return true;
     }
 
     @Override
@@ -225,12 +203,13 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
      */
     private void doOCR(final Bitmap bitmap) {
         //Open a waiting pop up during the treatment
+        OCRcounter = 0;
         mProgressDialog = ProgressDialog.show(getActivity(), "Processing",
                 "Doing OCR...", true);
+        success = false;
         int rotationDegree = 90;
         TextRecognizer recognizer = TextRecognition.getClient();
-
-        for(int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++){
             InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
             final Task<Text> result =
                     recognizer.process(image)
@@ -239,6 +218,14 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                                 public void onSuccess(Text visionText) {
                                     List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
                                     success = extractCode(recognizedText);
+                                    mProgressDialog.cancel();
+                                    if(!success) {
+                                        imageResult(false);
+                                    }
+                                    else {
+                                        imageResult(true);
+
+                                    }
                                 }
                             })
                             .addOnFailureListener(
@@ -247,13 +234,22 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                                         public void onFailure(@NonNull Exception e) {
                                         }
                                     });
-        }
-        mProgressDialog.cancel();
-        if(!success) {
-            Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
+
         }
     }
 
+    private void imageResult(boolean ocrSuccess)
+    {
+        if(ocrSuccess){
+            viewPager.setCurrentItem(1);
+        }
+        else{
+            OCRcounter++;
+            if(OCRcounter == 4){
+                Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
     private boolean extractCode(List<Text.TextBlock> recognizedText) {
         boolean found = false;
         Text.TextBlock t = null;
@@ -267,7 +263,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 found = true;
             }
         }
-
         if(found){
             tempText = tempText.replace("FR", "");
             tempText = tempText.replace("-", ".");
@@ -276,16 +271,15 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             tempText = tempText.replace("I", "1");
             tempText = tempText.replace(" ", "");
             tempText = tempText.replace("\n", "");
-            mProgressDialog.dismiss();
+            TextInputEditText editText = getActivity().findViewById(R.id.tf_estampille);
+            editText.setText(tempText);
             //Open the activity which permit to search the product origin with a stamp in the text field
-            Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
+            /*Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
             otherActivity.putExtra("ocrText", tempText);
             startActivity(otherActivity);
-            getActivity().finish();
+            getActivity().finish();*/
         }
         return found;
-
-
     }
 
     @Override
@@ -304,6 +298,28 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+        flagPermissions = true;
+    }
+
+    /**
+     * Clear the file which contains the search history
+     */
+    private void clearFile () {
+        List <String> list = new ArrayList<>();
+        ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.list_item_layout, list);
+        listView.setAdapter(adapter);
+
+        File file = new File (getActivity().getFilesDir()+"/historyFile.txt");
+        try {
+            if (file.exists()) {
+                PrintWriter writer = new PrintWriter(file);
+                writer.print("");
+                writer.close();
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

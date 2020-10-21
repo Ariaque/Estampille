@@ -77,7 +77,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
                     String fileName = "historyFile.txt";
                     try {
                         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(getActivity().openFileOutput(fileName, Context.MODE_APPEND)));
-                        bw.write(tab[3]+ ";" + tab[6]+ "\n");
+                        bw.write(tab[1]+ ";" + tab[4]+ "\n");
                         bw.close();
                     }
                     catch (Exception e){

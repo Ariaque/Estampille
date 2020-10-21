@@ -2,6 +2,7 @@ package istic.projet.estampille;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
@@ -13,8 +14,21 @@ import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ImageButton;
+import android.util.SparseIntArray;
+import android.view.Surface;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,15 +43,19 @@ import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     int PERMISSION_ALL = 1;
-    ListView list;
-
     String[] PERMISSIONS = {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.CAMERA,
@@ -116,7 +134,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         historyMenuItem = menu.findItem(R.id.action_history);
         searchMenuItem = menu.findItem(R.id.action_write_code);
         lookAroundMenuItem = menu.findItem(R.id.action_look_around);
-        setFocusOnHistoryItem();
+        try {
+            setFocusOnHistoryItem();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         viewPager.addOnPageChangeListener(this);
         return true;
     }
@@ -125,7 +147,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_history:
-                setFocusOnHistoryItem();
+                try {
+                    setFocusOnHistoryItem();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 viewPager.setCurrentItem(0);
 
                 return true;
@@ -144,6 +170,15 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
+    /**
+     * Ask permissions if it's not already done.
+     */
+    void askPermissions() {
+        if (!hasPermissions(context, PERMISSIONS)) {
+            requestPermissions(PERMISSIONS, PERMISSION_ALL);
+        }
+    }
+
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -152,7 +187,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     @Override
     public void onPageSelected(int position) {
         if (position == 0) {
-            setFocusOnHistoryItem();
+            try {
+                setFocusOnHistoryItem();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else if (position == 1) {
             setFocusOnSearchItem();
         } else if (position == 2) {
@@ -165,7 +204,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     }
 
-    private void setFocusOnHistoryItem() {
+    private void setFocusOnHistoryItem() throws IOException {
+        this.readFile();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginWhite, BlendMode.SRC_ATOP));
             searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
@@ -200,6 +240,52 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             lookAroundMenuItem.getIcon().setColorFilter(foodOriginWhite, PorterDuff.Mode.SRC_ATOP);
         }
     }
+
+    public void readFile() {
+        String fileName = "historyFile.txt";
+        list = new ArrayList<>();
+
+        try {
+            BufferedReader br = new BufferedReader((new InputStreamReader(openFileInput(fileName))));
+            String line;
+            StringBuilder buffer = new StringBuilder();
+            while ((line = br.readLine()) != null){
+                Map <String, String> data = new HashMap<>();
+                buffer.append(line).append("\n");
+                String[] infos = line.split(";");
+                data.put("estampille",infos[0]);
+                data.put("entreprise", infos[1]);
+                list.add(data);
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Set<Map<String, String>> mySet = new LinkedHashSet<>(list);
+        list= new ArrayList<>(mySet);
+
+        ListView listView = findViewById(R.id.listView);
+        SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(), list, R.layout.list_item_layout, new String[] {"estampille", "entreprise"}, new int[] {R.id.item1, R.id.item2});
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String estampille = list.get(i).get("estampille");
+                String entreprise = list.get(i).get("entreprise");
+
+               /* String[] infos = new String[] {};
+                Intent intent = new Intent(context, DisplayMap.class);
+                Bundle mapBundle = new Bundle();
+                mapBundle.putStringArray("Infos", infos);
+                intent.putExtras(mapBundle);
+                startActivity(intent);*/
+            }
+        });
+
+    }
+}
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
