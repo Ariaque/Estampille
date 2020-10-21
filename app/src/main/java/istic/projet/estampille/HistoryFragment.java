@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.time.Duration;
@@ -73,6 +74,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private boolean success;
     private ViewPager viewPager;
 
+    private int OCRcounter = 0;
 
 
 
@@ -246,43 +248,53 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
      */
     private void doOCR(final Bitmap bitmap) {
         //Open a waiting pop up during the treatment
+        OCRcounter = 0;
         mProgressDialog = ProgressDialog.show(getActivity(), "Processing",
                 "Doing OCR...", true);
         success = false;
-        int i = 0;
         int rotationDegree = 90;
         TextRecognizer recognizer = TextRecognition.getClient();
-        InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
-        final Task<Text> result =
-                recognizer.process(image)
-                        .addOnSuccessListener(new OnSuccessListener<Text>() {
-                            @Override
-                            public void onSuccess(Text visionText) {
-                                int i = 0;
-                                while(i < 4 && !success){
+        for (int i = 0; i < 4; i++){
+            InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
+            final Task<Text> result =
+                    recognizer.process(image)
+                            .addOnSuccessListener(new OnSuccessListener<Text>() {
+                                @Override
+                                public void onSuccess(Text visionText) {
                                     List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
                                     success = extractCode(recognizedText);
-                                    i++;
-                                }
-                                mProgressDialog.cancel();
-                                if(!success) {
-                                    Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
-                                }
-                                else {
-                                    viewPager.setCurrentItem(1);
-                                }
-                            }
-                        })
-                        .addOnFailureListener(
-                                new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
+                                    mProgressDialog.cancel();
+                                    if(!success) {
+                                        imageResult(false);
                                     }
-                                });
+                                    else {
+                                        imageResult(true);
 
+                                    }
+                                }
+                            })
+                            .addOnFailureListener(
+                                    new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                        }
+                                    });
 
+        }
     }
 
+    private void imageResult(boolean ocrSuccess)
+    {
+        if(ocrSuccess){
+            viewPager.setCurrentItem(1);
+        }
+        else{
+            OCRcounter++;
+            if(OCRcounter == 4){
+                Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
     private boolean extractCode(List<Text.TextBlock> recognizedText) {
         boolean found = false;
         Text.TextBlock t = null;
