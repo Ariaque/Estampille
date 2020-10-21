@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private int foodOriginDarkBlue;
     private int foodOriginWhite;
     private ArrayList<Map<String, String>> list;
+    private Set<String> setH;
 
 
     /**
@@ -269,6 +270,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     public void readFile() {
         String fileName = "historyFile.txt";
         list = new ArrayList<>();
+        setH = new LinkedHashSet<>();
 
         try {
             BufferedReader br = new BufferedReader((new InputStreamReader(openFileInput(fileName))));
@@ -279,7 +281,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
                 data.put("estampille",infos[0]);
-                data.put("entreprise", infos[1]);
+                data.put("entreprise", infos[2]);
+                setH.add(line);
                 list.add(data);
             }
             br.close();
@@ -297,15 +300,13 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String estampille = list.get(i).get("estampille");
-                String entreprise = list.get(i).get("entreprise");
-
-               /* String[] infos = new String[] {};
+                Object[] tab = setH.toArray();
+                String line = (String)tab[i];
                 Intent intent = new Intent(context, DisplayMap.class);
                 Bundle mapBundle = new Bundle();
-                mapBundle.putStringArray("Infos", infos);
+                mapBundle.putStringArray("Infos", line.split(";"));
                 intent.putExtras(mapBundle);
-                startActivity(intent);*/
+                startActivity(intent);
             }
         });
 
