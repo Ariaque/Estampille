@@ -299,8 +299,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 data.put("estampille",infos[0]);
                 data.put("entreprise", infos[2]);
                 setH.add(line);
-                data.put("estampille", infos[0]);
-                data.put("entreprise", infos[1]);
                 list.add(data);
             }
             br.close();
