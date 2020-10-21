@@ -18,4 +18,8 @@
     <string name="recognition_fail_toast">Pas d\'estampille reconnue</string>
     <string name="maps_api_key">AIzaSyCYasmitSEl9kMoj8Jsq0x6OOgPJTUvmKE</string>
     <string name="no_gps_marker_name">Pyramide du Louvre</string>
+    <string name="no_gps_found">Aucun signale GPS</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    <string name="dialog_delete_message">Désirez-vous supprimer définitivement votre historique ?</string>
 </resources>
