@@ -16,9 +16,11 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
 public class WritePackagingNumberFragment extends Fragment implements View.OnTouchListener, View.OnClickListener {
@@ -72,6 +74,16 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
             while ((line = reader.readLine()) != null) {
                 String[] tab = line.split(";");
                 if (txt.equals(tab[1])) {
+                    String fileName = "historyFile.txt";
+                    try {
+                        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(getActivity().openFileOutput(fileName, Context.MODE_APPEND)));
+                        bw.write(tab[3]+ ";" + tab[6]+ "\n");
+                        bw.close();
+                    }
+                    catch (Exception e){
+                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+
                     Intent intent = new Intent(context, DisplayMap.class);
                     Bundle mapBundle = new Bundle();
                     mapBundle.putStringArray("Infos", tab);
