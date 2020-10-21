@@ -30,9 +30,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class LookAroundFragment extends Fragment {
-    private SupportMapFragment mapFragment;
+public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
     private final HashMap<String, LatLng> markersToAdd = new HashMap<>();
+    private SupportMapFragment mapFragment;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        setUpMapIfNeeded();
+    }
+
+    private void setUpMapIfNeeded() {
+        mapFragment.getMapAsync(this);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,35 +51,7 @@ public class LookAroundFragment extends Fragment {
                 R.layout.fragment_look_around, container, false);
         if (mapFragment == null) {
             mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_test);
-            mapFragment.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(GoogleMap googleMap) {
-                    if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(),
-                            Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                            ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(),
-                                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-
-                    Criteria criteria = new Criteria();
-                    LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-                    Location location = null;
-                    try {
-                        location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
-                    } catch (Exception e) {
-                        Toast.makeText(getActivity().getApplicationContext(), getActivity().getApplicationContext().getString(R.string.no_gps_found), Toast.LENGTH_SHORT).show();
-                    }
-                    googleMap.setMyLocationEnabled(true);
-
-                    if (location != null) {
-                        CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
-                                .zoom(9)                   // Sets the zoom
-                                .build();                   // Creates a CameraPosition from the builder
-                        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                    }
-                }
-            });
+            mapFragment.getMapAsync(this);
         }
 
         // R.id.map is a FrameLayout, not a Fragment
@@ -109,6 +91,33 @@ public class LookAroundFragment extends Fragment {
         } else {
             LatLng latLng = new LatLng(0, 0);
             return latLng;
+        }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        Criteria criteria = new Criteria();
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        Location location = null;
+        try {
+            location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+        } catch (Exception e) {
+            Toast.makeText(getActivity().getApplicationContext(), getActivity().getApplicationContext().getString(R.string.no_gps_found), Toast.LENGTH_SHORT).show();
+        }
+        googleMap.setMyLocationEnabled(true);
+        if (location != null) {
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
+                    .zoom(9)                   // Sets the zoom
+                    .build();                   // Creates a CameraPosition from the builder
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
 }
