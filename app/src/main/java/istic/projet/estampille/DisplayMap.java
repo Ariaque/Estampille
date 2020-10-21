@@ -3,6 +3,7 @@ package istic.projet.estampille;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -60,6 +61,7 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.d("Display map", "onMapReady");
         LatLng coords = new LatLng(lat, lon);
         googleMap.addMarker(new MarkerOptions()
                 .position(coords)

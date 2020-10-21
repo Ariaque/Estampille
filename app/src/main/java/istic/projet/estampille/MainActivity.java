@@ -1,38 +1,25 @@
 package istic.projet.estampille;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
 import android.graphics.PorterDuff;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageButton;
-import android.util.SparseIntArray;
-import android.view.Surface;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -42,22 +29,13 @@ import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
 
-    private static final String errorFileCreate = "Error file create!";
-    private static final String errorConvert = "Error convert!";
-    private static final int REQUEST_IMAGE1_CAPTURE = 1;
-    private static final int REQUEST_PERMISSION_EXTERNAL_STORAGE = 2;
-
-    protected String mCurrentPhotoPath;
-    ImageView firstImage;
-    TextView ocrText;
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     int PERMISSION_ALL = 1;
-    boolean flagPermissions = false;
     ListView list;
 
     String[] PERMISSIONS = {
@@ -65,12 +43,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             android.Manifest.permission.CAMERA,
             Manifest.permission.ACCESS_FINE_LOCATION
     };
-    private ProgressDialog mProgressDialog;
     private Context context;
-    private Uri photoURI1;
-    private Uri oldPhotoURI;
-    private Button ecrire;
-    private FloatingActionButton scanButton;
     private Toolbar mToolBar;
     private FragmentPagerAdapter fragmentPagerAdapter;
     private ViewPager viewPager;
@@ -81,37 +54,18 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private int foodOriginWhite;
     private ConstraintLayout containerView;
 
-
-    /**
-     * Do a recognition stamp in the bitmap in parameter
-     *
-     * @param bitmap the stamp image
-     */
-
-    /**
-     * @param context     the application context
-     * @param permissions permissions asked by the application
-     * @return true if the user has these permissions false otherwise
-     */
-    private boolean hasPermissions(Context context, String... permissions) {
-        if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
-        setContentView(R.layout.activity_main);
         this.containerView = findViewById(R.id.main_container);
 
+        if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, "L'écriture en mémoire est requise pour le chargment des données", Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
+        } else {
+            launchDownloadWorker();
+        }
         mToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -121,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         viewPager.setOffscreenPageLimit(2);
         foodOriginDarkBlue = ResourcesCompat.getColor(getResources(), R.color.FoodOriginDarkBlue, null);
         foodOriginWhite = ResourcesCompat.getColor(getResources(), R.color.FoodOriginWhite, null);
-
         //Detect everything that's potentially suspect and write it in log
         StrictMode.VmPolicy builder = new StrictMode.VmPolicy.Builder()
                 .detectAll()
@@ -129,11 +82,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 .build();
         StrictMode.setVmPolicy(builder);
 
-        if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, "L'écriture en mémoire est requise pour le chargment des données", Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
-        } else {
-            launchDownloadWorker();
-        }
     }
 
 
@@ -196,15 +144,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
-    /**
-     * Ask permissions if it's not already done.
-     */
-    void askPermissions() {
-        if (!hasPermissions(context, PERMISSIONS)) {
-            requestPermissions(PERMISSIONS, PERMISSION_ALL);
-        }
-    }
-
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -264,6 +203,9 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.e("MA permission", "onRequestPermissionsResult MA");
+        Log.e("MA permission demandees", String.valueOf(permissions.length));
+        Log.e("MA permission req code", String.valueOf(requestCode));
         if (requestCode == Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 launchDownloadWorker();
@@ -274,9 +216,9 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 Toast.makeText(this, "Write external storage permission was not granted", Toast.LENGTH_SHORT).show();
             }
         } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
         }
+
+
     }
-
-
-}

@@ -1,5 +1,6 @@
 package istic.projet.estampille;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -73,10 +74,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private ViewGroup containerView;
     private boolean success;
     private ViewPager viewPager;
-
-
-
-
     private ListView listView;
 
     @Override
@@ -89,7 +86,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         scanButton.setOnClickListener(this);
         this.containerView = rootView;
         viewPager = getActivity().findViewById(R.id.pager);
-        checkPermissions();
 
 
         ArrayList<Map<String, String>> list = new ArrayList<>();
@@ -122,39 +118,17 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         br.close();
         Set<Map<String, String>> mySet = new LinkedHashSet<>();
         mySet.addAll(list);
-        list= new ArrayList<>(mySet);
+        list = new ArrayList<>(mySet);
         System.out.println("taille"+list.size());
-
         return list;
     }
+
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 0);
         ORIENTATIONS.append(Surface.ROTATION_90, 90);
         ORIENTATIONS.append(Surface.ROTATION_180, 180);
         ORIENTATIONS.append(Surface.ROTATION_270, 270);
-    }
-
-
-    /**
-     * Do a recognition stamp in the bitmap in parameter
-     *
-     * @param bitmap the stamp image
-     */
-    /**
-     * @param context the application context
-     * @param permissions permissions asked by the application
-     * @return true if the user has these permissions false otherwise
-     */
-    private static boolean hasPermissions(Context context, String... permissions) {
-        if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     @Override
@@ -253,39 +227,31 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         //Open a waiting pop up during the treatment
         mProgressDialog = ProgressDialog.show(getActivity(), "Processing",
                 "Doing OCR...", true);
-        success = false;
-        int i = 0;
         int rotationDegree = 90;
         TextRecognizer recognizer = TextRecognition.getClient();
-        InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
-        final Task<Text> result =
-                recognizer.process(image)
-                        .addOnSuccessListener(new OnSuccessListener<Text>() {
-                            @Override
-                            public void onSuccess(Text visionText) {
-                                int i = 0;
-                                while(i < 4 && !success){
+
+        for(int i = 0; i < 4; i++){
+            InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
+            final Task<Text> result =
+                    recognizer.process(image)
+                            .addOnSuccessListener(new OnSuccessListener<Text>() {
+                                @Override
+                                public void onSuccess(Text visionText) {
                                     List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
                                     success = extractCode(recognizedText);
-                                    i++;
                                 }
-                                mProgressDialog.cancel();
-                                if(!success) {
-                                    Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
-                                }
-                                else {
-                                    viewPager.setCurrentItem(1);
-                                }
-                            }
-                        })
-                        .addOnFailureListener(
-                                new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                    }
-                                });
-
-
+                            })
+                            .addOnFailureListener(
+                                    new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                        }
+                                    });
+        }
+        mProgressDialog.cancel();
+        if(!success) {
+            Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private boolean extractCode(List<Text.TextBlock> recognizedText) {
@@ -310,13 +276,12 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             tempText = tempText.replace("I", "1");
             tempText = tempText.replace(" ", "");
             tempText = tempText.replace("\n", "");
-            TextInputEditText editText = getActivity().findViewById(R.id.tf_estampille);
-            editText.setText(tempText);
+            mProgressDialog.dismiss();
             //Open the activity which permit to search the product origin with a stamp in the text field
-            /*Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
+            Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
             otherActivity.putExtra("ocrText", tempText);
             startActivity(otherActivity);
-            getActivity().finish();*/
+            getActivity().finish();
         }
         return found;
 
@@ -325,6 +290,9 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.e("HF permission", "onRequestPermissionsResult LAF");
+        Log.e("HF permissions demands", String.valueOf(permissions.length));
+        Log.e("HF permission req code", String.valueOf(requestCode));
         if (requestCode == Constants.REQUEST_CODE_PERMISSION_CAMERA) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera();

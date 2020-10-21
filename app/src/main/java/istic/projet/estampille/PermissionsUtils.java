@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -15,18 +17,20 @@ public class PermissionsUtils {
 
 
     public static void checkPermission(Activity activity, View containerView, String[] permissions, String rational_text, int requestCode) {
+        Log.e("permission","checkpermission a "+permissions.toString());
         for (int i = 0; i < permissions.length; i++) {
             if (activity.shouldShowRequestPermissionRationale(permissions[i])) {
                 explain(activity, containerView, permissions[i], requestCode, "Cette permission est nécessaire pour avoir les données");
                 Toast.makeText(activity.getApplicationContext(), rational_text, Toast.LENGTH_SHORT).show();
             } else {
-                activity.requestPermissions(new String[]{permissions[i]},
+                ActivityCompat.requestPermissions(activity, new String[]{permissions[i]},
                         requestCode);
             }
         }
     }
 
     public static void checkPermission(Fragment fragment, View containerView, String[] permissions, String rational_text, int requestCode) {
+        Log.e("permission","checkpermission f "+permissions.toString());
         for (String permission : permissions) {
             if (fragment.getActivity().shouldShowRequestPermissionRationale(permission)) {
                 explain(fragment.getActivity(), containerView, permission, requestCode, "Cette permission est nécessaire pour avoir les données");
