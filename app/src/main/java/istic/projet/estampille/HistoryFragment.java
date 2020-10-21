@@ -36,25 +36,17 @@ import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.time.Duration;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
@@ -91,50 +83,8 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         viewPager = getActivity().findViewById(R.id.pager);
         checkPermissions();
 
-
-        ArrayList<Map<String, String>> list = new ArrayList<>();
-        try {
-            list = this.readFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        SimpleAdapter adapter = new SimpleAdapter(getContext(), list, R.layout.list_item_layout, new String[] {"entreprise", "adresse"}, new int[] {R.id.item1, R.id.item2});
-        listView.setAdapter(adapter);
-
         return rootView;
     }
-
-    public ArrayList<Map<String, String>> readFile() throws IOException {
-        String fileName = "historyFile.txt";
-        ArrayList<Map<String, String>> list = new ArrayList<>();
-
-        BufferedReader br = new BufferedReader((new InputStreamReader(getActivity().openFileInput(fileName))));
-        String line;
-        StringBuffer buffer = new StringBuffer();
-        while ((line = br.readLine()) != null){
-            Map <String, String> data = new HashMap<>();
-            buffer.append(line).append("\n");
-            String[] infos = line.split(";");
-            data.put("entreprise",infos[0]);
-            data.put("adresse", infos[1]);
-            list.add(data);
-        }
-        br.close();
-        Set<Map<String, String>> mySet = new LinkedHashSet<>();
-        mySet.addAll(list);
-        list= new ArrayList<>(mySet);
-        System.out.println("taille"+list.size());
-
-        return list;
-    }
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 0);
-        ORIENTATIONS.append(Surface.ROTATION_90, 90);
-        ORIENTATIONS.append(Surface.ROTATION_180, 180);
-        ORIENTATIONS.append(Surface.ROTATION_270, 270);
-    }
-
 
     /**
      * Do a recognition stamp in the bitmap in parameter
@@ -324,10 +274,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             startActivity(otherActivity);
             getActivity().finish();*/
         }
-
         return found;
-
-
     }
 
     /**
@@ -340,5 +287,26 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             flagPermissions = false;
         }
         flagPermissions = true;
+    }
+
+    /**
+     * Clear the file which contains the search history
+     */
+    private void clearFile () {
+        List <String> list = new ArrayList<>();
+        ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.list_item_layout, list);
+        listView.setAdapter(adapter);
+
+        File file = new File (getActivity().getFilesDir()+"/historyFile.txt");
+        try {
+            if (file.exists()) {
+                PrintWriter writer = new PrintWriter(file);
+                writer.print("");
+                writer.close();
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
