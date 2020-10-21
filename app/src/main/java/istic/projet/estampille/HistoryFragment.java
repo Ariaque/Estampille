@@ -19,12 +19,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -242,7 +242,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         success = false;
         int rotationDegree = 90;
         TextRecognizer recognizer = TextRecognition.getClient();
-        for (int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++) {
             InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
             final Task<Text> result =
                     recognizer.process(image)

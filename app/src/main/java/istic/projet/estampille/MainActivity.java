@@ -2,7 +2,6 @@ package istic.projet.estampille;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
@@ -10,7 +9,6 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,12 +17,10 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
@@ -128,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         builder.putStringArray(Constants.KEY_DATA_GOUV_URLS, Constants.urls_data_gouv_array_2);
         return builder.build();
     }
+
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.deleteButton) {
@@ -204,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     public void onPageScrollStateChanged(int state) {
 
     }
+
     /**
      * Sets the focus on the "history" (first from left) menu item. Displays the button to delete the history.
      *
@@ -329,4 +327,5 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             }
         }
-    }}
+    }
+}
