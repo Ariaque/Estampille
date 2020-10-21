@@ -2,6 +2,7 @@ package istic.projet.estampille;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
@@ -9,6 +10,7 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private int foodOriginWhite;
     private ConstraintLayout containerView;
     private ArrayList<Map<String, String>> list;
+    private Set<String> setH;
 
 
     @Override
@@ -263,6 +266,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     public void readFile() {
         String fileName = "historyFile.txt";
         list = new ArrayList<>();
+        setH = new LinkedHashSet<>();
 
         try {
             BufferedReader br = new BufferedReader((new InputStreamReader(openFileInput(fileName))));
@@ -272,8 +276,9 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 Map<String, String> data = new HashMap<>();
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
-                data.put("estampille", infos[0]);
-                data.put("entreprise", infos[1]);
+                data.put("estampille",infos[0]);
+                data.put("entreprise", infos[2]);
+                setH.add(line);
                 list.add(data);
             }
             br.close();
@@ -291,15 +296,13 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String estampille = list.get(i).get("estampille");
-                String entreprise = list.get(i).get("entreprise");
-
-               /* String[] infos = new String[] {};
+                Object[] tab = setH.toArray();
+                String line = (String)tab[i];
                 Intent intent = new Intent(context, DisplayMap.class);
                 Bundle mapBundle = new Bundle();
-                mapBundle.putStringArray("Infos", infos);
+                mapBundle.putStringArray("Infos", line.split(";"));
                 intent.putExtras(mapBundle);
-                startActivity(intent);*/
+                startActivity(intent);
             }
         });
     }

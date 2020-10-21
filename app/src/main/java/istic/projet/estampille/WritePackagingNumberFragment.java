@@ -88,7 +88,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
                     String fileName = "historyFile.txt";
                     try {
                         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(getActivity().openFileOutput(fileName, Context.MODE_APPEND)));
-                        bw.write(tab[1] + ";" + tab[4] + "\n");
+                        bw.write(tab[1]+ ";" + tab[2]+";" + tab[3]+";" + tab[4]+ ";" + tab[5] + ";" + tab[6] + "\n");
                         bw.close();
                     } catch (Exception e) {
                         Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
@@ -103,7 +103,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
                 }
             }
 
-        } catch (IOException e) {
+        } catch (IOException e){
             Log.wtf("Erreur dans la lecture du CSV " + line, e);
             e.printStackTrace();
         }
