@@ -12,15 +12,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.util.SparseIntArray;
 import android.view.LayoutInflater;
-import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -36,6 +34,7 @@ import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -45,10 +44,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -72,11 +69,26 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private FloatingActionButton scanButton;
     private boolean success;
     private ViewPager viewPager;
-
-
+    private int i = 0;
 
 
     private ListView listView;
+
+    /**
+     * @param context     the application context
+     * @param permissions permissions asked by the application
+     * @return true if the user has these permissions false otherwise
+     */
+    private static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -96,11 +108,17 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        SimpleAdapter adapter = new SimpleAdapter(getContext(), list, R.layout.list_item_layout, new String[] {"entreprise", "adresse"}, new int[] {R.id.item1, R.id.item2});
+        SimpleAdapter adapter = new SimpleAdapter(getContext(), list, R.layout.list_item_layout, new String[]{"entreprise", "adresse"}, new int[]{R.id.item1, R.id.item2});
         listView.setAdapter(adapter);
 
         return rootView;
     }
+
+
+    /**
+     * Do a recognition stamp in the bitmap in parameter
+     *
+     */
 
     public ArrayList<Map<String, String>> readFile() throws IOException {
         String fileName = "historyFile.txt";
@@ -109,50 +127,21 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         BufferedReader br = new BufferedReader((new InputStreamReader(getActivity().openFileInput(fileName))));
         String line;
         StringBuffer buffer = new StringBuffer();
-        while ((line = br.readLine()) != null){
-            Map <String, String> data = new HashMap<>();
+        while ((line = br.readLine()) != null) {
+            Map<String, String> data = new HashMap<>();
             buffer.append(line).append("\n");
             String[] infos = line.split(";");
-            data.put("entreprise",infos[0]);
+            data.put("entreprise", infos[0]);
             data.put("adresse", infos[1]);
             list.add(data);
         }
         br.close();
         Set<Map<String, String>> mySet = new LinkedHashSet<>();
         mySet.addAll(list);
-        list= new ArrayList<>(mySet);
-        System.out.println("taille"+list.size());
+        list = new ArrayList<>(mySet);
+        System.out.println("taille" + list.size());
 
         return list;
-    }
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 0);
-        ORIENTATIONS.append(Surface.ROTATION_90, 90);
-        ORIENTATIONS.append(Surface.ROTATION_180, 180);
-        ORIENTATIONS.append(Surface.ROTATION_270, 270);
-    }
-
-
-    /**
-     * Do a recognition stamp in the bitmap in parameter
-     *
-     * @param bitmap the stamp image
-     */
-    /**
-     * @param context the application context
-     * @param permissions permissions asked by the application
-     * @return true if the user has these permissions false otherwise
-     */
-    private static boolean hasPermissions(Context context, String... permissions) {
-        if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     @Override
@@ -242,6 +231,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Do a recognition stamp in the bitmap in parameter
+     *
      * @param bitmap the stamp image
      */
     private void doOCR(final Bitmap bitmap) {
@@ -249,37 +239,39 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         mProgressDialog = ProgressDialog.show(getActivity(), "Processing",
                 "Doing OCR...", true);
         success = false;
-        int i = 0;
         int rotationDegree = 90;
+        i = 0;
         TextRecognizer recognizer = TextRecognition.getClient();
-        InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
-        final Task<Text> result =
-                recognizer.process(image)
-                        .addOnSuccessListener(new OnSuccessListener<Text>() {
-                            @Override
-                            public void onSuccess(Text visionText) {
-                                int i = 0;
-                                while(i < 4 && !success){
+        while(i < 4 && !success) {
+            System.out.println(i);
+            InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
+            final Task<Text> result =
+                    recognizer.process(image)
+                            .addOnSuccessListener(new OnSuccessListener<Text>() {
+                                @Override
+                                public void onSuccess(Text visionText) {
                                     List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
                                     success = extractCode(recognizedText);
+                                    if(i == 3 && !success) {
+                                        mProgressDialog.cancel();
+                                        Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
+                                    }
+                                    else if(success){
+                                        mProgressDialog.cancel();
+                                        viewPager.setCurrentItem(1);
+                                    }
                                     i++;
                                 }
-                                mProgressDialog.cancel();
-                                if(!success) {
-                                    Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
-                                }
-                                else {
-                                    viewPager.setCurrentItem(1);
-                                }
-                            }
-                        })
-                        .addOnFailureListener(
-                                new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                    }
-                                });
+                            })
+                            .addOnFailureListener(
+                                    new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                        }
+                                    });
 
+        }
+        System.out.println("HERE");
 
     }
 
@@ -296,7 +288,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 found = true;
             }
         }
-        if(found){
+        if (found) {
             tempText = tempText.replace("FR", "");
             tempText = tempText.replace("-", ".");
             tempText = tempText.replace("CE", "");
