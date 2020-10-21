@@ -3,20 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_look_around"
+        android:focusable="true"
         android:gravity="left"
         android:icon="@drawable/ic_baseline_location_on_24"
-        android:title="test"
+        android:background="?attr/selectableItemBackground"
+        android:title=""
         app:showAsAction="always" />
     <item
         android:id="@+id/action_write_code"
+        android:focusable="true"
         android:gravity="left"
         android:icon="@drawable/ic_baseline_search_24"
-        android:title="test"
+        android:background="?attr/selectableItemBackground"
+        android:title=""
         app:showAsAction="always" />
     <item
         android:id="@+id/action_history"
+        android:focusable="true"
         android:gravity="left"
         android:icon="@drawable/ic_baseline_history_24"
-        android:title="test"
+        android:background="?attr/selectableItemBackground"
+        android:title=""
         app:showAsAction="always" />
 </menu>

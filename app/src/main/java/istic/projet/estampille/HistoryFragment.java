@@ -1,6 +1,5 @@
 package istic.projet.estampille;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -18,15 +17,14 @@ import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -35,34 +33,29 @@ import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
-
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.time.Duration;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
-    private static final String errorFileCreate = "Error file create!";
-    private static final String errorConvert = "Error convert!";
     private static final int REQUEST_IMAGE1_CAPTURE = 1;
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 0);
-        ORIENTATIONS.append(Surface.ROTATION_90, 90);
-        ORIENTATIONS.append(Surface.ROTATION_180, 180);
-        ORIENTATIONS.append(Surface.ROTATION_270, 270);
-    }
-
     protected String mCurrentPhotoPath;
-    ImageView firstImage;
-    TextView ocrText;
     int PERMISSION_ALL = 1;
     boolean flagPermissions = false;
     String[] PERMISSIONS = {
@@ -75,9 +68,76 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private Uri oldPhotoURI;
     private FloatingActionButton scanButton;
     private ViewGroup containerView;
+    private boolean success;
+
+
+
+
+
+    private ListView listView;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        ViewGroup rootView = (ViewGroup) inflater.inflate(
+                R.layout.fragment_history, container, false);
+        context = rootView.getContext();
+        scanButton = rootView.findViewById(R.id.scan_button);
+        listView = rootView.findViewById(R.id.listView);
+        scanButton.setOnClickListener(this);
+//        this.containerView = (ConstraintLayout) rootView.findViewById(R.id.main_container);
+        this.containerView = rootView;
+
+        ArrayList<Map<String, String>> list = new ArrayList<>();
+        try {
+            list = this.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        SimpleAdapter adapter = new SimpleAdapter(getContext(), list, R.layout.list_item_layout, new String[] {"entreprise", "adresse"}, new int[] {R.id.item1, R.id.item2});
+        listView.setAdapter(adapter);
+
+        return rootView;
+    }
+
+    public ArrayList<Map<String, String>> readFile() throws IOException {
+        String fileName = "historyFile.txt";
+        ArrayList<Map<String, String>> list = new ArrayList<>();
+
+        BufferedReader br = new BufferedReader((new InputStreamReader(getActivity().openFileInput(fileName))));
+        String line;
+        StringBuffer buffer = new StringBuffer();
+        while ((line = br.readLine()) != null){
+            Map <String, String> data = new HashMap<>();
+            buffer.append(line).append("\n");
+            String[] infos = line.split(";");
+            data.put("entreprise",infos[0]);
+            data.put("adresse", infos[1]);
+            list.add(data);
+        }
+        br.close();
+        Set<Map<String, String>> mySet = new LinkedHashSet<>();
+        mySet.addAll(list);
+        list= new ArrayList<>(mySet);
+        System.out.println("taille"+list.size());
+
+        return list;
+    }
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+    static {
+        ORIENTATIONS.append(Surface.ROTATION_0, 0);
+        ORIENTATIONS.append(Surface.ROTATION_90, 90);
+        ORIENTATIONS.append(Surface.ROTATION_180, 180);
+        ORIENTATIONS.append(Surface.ROTATION_270, 270);
+    }
+
 
     /**
-     * @param context     the application context
+     * Do a recognition stamp in the bitmap in parameter
+     *
+     * @param bitmap the stamp image
+     */
+    /**
+     * @param context the application context
      * @param permissions permissions asked by the application
      * @return true if the user has these permissions false otherwise
      */
@@ -93,21 +153,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        ViewGroup rootView = (ViewGroup) inflater.inflate(
-                R.layout.fragment_history, container, false);
-        context = rootView.getContext();
-        scanButton = rootView.findViewById(R.id.scan_button);
-        scanButton.setOnClickListener(this);
-        firstImage = rootView.findViewById(R.id.ocr_image);
-        ocrText = rootView.findViewById(R.id.ocr_text);
-//        this.containerView = (ConstraintLayout) rootView.findViewById(R.id.main_container);
-        this.containerView = rootView;
-        return rootView;
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -119,14 +164,13 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 InputStream is = context.getContentResolver().openInputStream(photoURI1);
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 bmp = BitmapFactory.decodeStream(is, null, options);
+                is.close();
 
             } catch (Exception ex) {
                 Log.i(getClass().getSimpleName(), ex.getMessage());
-                Toast.makeText(context, errorConvert, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.conversion_fail_toast, Toast.LENGTH_SHORT).show();
             }
-
             //Start the stamp recognition
-            firstImage.setImageBitmap(bmp);
             doOCR(bmp);
 
             OutputStream os;
@@ -139,12 +183,11 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 os.close();
             } catch (Exception ex) {
                 Log.e(getClass().getSimpleName(), ex.getMessage());
-                Toast.makeText(context, errorFileCreate, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.file_creation_fail_toast, Toast.LENGTH_SHORT).show();
             }
 
         } else {
             photoURI1 = oldPhotoURI;
-            firstImage.setImageURI(photoURI1);
         }
     }
 
@@ -182,10 +225,9 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         if (takePictureIntent.resolveActivity(context.getPackageManager()) != null) {
             File photoFile = null;
             try {
-                // TODO : check permission
                 photoFile = createImageFile();
             } catch (IOException ex) {
-                Toast.makeText(context, errorFileCreate, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.file_creation_fail_toast, Toast.LENGTH_SHORT).show();
                 Log.i("File error", ex.toString());
             }
             // Continue only if the File was successfully created
@@ -200,46 +242,40 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Do a recognition stamp in the bitmap in parameter
-     *
      * @param bitmap the stamp image
      */
     private void doOCR(final Bitmap bitmap) {
         //Open a waiting pop up during the treatment
-        if (mProgressDialog == null) {
-            mProgressDialog = ProgressDialog.show(getActivity(), "Processing",
-                    "Doing OCR...", true);
-        }
-        new Thread(new Runnable() {
-            public void run() {
+        mProgressDialog = ProgressDialog.show(getActivity(), "Processing",
+                "Doing OCR...", true);
+        int rotationDegree = 90;
+        TextRecognizer recognizer = TextRecognition.getClient();
 
-                int rotationDegree = 90;
-                TextRecognizer recognizer = TextRecognition.getClient();
-
-                for (int i = 0; i < 4; i++) {
-                    InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
-
-                    final Task<Text> result =
-                            recognizer.process(image)
-                                    .addOnSuccessListener(new OnSuccessListener<Text>() {
+        for(int i = 0; i < 4; i++){
+            InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
+            final Task<Text> result =
+                    recognizer.process(image)
+                            .addOnSuccessListener(new OnSuccessListener<Text>() {
+                                @Override
+                                public void onSuccess(Text visionText) {
+                                    List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
+                                    success = extractCode(recognizedText);
+                                }
+                            })
+                            .addOnFailureListener(
+                                    new OnFailureListener() {
                                         @Override
-                                        public void onSuccess(Text visionText) {
-                                            List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
-                                            extractCode(recognizedText);
+                                        public void onFailure(@NonNull Exception e) {
                                         }
-                                    })
-                                    .addOnFailureListener(
-                                            new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                }
-                                            });
-                }
-
-            }
-        }).start();
+                                    });
+        }
+        mProgressDialog.cancel();
+        if(!success) {
+            Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private void extractCode(List<Text.TextBlock> recognizedText) {
+    private boolean extractCode(List<Text.TextBlock> recognizedText) {
         boolean found = false;
         Text.TextBlock t = null;
         Iterator it = recognizedText.iterator();
@@ -248,30 +284,29 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             t = (Text.TextBlock) it.next();
             tempText = t.getText().replace("(", "");
             tempText = tempText.replace(")", "");
-            System.out.println(tempText);
             if (tempText.matches("(?s).*[0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9][0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9](A|B).[0-9][0-9][0-9].[0-9][0-9][0-9].*")) {
                 found = true;
             }
         }
 
-        if (!found) {
-            return;
+        if(found){
+            tempText = tempText.replace("FR", "");
+            tempText = tempText.replace("-", ".");
+            tempText = tempText.replace("CE", "");
+            tempText = tempText.replace("l", "1");
+            tempText = tempText.replace("I", "1");
+            tempText = tempText.replace(" ", "");
+            tempText = tempText.replace("\n", "");
+            mProgressDialog.dismiss();
+            //Open the activity which permit to search the product origin with a stamp in the text field
+            Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
+            otherActivity.putExtra("ocrText", tempText);
+            startActivity(otherActivity);
+            getActivity().finish();
         }
+        return found;
 
-        tempText = tempText.replace("FR", "");
-        tempText = tempText.replace("-", ".");
-        tempText = tempText.replace("CE", "");
-        tempText = tempText.replace("l", "1");
-        tempText = tempText.replace("I", "1");
-        tempText = tempText.replace(" ", "");
-        tempText = tempText.replace("\n", "");
-        ocrText.setText(tempText);
-        mProgressDialog.dismiss();
-        //Open the activity which permit to search the product origin with a stamp in the text field
-        Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
-        otherActivity.putExtra("ocrText", ocrText.getText());
-        startActivity(otherActivity);
-        getActivity().finish();
+
     }
 
     @Override

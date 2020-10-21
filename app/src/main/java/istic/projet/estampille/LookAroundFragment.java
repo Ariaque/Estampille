@@ -61,33 +61,39 @@ public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
         Location location = locationManager.getLastKnownLocation(provider);
         mMap.setMyLocationEnabled(true);
 
-        if (location != null) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
+                    if (location != null) {
+                        Log.e("NearMeTest", "LocationExist");
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
+                                .zoom(9)                   // Sets the zoom
+                                .build();                   // Creates a CameraPosition from the builder
+                        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    }
 
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
-                    .zoom(9)                   // Sets the zoom
-                    .build();                   // Creates a CameraPosition from the builder
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        }
 
-        //Find near me
-                    /*InputStream is = null;
+                    Log.e("NearMeTest", "AvantFindNearMe");
+                    //Find near me
+                    InputStream is = null;
                     try {
+                        Log.e("NearMeTest", "tryis");
                         is = new FileInputStream(new File(Environment
                                 .getExternalStorageDirectory().toString()
                                 + "/data/foodorigin_datagouv.txt"));
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
+                        Log.e("NearMeTest", "catchis : " + e.toString());
                     }
                     if (is != null) {
+                        Log.e("NearMeTest", "isExist");
                         BufferedReader reader = new BufferedReader(
                                 new InputStreamReader(is, StandardCharsets.UTF_8)
                         );
 
+                        Log.e("NearMeTest", "avantwhile");
                         String aCompanyLine = "";
                         try {
                             while ((aCompanyLine = reader.readLine()) != null) {
+                                Log.e("NearMeTest", "while");
                                 String[] tab = aCompanyLine.split(";");
                                 String cedex = tab[4].substring(0,2);
                                 int cedexInt = Integer.parseInt(cedex);
@@ -129,10 +135,16 @@ public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
             mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_test);
             //mapFragment = SupportMapFragment.newInstance();
             mapFragment.getMapAsync(this);
+                }
+            });
         }
+
+        // R.id.map is a FrameLayout, not a Fragment
+        //getChildFragmentManager().beginTransaction().replace(R.id.map_test, mapFragment).commit();
+        return rootView;
     }
 
-    private LatLng getCoords(String address) {
+    private LatLng getCoords(String address){
         Geocoder geocoder = new Geocoder(getActivity().getApplicationContext());
         List<Address> addresses = new ArrayList<Address>();
         try {
@@ -140,12 +152,13 @@ public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (addresses.size() > 0) {
-            double latitude = addresses.get(0).getLatitude();
-            double longitude = addresses.get(0).getLongitude();
+        if(addresses.size() > 0) {
+            double latitude= addresses.get(0).getLatitude();
+            double longitude= addresses.get(0).getLongitude();
             LatLng latLng = new LatLng(latitude, longitude);
             return latLng;
-        } else {
+        }
+        else{
             LatLng latLng = new LatLng(0, 0);
             return latLng;
         }
