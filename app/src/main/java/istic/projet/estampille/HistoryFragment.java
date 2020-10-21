@@ -12,15 +12,14 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.util.SparseIntArray;
 import android.view.LayoutInflater;
-import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -36,17 +35,24 @@ import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
@@ -65,6 +71,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private FloatingActionButton scanButton;
     private boolean success;
     private ViewPager viewPager;
+    private int i = 0;
 
     private int OCRcounter = 0;
 
@@ -83,9 +90,48 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         viewPager = getActivity().findViewById(R.id.pager);
         checkPermissions();
 
+
+        ArrayList<Map<String, String>> list = new ArrayList<>();
+        try {
+            list = this.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        SimpleAdapter adapter = new SimpleAdapter(getContext(), list, R.layout.list_item_layout, new String[]{"entreprise", "adresse"}, new int[]{R.id.item1, R.id.item2});
+        listView.setAdapter(adapter);
+
         return rootView;
     }
 
+
+    /**
+     * Do a recognition stamp in the bitmap in parameter
+     *
+     */
+
+    public ArrayList<Map<String, String>> readFile() throws IOException {
+        String fileName = "historyFile.txt";
+        ArrayList<Map<String, String>> list = new ArrayList<>();
+
+        BufferedReader br = new BufferedReader((new InputStreamReader(getActivity().openFileInput(fileName))));
+        String line;
+        StringBuffer buffer = new StringBuffer();
+        while ((line = br.readLine()) != null) {
+            Map<String, String> data = new HashMap<>();
+            buffer.append(line).append("\n");
+            String[] infos = line.split(";");
+            data.put("entreprise", infos[0]);
+            data.put("adresse", infos[1]);
+            list.add(data);
+        }
+        br.close();
+        Set<Map<String, String>> mySet = new LinkedHashSet<>();
+        mySet.addAll(list);
+        list = new ArrayList<>(mySet);
+        System.out.println("taille" + list.size());
+
+        return list;
+    }
     /**
      * Do a recognition stamp in the bitmap in parameter
      *
@@ -194,6 +240,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Do a recognition stamp in the bitmap in parameter
+     *
      * @param bitmap the stamp image
      */
     private void doOCR(final Bitmap bitmap) {
@@ -245,6 +292,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             }
         }
     }
+
     private boolean extractCode(List<Text.TextBlock> recognizedText) {
         boolean found = false;
         Text.TextBlock t = null;
@@ -258,7 +306,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 found = true;
             }
         }
-        if(found){
+        if (found) {
             tempText = tempText.replace("FR", "");
             tempText = tempText.replace("-", ".");
             tempText = tempText.replace("CE", "");
