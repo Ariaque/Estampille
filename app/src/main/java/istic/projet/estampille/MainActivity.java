@@ -19,9 +19,11 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -61,61 +63,23 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private Fragment historyFragment;
     private int foodOriginDarkBlue;
     private int foodOriginWhite;
+    private ConstraintLayout containerView;
     private ArrayList<Map<String, String>> list;
     private Set<String> setH;
 
-
-    /**
-     * @param context     the application context
-     * @param permissions permissions asked by the application
-     * @return true if the user has these permissions false otherwise
-     */
-    private boolean hasPermissions(Context context, String... permissions) {
-        if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
+        this.containerView = findViewById(R.id.main_container);
 
-
-        if (!hasPermissions(context, PERMISSIONS)) {
-            askPermissions();
+        if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, "L'écriture en mémoire est requise pour le chargment des données", Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
+        } else {
+            launchDownloadWorker();
         }
-        // Downloading of the lists of CE-approved establishments every 7 days
-        setContentView(R.layout.activity_main);
-        Constraints constraints = new Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build();
-        final long repeatInterval = 15;
-        PeriodicWorkRequest downloadDataGouv =
-                // TODO : change interval to 7 days
-                new PeriodicWorkRequest.Builder(DownloadDataWorker.class, repeatInterval, TimeUnit.MINUTES)
-                        .setConstraints(constraints)
-                        .setInputData(createInputDataForDownloadWorker())
-                        .build();
-        WorkManager.getInstance(getApplicationContext())
-                .enqueue(downloadDataGouv);
-
-        //Add listener to button
-        /*this.ecrire = findViewById(R.id.ecrire);
-        ecrire.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent otherActivity = new Intent(getApplicationContext(), EcritureEstampille.class);
-                startActivity(otherActivity);
-                finish();
-            }
-        });*/
         mToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -132,6 +96,36 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 .build();
         StrictMode.setVmPolicy(builder);
 
+    }
+
+    /**
+     * Downloading of the lists of CE-approved establishments every 7 days
+     */
+    private void launchDownloadWorker() {
+        if (this.getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            Constraints constraints = new Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build();
+            final long repeatInterval = 7;
+            PeriodicWorkRequest downloadDataGouv =
+                    new PeriodicWorkRequest.Builder(DownloadDataWorker.class, repeatInterval, TimeUnit.DAYS)
+                            .setConstraints(constraints)
+                            .setInputData(createInputDataForDownloadWorker())
+                            .build();
+            WorkManager.getInstance(getApplicationContext())
+                    .enqueue(downloadDataGouv);
+        }
+    }
+
+    /**
+     * Gives the urls that allows to access the lists of CE-approved establishments
+     *
+     * @return the input
+     */
+    private Data createInputDataForDownloadWorker() {
+        Data.Builder builder = new Data.Builder();
+        builder.putStringArray(Constants.KEY_DATA_GOUV_URLS, Constants.urls_data_gouv_array_2);
+        return builder.build();
     }
 
     @Override
@@ -212,24 +206,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     }
 
     /**
-     * @return
-     */
-    private Data createInputDataForDownloadWorker() {
-        Data.Builder builder = new Data.Builder();
-        builder.putStringArray(Constants.KEY_DATA_GOUV_URLS, Constants.urls_data_gouv_array);
-        return builder.build();
-    }
-
-    /**
-     * Asks permissions if it's not already done.
-     */
-    void askPermissions() {
-        if (!hasPermissions(context, PERMISSIONS)) {
-            requestPermissions(PERMISSIONS, PERMISSION_ALL);
-        }
-    }
-
-    /**
      * Sets the focus on the "history" (first from left) menu item. Displays the button to delete the history.
      *
      * @throws IOException throws an {@link IOException} if something goes wrong
@@ -268,6 +244,10 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
      * Sets the focus on the "look around" (third from left) menu item. Displays the button to delete the history.
      */
     private void setFocusOnLookAroundItem() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    "La localisation est nécessaire pour voir les industries autour de vous", Constants.REQUEST_CODE_LOCATION);
+        }
         deleteButton.setVisibility(View.INVISIBLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
@@ -325,7 +305,30 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 startActivity(intent);
             }
         });
-
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                launchDownloadWorker();
+            } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
+                PermissionsUtils.displayOptions(this, containerView, "La permission d'accès au stockage est désactivée");
+            } else {
+                PermissionsUtils.explain(this, containerView, permissions[0], requestCode, "La permission d'accès au stockage est nécessaire pour charger les données");
+            }
+        } else if (requestCode == Constants.REQUEST_CODE_LOCATION) {
+            if (grantResults.length > 0 && permissions.length > 0) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Fragment lookAroundFragment = (LookAroundFragment) fragmentPagerAdapter.instantiateItem(viewPager, 2);
+                } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
+                    PermissionsUtils.displayOptions(this, containerView, "La permission de géolocalisation est désactivée");
+                } else {
+                    PermissionsUtils.explain(this, containerView, permissions[0], requestCode, "La permission de géolocalisation est nécessaire vous situer sur la carte");
+                }
+            } else {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+        }
+    }
 }

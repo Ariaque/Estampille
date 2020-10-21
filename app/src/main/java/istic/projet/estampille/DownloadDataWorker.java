@@ -1,10 +1,15 @@
 package istic.projet.estampille;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -26,6 +31,14 @@ public class DownloadDataWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+//        check
+//        if (this.getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) getApplicationContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//                Toast.makeText(this.getApplicationContext(), "Write extenral storage permission needed", Toast.LENGTH_SHORT).show();
+//            } else {
+//                ActivityCompat.requestPermissions(MainActivity.class, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+//            }
+//        }
 
         Log.d(DownloadDataWorker.class.getName(), "Starting periodic backup job");
         try {
@@ -55,6 +68,7 @@ public class DownloadDataWorker extends Worker {
                 i++;
             }
             bufferedWriter.close();
+            fstream.close();
             return Result.success();
         } catch (IOException e) {
             Log.e(DownloadDataWorker.class.getName(), e.getMessage());
