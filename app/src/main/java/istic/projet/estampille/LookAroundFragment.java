@@ -2,7 +2,6 @@ package istic.projet.estampille;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
@@ -10,14 +9,11 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -28,34 +24,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.text.Text;
-import com.google.mlkit.vision.text.TextRecognition;
-import com.google.mlkit.vision.text.TextRecognizer;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class LookAroundFragment extends Fragment {
     private SupportMapFragment mapFragment;
-    private HashMap<String, LatLng> markersToAdd = new HashMap<>();
+    private final HashMap<String, LatLng> markersToAdd = new HashMap<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -77,11 +54,9 @@ public class LookAroundFragment extends Fragment {
                     Criteria criteria = new Criteria();
                     LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
                     Location location = null;
-                    try
-                    {
+                    try {
                         location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
-                    }
-                    catch(Exception e){
+                    } catch (Exception e) {
                         Toast.makeText(getActivity().getApplicationContext(), getActivity().getApplicationContext().getString(R.string.no_gps_found), Toast.LENGTH_SHORT).show();
                     }
                     googleMap.setMyLocationEnabled(true);
@@ -102,16 +77,23 @@ public class LookAroundFragment extends Fragment {
         return rootView;
     }
 
-    private void addMarkers(GoogleMap googleMap, HashMap<String, LatLng> markersToAdd)
-    {
-        for (String name: markersToAdd.keySet()) {
+    /**
+     * @param googleMap
+     * @param markersToAdd
+     */
+    private void addMarkers(GoogleMap googleMap, HashMap<String, LatLng> markersToAdd) {
+        for (String name : markersToAdd.keySet()) {
             googleMap.addMarker(new MarkerOptions()
                     .position(markersToAdd.get(name))
                     .title(name));
         }
     }
 
-    private LatLng getCoords(String address){
+    /**
+     * @param address
+     * @return
+     */
+    private LatLng getCoords(String address) {
         Geocoder geocoder = new Geocoder(getActivity().getApplicationContext());
         List<Address> addresses = new ArrayList<Address>();
         try {
@@ -119,13 +101,12 @@ public class LookAroundFragment extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(addresses.size() > 0) {
-            double latitude= addresses.get(0).getLatitude();
-            double longitude= addresses.get(0).getLongitude();
+        if (addresses.size() > 0) {
+            double latitude = addresses.get(0).getLatitude();
+            double longitude = addresses.get(0).getLongitude();
             LatLng latLng = new LatLng(latitude, longitude);
             return latLng;
-        }
-        else{
+        } else {
             LatLng latLng = new LatLng(0, 0);
             return latLng;
         }

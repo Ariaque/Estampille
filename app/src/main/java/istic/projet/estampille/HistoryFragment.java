@@ -3,6 +3,7 @@ package istic.projet.estampille;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
@@ -57,6 +59,7 @@ import java.util.Set;
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     private static final int REQUEST_IMAGE1_CAPTURE = 1;
+    private static HistoryFragment instance;
     protected String mCurrentPhotoPath;
     int PERMISSION_ALL = 1;
     boolean flagPermissions = false;
@@ -71,13 +74,35 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private FloatingActionButton scanButton;
     private boolean success;
     private ViewPager viewPager;
-    private int i = 0;
-
     private int OCRcounter = 0;
 
 
-
     private ListView listView;
+
+    /**
+     * Gets the current instance of {@link HistoryFragment}.
+     *
+     * @return the current instance of {@link HistoryFragment}.
+     */
+    public static HistoryFragment getInstance() {
+        return instance;
+    }
+
+    /**
+     * @param context     the application context
+     * @param permissions permissions asked by the application
+     * @return true if the user has these permissions false otherwise
+     */
+    private static boolean hasPermissions(Context context, String... permissions) {
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -99,58 +124,9 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         }
         SimpleAdapter adapter = new SimpleAdapter(getContext(), list, R.layout.list_item_layout, new String[]{"entreprise", "adresse"}, new int[]{R.id.item1, R.id.item2});
         listView.setAdapter(adapter);
+        instance = this;
 
         return rootView;
-    }
-
-
-    /**
-     * Do a recognition stamp in the bitmap in parameter
-     *
-     */
-
-    public ArrayList<Map<String, String>> readFile() throws IOException {
-        String fileName = "historyFile.txt";
-        ArrayList<Map<String, String>> list = new ArrayList<>();
-
-        BufferedReader br = new BufferedReader((new InputStreamReader(getActivity().openFileInput(fileName))));
-        String line;
-        StringBuffer buffer = new StringBuffer();
-        while ((line = br.readLine()) != null) {
-            Map<String, String> data = new HashMap<>();
-            buffer.append(line).append("\n");
-            String[] infos = line.split(";");
-            data.put("entreprise", infos[0]);
-            data.put("adresse", infos[1]);
-            list.add(data);
-        }
-        br.close();
-        Set<Map<String, String>> mySet = new LinkedHashSet<>();
-        mySet.addAll(list);
-        list = new ArrayList<>(mySet);
-        System.out.println("taille" + list.size());
-
-        return list;
-    }
-    /**
-     * Do a recognition stamp in the bitmap in parameter
-     *
-     * @param bitmap the stamp image
-     */
-    /**
-     * @param context the application context
-     * @param permissions permissions asked by the application
-     * @return true if the user has these permissions false otherwise
-     */
-    private static boolean hasPermissions(Context context, String... permissions) {
-        if (context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     @Override
@@ -192,24 +168,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    /**
-     * @return A file which represent the image of the stamp
-     * @throws IOException
-     */
-    public File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("MMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
     @Override
     public void onClick(View view) {
         // Check permissions
@@ -240,6 +198,54 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Do a recognition stamp in the bitmap in parameter
+     */
+    public ArrayList<Map<String, String>> readFile() throws IOException {
+        String fileName = "historyFile.txt";
+        ArrayList<Map<String, String>> list = new ArrayList<>();
+
+        BufferedReader br = new BufferedReader((new InputStreamReader(getActivity().openFileInput(fileName))));
+        String line;
+        StringBuffer buffer = new StringBuffer();
+        while ((line = br.readLine()) != null) {
+            Map<String, String> data = new HashMap<>();
+            buffer.append(line).append("\n");
+            String[] infos = line.split(";");
+            data.put("entreprise", infos[0]);
+            data.put("adresse", infos[1]);
+            list.add(data);
+        }
+        br.close();
+        Set<Map<String, String>> mySet = new LinkedHashSet<>();
+        mySet.addAll(list);
+        list = new ArrayList<>(mySet);
+        System.out.println("taille" + list.size());
+
+        return list;
+    }
+
+    /**
+     * Creates the image file.
+     *
+     * @return A file which represent the image of the stamp
+     * @throws IOException Throws an {@link IOException} if something goes wrong in the file creation process.
+     */
+    public File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("MMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+
+    /**
+     * Recognizes the text from the bitmap in parameter.
      *
      * @param bitmap the stamp image
      */
@@ -251,7 +257,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         success = false;
         int rotationDegree = 90;
         TextRecognizer recognizer = TextRecognition.getClient();
-        for (int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++) {
             InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
             final Task<Text> result =
                     recognizer.process(image)
@@ -261,13 +267,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                                     List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
                                     success = extractCode(recognizedText);
                                     mProgressDialog.cancel();
-                                    if(!success) {
-                                        imageResult(false);
-                                    }
-                                    else {
-                                        imageResult(true);
-
-                                    }
+                                    imageResult(success);
                                 }
                             })
                             .addOnFailureListener(
@@ -280,19 +280,28 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void imageResult(boolean ocrSuccess)
-    {
-        if(ocrSuccess){
+    /**
+     * Sets the ocr in the text input inside {@link WritePackagingNumberFragment} if the recognition has been successful.
+     *
+     * @param ocrSuccess indicates if the recognition has been successful (true) or not (false).
+     */
+    private void imageResult(boolean ocrSuccess) {
+        if (ocrSuccess) {
             viewPager.setCurrentItem(1);
-        }
-        else{
+        } else {
             OCRcounter++;
-            if(OCRcounter == 4){
+            if (OCRcounter == 4) {
                 Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
             }
         }
     }
 
+    /**
+     * Extracts the packaging code from the text recognized on the picture.
+     *
+     * @param recognizedText recognized text
+     * @return true if a character chain matching with the packaging number regex has been found, false otherwise
+     */
     private boolean extractCode(List<Text.TextBlock> recognizedText) {
         boolean found = false;
         Text.TextBlock t = null;
@@ -302,7 +311,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             t = (Text.TextBlock) it.next();
             tempText = t.getText().replace("(", "");
             tempText = tempText.replace(")", "");
-            if (tempText.matches("(?s).*[0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9][0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9](A|B).[0-9][0-9][0-9].[0-9][0-9][0-9].*")) {
+            if (tempText.matches("(?s).*[0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9][0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9](A|B)[.][0-9][0-9][0-9][.][0-9][0-9][0-9].*")) {
                 found = true;
             }
         }
@@ -340,21 +349,34 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     /**
      * Clear the file which contains the search history
      */
-    private void clearFile () {
-        List <String> list = new ArrayList<>();
-        ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.list_item_layout, list);
-        listView.setAdapter(adapter);
-
-        File file = new File (getActivity().getFilesDir()+"/historyFile.txt");
-        try {
-            if (file.exists()) {
-                PrintWriter writer = new PrintWriter(file);
-                writer.print("");
-                writer.close();
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void clearFile() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(R.string.dialog_delete_message)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        List<String> list = new ArrayList<>();
+                        ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.list_item_layout, list);
+                        listView.setAdapter(adapter);
+                        File file = new File(getActivity().getFilesDir() + "/historyFile.txt");
+                        try {
+                            if (file.exists()) {
+                                System.out.println("DELETED");
+                                PrintWriter writer = new PrintWriter(file);
+                                writer.print("");
+                                writer.close();
+                            }
+                            dialog.dismiss();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
