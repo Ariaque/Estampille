@@ -12,8 +12,8 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="150dp"
         android:layout_marginEnd="15dp"
-        android:backgroundTint="@color/FoodOriginBlue"
-        app:boxBackgroundColor="@color/FoodOriginBlue"
+        android:backgroundTint="@color/FoodOriginOrange"
+        app:boxBackgroundColor="@color/FoodOriginOrange"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -24,10 +24,10 @@
             android:layout_height="wrap_content"
             android:focusable="true"
             android:focusableInTouchMode ="true"
-            android:backgroundTint="@color/FoodOriginBlue"
+            android:backgroundTint="@color/FoodOriginOrange"
             android:hint="@string/tf_write_estampille"
             android:textColorHighlight="#80006BA3"
-            android:textColorLink="@color/FoodOriginBlue" />
+            android:textColorLink="@color/FoodOriginOrange" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
@@ -36,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:backgroundTint="@color/FoodOriginBlue"
+        android:backgroundTint="@color/FoodOriginOrange"
         android:text="@string/button_search_estampille"
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
