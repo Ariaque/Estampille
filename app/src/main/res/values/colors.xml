@@ -2,9 +2,9 @@
 <resources>
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="FoodOriginBlue">#006BA3</color>
-    <color name="FoodOriginDarkBlue">#013961</color>
+    <color name="colorAccent">#C6533C</color>
+    <color name="FoodOriginOrange">#F06449</color>
+    <color name="FoodOriginDarkOrange">#C6533C</color>
     <color name="FoodOriginWhite">#FFFFFF</color>
     <color name="colorGrey"> #9b9b9b</color>
     <color name="colorBlack"> #000000</color>

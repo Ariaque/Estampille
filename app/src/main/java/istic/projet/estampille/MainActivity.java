@@ -2,6 +2,7 @@ package istic.projet.estampille;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
@@ -14,13 +15,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
@@ -42,7 +46,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener {
+public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener {
 
     int PERMISSION_ALL = 1;
     String[] PERMISSIONS = {
@@ -53,14 +57,17 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private Context context;
     private Toolbar mToolBar;
     private FragmentPagerAdapter fragmentPagerAdapter;
+    private ImageButton deleteButton;
     private ViewPager viewPager;
     private MenuItem historyMenuItem;
     private MenuItem searchMenuItem;
     private MenuItem lookAroundMenuItem;
+    private Fragment historyFragment;
     private int foodOriginDarkBlue;
     private int foodOriginWhite;
     private ConstraintLayout containerView;
     private ArrayList<Map<String, String>> list;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         fragmentPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPager.setAdapter(fragmentPagerAdapter);
         viewPager.setOffscreenPageLimit(2);
-        foodOriginDarkBlue = ResourcesCompat.getColor(getResources(), R.color.FoodOriginDarkBlue, null);
+        foodOriginDarkBlue = ResourcesCompat.getColor(getResources(), R.color.FoodOriginDarkOrange, null);
         foodOriginWhite = ResourcesCompat.getColor(getResources(), R.color.FoodOriginWhite, null);
         //Detect everything that's potentially suspect and write it in log
         StrictMode.VmPolicy builder = new StrictMode.VmPolicy.Builder()
@@ -121,6 +128,12 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         builder.putStringArray(Constants.KEY_DATA_GOUV_URLS, Constants.urls_data_gouv_array_2);
         return builder.build();
     }
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.deleteButton) {
+            HistoryFragment.getInstance().clearFile();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -129,6 +142,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         historyMenuItem = menu.findItem(R.id.action_history);
         searchMenuItem = menu.findItem(R.id.action_write_code);
         lookAroundMenuItem = menu.findItem(R.id.action_look_around);
+        deleteButton = findViewById(R.id.deleteButton);
+        deleteButton.setOnClickListener(this);
         try {
             setFocusOnHistoryItem();
         } catch (IOException e) {
@@ -189,9 +204,14 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     public void onPageScrollStateChanged(int state) {
 
     }
-
+    /**
+     * Sets the focus on the "history" (first from left) menu item. Displays the button to delete the history.
+     *
+     * @throws IOException throws an {@link IOException} if something goes wrong
+     */
     private void setFocusOnHistoryItem() throws IOException {
         this.readFile();
+        deleteButton.setVisibility(View.VISIBLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginWhite, BlendMode.SRC_ATOP));
             searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
@@ -203,7 +223,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
+    /**
+     * Sets the focus on the "search" (second from left) menu item. Displays the button to delete the history.
+     */
     private void setFocusOnSearchItem() {
+        deleteButton.setVisibility(View.INVISIBLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
             searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginWhite, BlendMode.SRC_ATOP));
@@ -215,12 +239,15 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
+    /**
+     * Sets the focus on the "look around" (third from left) menu item. Displays the button to delete the history.
+     */
     private void setFocusOnLookAroundItem() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("LAF permission", "getLocationPermission: getting location permissions");
             PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                     "La localisation est nécessaire pour voir les industries autour de vous", Constants.REQUEST_CODE_LOCATION);
         }
+        deleteButton.setVisibility(View.INVISIBLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
             searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
@@ -232,6 +259,9 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
+    /**
+     * Reads the history file content.
+     */
     public void readFile() {
         String fileName = "historyFile.txt";
         list = new ArrayList<>();
@@ -299,5 +329,4 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             }
         }
-    }
-}
+    }}

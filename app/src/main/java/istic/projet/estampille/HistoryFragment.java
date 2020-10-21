@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
@@ -36,21 +38,28 @@ import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     private static final int REQUEST_IMAGE1_CAPTURE = 1;
+    private static HistoryFragment instance;
     protected String mCurrentPhotoPath;
     private ProgressDialog mProgressDialog;
     private Context context;
@@ -61,7 +70,18 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private boolean success;
     private ViewPager viewPager;
     private int OCRcounter = 0;
+
+
     private ListView listView;
+
+    /**
+     * Gets the current instance of {@link HistoryFragment}.
+     *
+     * @return the current instance of {@link HistoryFragment}.
+     */
+    public static HistoryFragment getInstance() {
+        return instance;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,6 +93,17 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         scanButton.setOnClickListener(this);
         this.containerView = rootView;
         viewPager = getActivity().findViewById(R.id.pager);
+
+
+        ArrayList<Map<String, String>> list = new ArrayList<>();
+        try {
+            list = this.readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        SimpleAdapter adapter = new SimpleAdapter(getContext(), list, R.layout.list_item_layout, new String[]{"entreprise", "adresse"}, new int[]{R.id.item1, R.id.item2});
+        listView.setAdapter(adapter);
+        instance = this;
 
         return rootView;
     }
@@ -116,24 +147,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    /**
-     * @return A file which represent the image of the stamp
-     * @throws IOException
-     */
-    public File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("MMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
     @Override
     public void onClick(View view) {
         if (this.getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -170,6 +183,54 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Do a recognition stamp in the bitmap in parameter
+     */
+    public ArrayList<Map<String, String>> readFile() throws IOException {
+        String fileName = "historyFile.txt";
+        ArrayList<Map<String, String>> list = new ArrayList<>();
+
+        BufferedReader br = new BufferedReader((new InputStreamReader(getActivity().openFileInput(fileName))));
+        String line;
+        StringBuffer buffer = new StringBuffer();
+        while ((line = br.readLine()) != null) {
+            Map<String, String> data = new HashMap<>();
+            buffer.append(line).append("\n");
+            String[] infos = line.split(";");
+            data.put("entreprise", infos[0]);
+            data.put("adresse", infos[1]);
+            list.add(data);
+        }
+        br.close();
+        Set<Map<String, String>> mySet = new LinkedHashSet<>();
+        mySet.addAll(list);
+        list = new ArrayList<>(mySet);
+        System.out.println("taille" + list.size());
+
+        return list;
+    }
+
+    /**
+     * Creates the image file.
+     *
+     * @return A file which represent the image of the stamp
+     * @throws IOException Throws an {@link IOException} if something goes wrong in the file creation process.
+     */
+    public File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("MMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+
+    /**
+     * Recognizes the text from the bitmap in parameter.
      *
      * @param bitmap the stamp image
      */
@@ -181,7 +242,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         success = false;
         int rotationDegree = 90;
         TextRecognizer recognizer = TextRecognition.getClient();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++){
             InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
             final Task<Text> result =
                     recognizer.process(image)
@@ -204,6 +265,11 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    /**
+     * Sets the ocr in the text input inside {@link WritePackagingNumberFragment} if the recognition has been successful.
+     *
+     * @param ocrSuccess indicates if the recognition has been successful (true) or not (false).
+     */
     private void imageResult(boolean ocrSuccess) {
         if (ocrSuccess) {
             viewPager.setCurrentItem(1);
@@ -215,6 +281,12 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    /**
+     * Extracts the packaging code from the text recognized on the picture.
+     *
+     * @param recognizedText recognized text
+     * @return true if a character chain matching with the packaging number regex has been found, false otherwise
+     */
     private boolean extractCode(List<Text.TextBlock> recognizedText) {
         boolean found = false;
         Text.TextBlock t = null;
@@ -224,7 +296,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             t = (Text.TextBlock) it.next();
             tempText = t.getText().replace("(", "");
             tempText = tempText.replace(")", "");
-            if (tempText.matches("(?s).*[0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9][0-9][0-9].[0-9][0-9][0-9].[0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9](A|B).[0-9][0-9][0-9].[0-9][0-9][0-9].*")) {
+            if (tempText.matches("(?s).*[0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9][0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9].*") || tempText.matches("(?s).*[0-9](A|B)[.][0-9][0-9][0-9][.][0-9][0-9][0-9].*")) {
                 found = true;
             }
         }
@@ -266,20 +338,34 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     /**
      * Clear the file which contains the search history
      */
-    private void clearFile() {
-        List<String> list = new ArrayList<>();
-        ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.list_item_layout, list);
-        listView.setAdapter(adapter);
-
-        File file = new File(getActivity().getFilesDir() + "/historyFile.txt");
-        try {
-            if (file.exists()) {
-                PrintWriter writer = new PrintWriter(file);
-                writer.print("");
-                writer.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void clearFile() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(R.string.dialog_delete_message)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        List<String> list = new ArrayList<>();
+                        ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.list_item_layout, list);
+                        listView.setAdapter(adapter);
+                        File file = new File(getActivity().getFilesDir() + "/historyFile.txt");
+                        try {
+                            if (file.exists()) {
+                                System.out.println("DELETED");
+                                PrintWriter writer = new PrintWriter(file);
+                                writer.print("");
+                                writer.close();
+                            }
+                            dialog.dismiss();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

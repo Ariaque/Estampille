@@ -49,14 +49,20 @@ public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_look_around, container, false);
-
         if (mapFragment == null) {
             mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_test);
             mapFragment.getMapAsync(this);
         }
+
+        // R.id.map is a FrameLayout, not a Fragment
+        //getChildFragmentManager().beginTransaction().replace(R.id.map_test, mapFragment).commit();
         return rootView;
     }
 
+    /**
+     * @param googleMap
+     * @param markersToAdd
+     */
     private void addMarkers(GoogleMap googleMap, HashMap<String, LatLng> markersToAdd) {
         for (String name : markersToAdd.keySet()) {
             googleMap.addMarker(new MarkerOptions()
@@ -65,6 +71,10 @@ public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * @param address
+     * @return
+     */
     private LatLng getCoords(String address) {
         Geocoder geocoder = new Geocoder(getActivity().getApplicationContext());
         List<Address> addresses = new ArrayList<Address>();
