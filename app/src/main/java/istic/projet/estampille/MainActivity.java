@@ -2,7 +2,6 @@ package istic.projet.estampille;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
@@ -11,30 +10,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
-import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
-import android.util.SparseIntArray;
-import android.view.Surface;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.work.Constraints;
@@ -71,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private int foodOriginDarkBlue;
     private int foodOriginWhite;
     private ConstraintLayout containerView;
+    private ArrayList<Map<String, String>> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,17 +92,17 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     }
 
-
+    /**
+     * Downloading of the lists of CE-approved establishments every 7 days
+     */
     private void launchDownloadWorker() {
         if (this.getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            // Downloading of the lists of CE-approved establishments every 7 days
             Constraints constraints = new Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
                     .build();
-            final long repeatInterval = 15;
+            final long repeatInterval = 7;
             PeriodicWorkRequest downloadDataGouv =
-                    // TODO : change interval to 7 days
-                    new PeriodicWorkRequest.Builder(DownloadDataWorker.class, repeatInterval, TimeUnit.MINUTES)
+                    new PeriodicWorkRequest.Builder(DownloadDataWorker.class, repeatInterval, TimeUnit.DAYS)
                             .setConstraints(constraints)
                             .setInputData(createInputDataForDownloadWorker())
                             .build();
@@ -121,6 +111,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
+    /**
+     * Gives the urls that allows to access the lists of CE-approved establishments
+     *
+     * @return the input
+     */
     private Data createInputDataForDownloadWorker() {
         Data.Builder builder = new Data.Builder();
         builder.putStringArray(Constants.KEY_DATA_GOUV_URLS, Constants.urls_data_gouv_array_2);
@@ -167,15 +162,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    /**
-     * Ask permissions if it's not already done.
-     */
-    void askPermissions() {
-        if (!hasPermissions(context, PERMISSIONS)) {
-            requestPermissions(PERMISSIONS, PERMISSION_ALL);
         }
     }
 
@@ -230,6 +216,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     }
 
     private void setFocusOnLookAroundItem() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.e("LAF permission", "getLocationPermission: getting location permissions");
+            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    "La localisation est nécessaire pour voir les industries autour de vous", Constants.REQUEST_CODE_LOCATION);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
             searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
@@ -249,11 +240,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             BufferedReader br = new BufferedReader((new InputStreamReader(openFileInput(fileName))));
             String line;
             StringBuilder buffer = new StringBuilder();
-            while ((line = br.readLine()) != null){
-                Map <String, String> data = new HashMap<>();
+            while ((line = br.readLine()) != null) {
+                Map<String, String> data = new HashMap<>();
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
-                data.put("estampille",infos[0]);
+                data.put("estampille", infos[0]);
                 data.put("entreprise", infos[1]);
                 list.add(data);
             }
@@ -263,10 +254,10 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
 
         Set<Map<String, String>> mySet = new LinkedHashSet<>(list);
-        list= new ArrayList<>(mySet);
+        list = new ArrayList<>(mySet);
 
         ListView listView = findViewById(R.id.listView);
-        SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(), list, R.layout.list_item_layout, new String[] {"estampille", "entreprise"}, new int[] {R.id.item1, R.id.item2});
+        SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(), list, R.layout.list_item_layout, new String[]{"estampille", "entreprise"}, new int[]{R.id.item1, R.id.item2});
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -283,28 +274,30 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 startActivity(intent);*/
             }
         });
-
     }
-}
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.e("MA permission", "onRequestPermissionsResult MA");
-        Log.e("MA permission demandees", String.valueOf(permissions.length));
-        Log.e("MA permission req code", String.valueOf(requestCode));
         if (requestCode == Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 launchDownloadWorker();
             } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
                 PermissionsUtils.displayOptions(this, containerView, "La permission d'accès au stockage est désactivée");
             } else {
-                PermissionsUtils.explain(this, containerView, permissions[0], requestCode, "Cette permission est nécessaire pour charger les données");
-                Toast.makeText(this, "Write external storage permission was not granted", Toast.LENGTH_SHORT).show();
+                PermissionsUtils.explain(this, containerView, permissions[0], requestCode, "La permission d'accès au stockage est nécessaire pour charger les données");
             }
-        } else {
+        } else if (requestCode == Constants.REQUEST_CODE_LOCATION) {
+            if (grantResults.length > 0 && permissions.length > 0) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Fragment lookAroundFragment = (LookAroundFragment) fragmentPagerAdapter.instantiateItem(viewPager, 2);
+                } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
+                    PermissionsUtils.displayOptions(this, containerView, "La permission de géolocalisation est désactivée");
+                } else {
+                    PermissionsUtils.explain(this, containerView, permissions[0], requestCode, "La permission de géolocalisation est nécessaire vous situer sur la carte");
+                }
+            } else {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             }
         }
-
-
     }
+}
