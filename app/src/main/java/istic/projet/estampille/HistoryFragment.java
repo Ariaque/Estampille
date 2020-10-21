@@ -25,10 +25,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
@@ -69,7 +72,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private FloatingActionButton scanButton;
     private ViewGroup containerView;
     private boolean success;
-
+    private ViewPager viewPager;
 
 
 
@@ -84,8 +87,10 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         scanButton = rootView.findViewById(R.id.scan_button);
         listView = rootView.findViewById(R.id.listView);
         scanButton.setOnClickListener(this);
-//        this.containerView = (ConstraintLayout) rootView.findViewById(R.id.main_container);
         this.containerView = rootView;
+        viewPager = getActivity().findViewById(R.id.pager);
+        checkPermissions();
+
 
         ArrayList<Map<String, String>> list = new ArrayList<>();
         try {
@@ -248,31 +253,39 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         //Open a waiting pop up during the treatment
         mProgressDialog = ProgressDialog.show(getActivity(), "Processing",
                 "Doing OCR...", true);
+        success = false;
+        int i = 0;
         int rotationDegree = 90;
         TextRecognizer recognizer = TextRecognition.getClient();
-
-        for(int i = 0; i < 4; i++){
-            InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
-            final Task<Text> result =
-                    recognizer.process(image)
-                            .addOnSuccessListener(new OnSuccessListener<Text>() {
-                                @Override
-                                public void onSuccess(Text visionText) {
+        InputImage image = InputImage.fromBitmap(bitmap, rotationDegree * i);
+        final Task<Text> result =
+                recognizer.process(image)
+                        .addOnSuccessListener(new OnSuccessListener<Text>() {
+                            @Override
+                            public void onSuccess(Text visionText) {
+                                int i = 0;
+                                while(i < 4 && !success){
                                     List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
                                     success = extractCode(recognizedText);
+                                    i++;
                                 }
-                            })
-                            .addOnFailureListener(
-                                    new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                        }
-                                    });
-        }
-        mProgressDialog.cancel();
-        if(!success) {
-            Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
-        }
+                                mProgressDialog.cancel();
+                                if(!success) {
+                                    Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
+                                }
+                                else {
+                                    viewPager.setCurrentItem(1);
+                                }
+                            }
+                        })
+                        .addOnFailureListener(
+                                new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                    }
+                                });
+
+
     }
 
     private boolean extractCode(List<Text.TextBlock> recognizedText) {
@@ -297,12 +310,13 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             tempText = tempText.replace("I", "1");
             tempText = tempText.replace(" ", "");
             tempText = tempText.replace("\n", "");
-            mProgressDialog.dismiss();
+            TextInputEditText editText = getActivity().findViewById(R.id.tf_estampille);
+            editText.setText(tempText);
             //Open the activity which permit to search the product origin with a stamp in the text field
-            Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
+            /*Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
             otherActivity.putExtra("ocrText", tempText);
             startActivity(otherActivity);
-            getActivity().finish();
+            getActivity().finish();*/
         }
         return found;
 
