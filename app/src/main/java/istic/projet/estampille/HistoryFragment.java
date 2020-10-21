@@ -16,12 +16,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
@@ -97,8 +100,22 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        SimpleAdapter adapter = new SimpleAdapter(getContext(), list, R.layout.list_item_layout, new String[]{"entreprise", "adresse"}, new int[]{R.id.item1, R.id.item2});
-        listView.setAdapter(adapter);
+
+        ImageView imageView = rootView.findViewById(R.id.tuto_image);
+        if (list.size() > 0)
+        {
+            imageView.setVisibility(View.INVISIBLE);
+            SimpleAdapter adapter = new SimpleAdapter(getContext(), list, R.layout.list_item_layout, new String[]{"entreprise", "adresse"}, new int[]{R.id.item1, R.id.item2});
+            listView.setAdapter(adapter);
+        }
+        else
+        {
+            imageView.setVisibility(View.VISIBLE);
+            final ConstraintLayout.LayoutParams layoutparams = (ConstraintLayout.LayoutParams)imageView.getLayoutParams();
+            layoutparams.setMargins(0,0,0,0);
+            imageView.setLayoutParams(layoutparams);
+        }
+
 
         return rootView;
     }
