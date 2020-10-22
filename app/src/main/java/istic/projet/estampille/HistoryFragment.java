@@ -150,7 +150,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (this.getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.CAMERA}, "la caméra est nécessaire pour scanner les estmapilles", Constants.REQUEST_CODE_PERMISSION_CAMERA);
+            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.CAMERA}, "La caméra est nécessaire pour scanner les estampilles", Constants.REQUEST_CODE_PERMISSION_CAMERA);
         } else {
             openCamera();
         }
@@ -160,9 +160,9 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
      * Open camera.
      */
     public void openCamera() {
+        Log.e("camera", "open camera");
         //Intent to open the camera
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
         if (takePictureIntent.resolveActivity(context.getPackageManager()) != null) {
             File photoFile = null;
             try {
@@ -319,22 +319,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         return found;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == Constants.REQUEST_CODE_PERMISSION_CAMERA) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openCamera();
-            } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
-                PermissionsUtils.displayOptions(this.getActivity(), containerView, "La permission d'accès à la caméra est désactivée");
-            } else {
-                PermissionsUtils.explain(this.getActivity(), containerView, permissions[0], requestCode, "Cette permission est nécessaire pour scanner les estampilles");
-                Toast.makeText(this.getActivity(), "Write external storage permission was not granted", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
     /**
      * Clear the file which contains the search history
      */
@@ -367,5 +351,21 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == Constants.REQUEST_CODE_PERMISSION_CAMERA) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera();
+            } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
+                PermissionsUtils.displayOptions(this.getActivity(), containerView, PermissionsUtils.permission_camera_params);
+            } else {
+                PermissionsUtils.explain(this.getActivity(), containerView, permissions[0], requestCode, PermissionsUtils.permission_camera_explain);
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 }

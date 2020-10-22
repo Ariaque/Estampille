@@ -10,7 +10,6 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,12 +45,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener {
 
-    int PERMISSION_ALL = 1;
-    String[] PERMISSIONS = {
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            android.Manifest.permission.CAMERA,
-            Manifest.permission.ACCESS_FINE_LOCATION
-    };
     private Context context;
     private Toolbar mToolBar;
     private FragmentPagerAdapter fragmentPagerAdapter;
@@ -60,13 +53,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private MenuItem historyMenuItem;
     private MenuItem searchMenuItem;
     private MenuItem lookAroundMenuItem;
-    private Fragment historyFragment;
     private int foodOriginDarkBlue;
     private int foodOriginWhite;
     private ConstraintLayout containerView;
     private ArrayList<Map<String, String>> list;
     private Set<String> setH;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,9 +65,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
         this.containerView = findViewById(R.id.main_container);
-
         if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, "L'écriture en mémoire est requise pour le chargment des données", Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
+            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PermissionsUtils.permission_storage_explain, Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
         } else {
             launchDownloadWorker();
         }
@@ -246,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private void setFocusOnLookAroundItem() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                    "La localisation est nécessaire pour voir les industries autour de vous", Constants.REQUEST_CODE_LOCATION);
+                    PermissionsUtils.permission_geoloc_explain, Constants.REQUEST_CODE_LOCATION);
         }
         deleteButton.setVisibility(View.INVISIBLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -276,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 Map<String, String> data = new HashMap<>();
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
-                data.put("estampille",infos[0]);
+                data.put("estampille", infos[0]);
                 data.put("entreprise", infos[2]);
                 setH.add(line);
                 list.add(data);
@@ -297,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Object[] tab = setH.toArray();
-                String line = (String)tab[i];
+                String line = (String) tab[i];
                 Intent intent = new Intent(context, DisplayMap.class);
                 Bundle mapBundle = new Bundle();
                 mapBundle.putStringArray("Infos", line.split(";"));
@@ -313,22 +303,23 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 launchDownloadWorker();
             } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
-                PermissionsUtils.displayOptions(this, containerView, "La permission d'accès au stockage est désactivée");
+                PermissionsUtils.displayOptions(this, containerView, PermissionsUtils.permission_storage_params);
             } else {
-                PermissionsUtils.explain(this, containerView, permissions[0], requestCode, "La permission d'accès au stockage est nécessaire pour charger les données");
+                PermissionsUtils.explain(this, containerView, permissions[0], requestCode, PermissionsUtils.permission_storage_explain);
             }
         } else if (requestCode == Constants.REQUEST_CODE_LOCATION) {
             if (grantResults.length > 0 && permissions.length > 0) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Fragment lookAroundFragment = (LookAroundFragment) fragmentPagerAdapter.instantiateItem(viewPager, 2);
+                    lookAroundFragment.onResume();
                 } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
-                    PermissionsUtils.displayOptions(this, containerView, "La permission de géolocalisation est désactivée");
+                    PermissionsUtils.displayOptions(this, containerView, PermissionsUtils.permission_geoloc_params);
                 } else {
-                    PermissionsUtils.explain(this, containerView, permissions[0], requestCode, "La permission de géolocalisation est nécessaire vous situer sur la carte");
+                    PermissionsUtils.explain(this, containerView, permissions[0], requestCode, PermissionsUtils.permission_geoloc_explain);
                 }
-            } else {
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 }
