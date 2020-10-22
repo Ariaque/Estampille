@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         context = MainActivity.this;
         this.containerView = findViewById(R.id.main_container);
         if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PermissionsUtils.permission_storage_explain, Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
+            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PermissionsUtils.permission_storage_explain, PermissionsUtils.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
         } else {
             launchDownloadWorker();
         }
@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private void setFocusOnLookAroundItem() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                    PermissionsUtils.permission_geoloc_explain, Constants.REQUEST_CODE_LOCATION);
+                    PermissionsUtils.permission_geoloc_explain, PermissionsUtils.REQUEST_CODE_LOCATION);
         }
         deleteButton.setVisibility(View.INVISIBLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -304,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE) {
+        if (requestCode == PermissionsUtils.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 launchDownloadWorker();
             } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
@@ -312,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             } else {
                 PermissionsUtils.explain(this, containerView, permissions[0], requestCode, PermissionsUtils.permission_storage_explain);
             }
-        } else if (requestCode == Constants.REQUEST_CODE_LOCATION) {
+        } else if (requestCode == PermissionsUtils.REQUEST_CODE_LOCATION) {
             if (grantResults.length > 0 && permissions.length > 0) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Fragment lookAroundFragment = (LookAroundFragment) fragmentPagerAdapter.instantiateItem(viewPager, 2);

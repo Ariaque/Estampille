@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -38,23 +37,17 @@ import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
@@ -137,7 +130,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (this.getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.CAMERA}, "La caméra est nécessaire pour scanner les estampilles", Constants.REQUEST_CODE_PERMISSION_CAMERA);
+            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.CAMERA}, "La caméra est nécessaire pour scanner les estampilles", PermissionsUtils.REQUEST_CODE_PERMISSION_CAMERA);
         } else {
             openCamera();
         }
@@ -316,7 +309,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == Constants.REQUEST_CODE_PERMISSION_CAMERA) {
+        if (requestCode == PermissionsUtils.REQUEST_CODE_PERMISSION_CAMERA) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera();
             } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
