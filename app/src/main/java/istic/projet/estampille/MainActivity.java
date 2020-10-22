@@ -10,6 +10,7 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Menu;
@@ -300,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         list = new ArrayList<>(mySet);
 
         //Changes the adapter list
-        SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(), list, R.layout.list_item_layout, new String[]{"estampille", "transformateur"}, new int[]{R.id.item1, R.id.item2});
+        SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(), list, R.layout.list_item_layout, new String[]{"transformateur", "estampille"}, new int[]{R.id.item1, R.id.item2});
         listView.setAdapter(adapter);
 
         //Adds listener for each list item : go to the information page of a transformer
