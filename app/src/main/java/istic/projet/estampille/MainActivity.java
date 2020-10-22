@@ -293,6 +293,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             }
         } catch (IOException e) {
             e.printStackTrace();
+            HistoryFragment.getInstance().setTutoVisibility(true);
         }
 
         //Deletes duplicates line
