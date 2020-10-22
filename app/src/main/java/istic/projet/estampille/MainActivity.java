@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     private Context context;
     private Toolbar mToolBar;
+    private Fragment historyFragment;
     private FragmentPagerAdapter fragmentPagerAdapter;
     private ImageButton deleteButton;
     private ViewPager viewPager;
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         WorkManager.getInstance(getApplicationContext())
                 .enqueue(downloadDataGouv);
 
-        //Manages design elements 
+        //Manages design elements
         mToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -291,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
                 data.put("estampille",infos[0]);
-                data.put("entreprise", infos[2]);
+                data.put("transformateur", infos[2]);
                 setH.add(line);
                 list.add(data);
             }
