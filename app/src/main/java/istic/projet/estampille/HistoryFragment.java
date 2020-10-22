@@ -55,6 +55,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
@@ -70,6 +72,9 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private boolean success;
     private ViewPager viewPager;
     private int OCRcounter = 0;
+    private static final Pattern normalStamp = Pattern.compile("[0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
+    private static final Pattern domTomStamp = Pattern.compile("[0-9][0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
+    private static final Pattern corsicaStamp = Pattern.compile("[0-9](A|B)[.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
 
 
     private ListView listView;
@@ -276,6 +281,8 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         } else {
             OCRcounter++;
             if (OCRcounter == 4) {
+                TextInputEditText editText = getActivity().findViewById(R.id.tf_estampille);
+                editText.setText("");
                 Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
             }
         }
@@ -289,9 +296,10 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
      */
     private boolean extractCode(List<Text.TextBlock> recognizedText) {
         boolean found = false;
-        Text.TextBlock t = null;
+        Text.TextBlock t;
         Iterator it = recognizedText.iterator();
         String tempText = null;
+        //Finds the group of text containing the string
         while (!found && it.hasNext()) {
             t = (Text.TextBlock) it.next();
             tempText = t.getText().replace("(", "");
@@ -301,20 +309,20 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             }
         }
         if (found) {
-            tempText = tempText.replace("FR", "");
-            tempText = tempText.replace("-", ".");
-            tempText = tempText.replace("CE", "");
-            tempText = tempText.replace("l", "1");
-            tempText = tempText.replace("I", "1");
-            tempText = tempText.replace(" ", "");
-            tempText = tempText.replace("\n", "");
+            //Removes spare characters from recognized string
+            Matcher normalMatcher = normalStamp.matcher(tempText);
+            Matcher domTomMatcher = domTomStamp.matcher(tempText);
+            Matcher corsicaMatcher = corsicaStamp.matcher(tempText);
             TextInputEditText editText = getActivity().findViewById(R.id.tf_estampille);
-            editText.setText(tempText);
-            //Open the activity which permit to search the product origin with a stamp in the text field
-            /*Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
-            otherActivity.putExtra("ocrText", tempText);
-            startActivity(otherActivity);
-            getActivity().finish();*/
+            if(normalMatcher.find()) {
+                editText.setText(normalMatcher.group(0));
+            }
+            else if (domTomMatcher.find()) {
+                editText.setText(domTomMatcher.group(0));
+            }
+            else if (corsicaMatcher.find()) {
+                editText.setText(corsicaMatcher.group(0));
+            }
         }
         return found;
     }

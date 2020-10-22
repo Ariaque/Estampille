@@ -3,17 +3,16 @@ package istic.projet.estampille;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -89,45 +88,44 @@ public class EcritureEstampille extends AppCompatActivity {
         boolean found = false;
         String productEstamp = "";
 
-      //  if (is != null) {
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(is, StandardCharsets.UTF_8)
-            );
-            //Recover the stamp in the text field
-            productEstamp = this.zoneText.getText().toString();
-            String aCompanyLine = "";
-            try {
-                while ((aCompanyLine = reader.readLine()) != null) {
-                    String[] tab = aCompanyLine.split(";");
-                    String fileName = "historyFile.txt";
-                    if (productEstamp.equals(tab[1])) {
-                       try {
-                            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(fileName, Context.MODE_APPEND)));
-                            bw.write(tab[3]+ ";" + tab[6]+ "\n");
-                            bw.close();
-                        }
-                        catch (Exception e){
-                            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-
-                        Intent intent = new Intent(getApplicationContext(), DisplayMap.class);
-                        Bundle mapBundle = new Bundle();
-                        mapBundle.putStringArray("Infos", tab);
-                        intent.putExtras(mapBundle);
-                        startActivity(intent);
-                        found = true;
-
+        //  if (is != null) {
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(is, StandardCharsets.UTF_8)
+        );
+        //Recover the stamp in the text field
+        productEstamp = this.zoneText.getText().toString();
+        String aCompanyLine = "";
+        try {
+            while ((aCompanyLine = reader.readLine()) != null) {
+                String[] tab = aCompanyLine.split(";");
+                String fileName = "historyFile.txt";
+                if (productEstamp.equals(tab[1])) {
+                    try {
+                        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(fileName, Context.MODE_APPEND)));
+                        bw.write(tab[3] + ";" + tab[6] + "\n");
+                        bw.close();
+                    } catch (Exception e) {
+                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
                     }
-                }
 
-            } catch (IOException e) {
-                Log.wtf("Erreur dans la lecture du CSV " + aCompanyLine, e);
-                e.printStackTrace();
+                    Intent intent = new Intent(getApplicationContext(), DisplayMap.class);
+                    Bundle mapBundle = new Bundle();
+                    mapBundle.putStringArray("Infos", tab);
+                    intent.putExtras(mapBundle);
+                    startActivity(intent);
+                    found = true;
+
+                }
             }
-            //If the stamp has no similarity in the CSV, the error page appears
-            if (!found) {
-                Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
-            }
+
+        } catch (IOException e) {
+            Log.wtf("Erreur dans la lecture du CSV " + aCompanyLine, e);
+            e.printStackTrace();
+        }
+        //If the stamp has no similarity in the CSV, the error page appears
+        if (!found) {
+            Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
+        }
 
 
         //     }

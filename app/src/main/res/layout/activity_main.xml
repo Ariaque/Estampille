@@ -10,6 +10,7 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
+        android:elevation="16dp"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/FoodOriginOrange"
@@ -51,6 +52,7 @@
 
     <ImageButton
         android:id="@+id/deleteButton"
+        android:elevation="16dp"
         android:layout_width="56dp"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/selectableItemBackground"
