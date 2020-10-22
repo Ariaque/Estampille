@@ -305,6 +305,10 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         dialog.show();
     }
 
+    /**
+     * Set the visibility of the tuto_image on the HistoryFragmet
+     * @param isTutoVisible true if the image must be visible, false otherwise
+     */
     public void setTutoVisibility(boolean isTutoVisible){
         ImageView imageView = getView().findViewById(R.id.tuto_image);
         if(isTutoVisible){
