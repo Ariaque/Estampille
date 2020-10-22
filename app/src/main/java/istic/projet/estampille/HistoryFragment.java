@@ -264,11 +264,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             tempText = tempText.replace("\n", "");
             TextInputEditText editText = getActivity().findViewById(R.id.tf_estampille);
             editText.setText(tempText);
-            //Open the activity which permit to search the product origin with a stamp in the text field
-            /*Intent otherActivity = new Intent(getActivity().getApplicationContext(), EcritureEstampille.class);
-            otherActivity.putExtra("ocrText", tempText);
-            startActivity(otherActivity);
-            getActivity().finish();*/
         }
         return found;
     }
