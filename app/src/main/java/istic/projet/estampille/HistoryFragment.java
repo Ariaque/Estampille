@@ -105,20 +105,16 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             e.printStackTrace();
         }
 
-        ImageView imageView = rootView.findViewById(R.id.tuto_image);
         if (list.size() > 0)
         {
-            imageView.setVisibility(View.INVISIBLE);
+            setTutoVisibility(false);
             SimpleAdapter adapter = new SimpleAdapter(getContext(), list, R.layout.list_item_layout, new String[]{"entreprise", "adresse"}, new int[]{R.id.item1, R.id.item2});
             listView.setAdapter(adapter);
             instance = this;
         }
         else
         {
-            imageView.setVisibility(View.VISIBLE);
-            final ConstraintLayout.LayoutParams layoutparams = (ConstraintLayout.LayoutParams)imageView.getLayoutParams();
-            layoutparams.setMargins(0,0,0,0);
-            imageView.setLayoutParams(layoutparams);
+            setTutoVisibility(true);
         }
 
 
@@ -350,7 +346,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-        flagPermissions = true;
     }
 
     /**
@@ -373,6 +368,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                                 writer.close();
                             }
                             dialog.dismiss();
+                            setTutoVisibility(true);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -385,5 +381,17 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public void setTutoVisibility(boolean isTutoVisible){
+        ImageView imageView = getView().findViewById(R.id.tuto_image);
+        if(isTutoVisible){
+            imageView.setVisibility(View.VISIBLE);
+            final ConstraintLayout.LayoutParams layoutparams = (ConstraintLayout.LayoutParams)imageView.getLayoutParams();
+            layoutparams.setMargins(0,0,0,0);
+            imageView.setLayoutParams(layoutparams);
+        }else{
+            imageView.setVisibility(View.INVISIBLE);
+        }
     }
 }

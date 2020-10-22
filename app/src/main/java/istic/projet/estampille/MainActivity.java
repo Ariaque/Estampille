@@ -10,12 +10,14 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -276,12 +278,22 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 Map<String, String> data = new HashMap<>();
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
+                Log.i("testHistory", String.valueOf(infos.length));
                 data.put("estampille",infos[0]);
                 data.put("entreprise", infos[2]);
                 setH.add(line);
                 list.add(data);
             }
             br.close();
+
+            ImageView imageView = findViewById(R.id.tuto_image);
+            if(list.size() == 0)
+            {
+                HistoryFragment.getInstance().setTutoVisibility(true);
+            }
+            else{
+                HistoryFragment.getInstance().setTutoVisibility(false);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
