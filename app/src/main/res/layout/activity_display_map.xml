@@ -12,23 +12,48 @@
         android:orientation="vertical"
         android:weightSum="10">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:minHeight="?attr/actionBarSize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:titleTextColor="@android:color/white"
+            android:background="#F46449">
+        </androidx.appcompat.widget.Toolbar>
+
+        <TextView
+            android:id="@+id/textView14"
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:gravity="center"
+            android:text="Origine"
+            android:textColor="@color/colorBlack"
+            android:textSize="17dp"
+            android:background="#F6EDEC"/>
+
         <TextView
             android:id="@+id/textView10"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:textColor="@color/colorBlack"
+            android:background="#F6EDEC"/>
 
         <TextView
             android:id="@+id/textView9"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:textColor="@color/colorBlack"
+            android:background="#F6EDEC"/>
 
         <TextView
             android:id="@+id/textView8"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:textColor="@color/colorBlack"
+            android:background="#F6EDEC"/>
 
         <fragment
             android:id="@+id/map"
