@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     }
 
     /**
-     * Downloading of the lists of CE-approved establishments every 7 days
+     * Downloading of the lists of CE-approved establishments every 7 days.
      */
     private void launchDownloadWorker() {
         if (this.getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
