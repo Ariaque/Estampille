@@ -10,7 +10,6 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,12 +45,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener {
 
-    int PERMISSION_ALL = 1;
-    String[] PERMISSIONS = {
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            android.Manifest.permission.CAMERA,
-            Manifest.permission.ACCESS_FINE_LOCATION
-    };
     private Context context;
     private Toolbar mToolBar;
     private FragmentPagerAdapter fragmentPagerAdapter;
@@ -60,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private MenuItem historyMenuItem;
     private MenuItem searchMenuItem;
     private MenuItem lookAroundMenuItem;
-    private Fragment historyFragment;
     private int foodOriginDarkBlue;
     private int foodOriginWhite;
     private ConstraintLayout containerView;
@@ -75,11 +67,13 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         context = MainActivity.this;
         this.containerView = findViewById(R.id.main_container);
 
+        //Checks permission
         if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, "L'écriture en mémoire est requise pour le chargment des données", Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
         } else {
             launchDownloadWorker();
         }
+
         // Downloading of the lists of CE-approved establishments every 7 days
         setContentView(R.layout.activity_main);
         Constraints constraints = new Constraints.Builder()
@@ -94,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                         .build();
         WorkManager.getInstance(getApplicationContext())
                 .enqueue(downloadDataGouv);
+
+        //Manages design elements 
         mToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -103,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         viewPager.setOffscreenPageLimit(2);
         foodOriginDarkBlue = ResourcesCompat.getColor(getResources(), R.color.FoodOriginDarkOrange, null);
         foodOriginWhite = ResourcesCompat.getColor(getResources(), R.color.FoodOriginWhite, null);
+
         //Detect everything that's potentially suspect and write it in log
         StrictMode.VmPolicy builder = new StrictMode.VmPolicy.Builder()
                 .detectAll()
