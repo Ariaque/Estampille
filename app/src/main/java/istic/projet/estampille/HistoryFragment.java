@@ -141,7 +141,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
      * Open camera.
      */
     public void openCamera() {
-        Log.e("camera", "open camera");
         //Intent to open the camera
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(context.getPackageManager()) != null) {
