@@ -16,6 +16,9 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Objects;
 
+/**
+ * Worker that download the list of CE-approved establishments.
+ */
 public class DownloadDataWorker extends Worker {
 
     public DownloadDataWorker(@NonNull Context context,
@@ -53,8 +56,8 @@ public class DownloadDataWorker extends Worker {
                 bufferedReader.close();
                 i++;
             }
-            bufferedWriter.close();
             fstream.close();
+            bufferedWriter.close();
             return Result.success();
         } catch (IOException e) {
             Log.e(DownloadDataWorker.class.getName(), e.getMessage());

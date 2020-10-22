@@ -1,9 +1,12 @@
 package istic.projet.estampille;
 
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
+public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener{
 
     double lon = 0;
     double lat = 0;
@@ -29,7 +32,7 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
     String address = "";
     String siret = "";
     String name = "";
-
+    private ImageButton backButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,10 +53,13 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
         TextView view8 = (TextView) findViewById(R.id.textView8);
         TextView view9 = (TextView) findViewById(R.id.textView9);
         TextView view10 = (TextView) findViewById(R.id.textView10);
+        backButton = findViewById(R.id.backButton);
 
         view8.setText(name);
         view9.setText(address);
         view10.setText(siret);
+
+        backButton.setOnClickListener(this);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         Objects.requireNonNull(mapFragment).getMapAsync(this);
@@ -86,6 +92,15 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
         else{
             LatLng latLng = new LatLng(0, 0);
             return latLng;
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view.getId() == R.id.backButton){
+            Intent otherActivity = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(otherActivity);
+            finish();
         }
     }
 }
