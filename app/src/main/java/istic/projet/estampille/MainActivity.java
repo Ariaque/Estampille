@@ -10,7 +10,6 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private MenuItem historyMenuItem;
     private MenuItem searchMenuItem;
     private MenuItem lookAroundMenuItem;
-    private Fragment historyFragment;
     private int foodOriginDarkBlue;
     private int foodOriginWhite;
     private ArrayList<Map<String, String>> list;
@@ -105,17 +103,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                         .build();
         WorkManager.getInstance(getApplicationContext())
                 .enqueue(downloadDataGouv);
-
-        //Add listener to button
-        /*this.ecrire = findViewById(R.id.ecrire);
-        ecrire.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent otherActivity = new Intent(getApplicationContext(), EcritureEstampille.class);
-                startActivity(otherActivity);
-                finish();
-            }
-        });*/
         mToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -281,15 +268,18 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     }
 
     /**
-     * Reads the history file content.
+     * Reads the history file content and diplays the history in the main page
      */
     public void readFile() {
         String fileName = "historyFile.txt";
+        ListView listView = findViewById(R.id.listView);
         list = new ArrayList<>();
         setH = new LinkedHashSet<>();
 
+        //Reads the file
         try {
-            BufferedReader br = new BufferedReader((new InputStreamReader(openFileInput(fileName))));
+            InputStreamReader inputReader = new InputStreamReader(openFileInput(fileName));
+            BufferedReader br = new BufferedReader(inputReader);
             String line;
             StringBuilder buffer = new StringBuilder();
             while ((line = br.readLine()) != null) {
@@ -297,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
                 data.put("estampille",infos[0]);
-                data.put("entreprise", infos[2]);
+                data.put("transformateur", infos[2]);
                 setH.add(line);
                 list.add(data);
             }
@@ -306,21 +296,23 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             e.printStackTrace();
         }
 
+        //Deletes duplicates line
         Set<Map<String, String>> mySet = new LinkedHashSet<>(list);
         list = new ArrayList<>(mySet);
 
-        ListView listView = findViewById(R.id.listView);
-        SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(), list, R.layout.list_item_layout, new String[]{"estampille", "entreprise"}, new int[]{R.id.item1, R.id.item2});
+        //Changes the adapter list
+        SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(), list, R.layout.list_item_layout, new String[]{"estampille", "transformateur"}, new int[]{R.id.item1, R.id.item2});
         listView.setAdapter(adapter);
 
+        //Adds listener for each list item : go to the information page of a transformer
+        Object[] tab = setH.toArray();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Object[] tab = setH.toArray();
-                String line = (String)tab[i];
+                String infos = (String)tab[i];
                 Intent intent = new Intent(context, DisplayMap.class);
                 Bundle mapBundle = new Bundle();
-                mapBundle.putStringArray("Infos", line.split(";"));
+                mapBundle.putStringArray("Infos", infos.split(";"));
                 intent.putExtras(mapBundle);
                 startActivity(intent);
             }
