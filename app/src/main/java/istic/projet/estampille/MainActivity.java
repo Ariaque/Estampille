@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         viewPager.setOffscreenPageLimit(2);
         foodOriginDarkBlue = ResourcesCompat.getColor(getResources(), R.color.FoodOriginDarkOrange, null);
         foodOriginWhite = ResourcesCompat.getColor(getResources(), R.color.FoodOriginWhite, null);
+
         //Detect everything that's potentially suspect and write it in log
         StrictMode.VmPolicy builder = new StrictMode.VmPolicy.Builder()
                 .detectAll()
@@ -251,15 +252,18 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     }
 
     /**
-     * Reads the history file content.
+     * Reads the history file content and diplays the history in the main page
      */
     public void readFile() {
         String fileName = "historyFile.txt";
+        ListView listView = findViewById(R.id.listView);
         list = new ArrayList<>();
         setH = new LinkedHashSet<>();
 
+        //Reads the file
         try {
-            BufferedReader br = new BufferedReader((new InputStreamReader(openFileInput(fileName))));
+            InputStreamReader inputReader = new InputStreamReader(openFileInput(fileName));
+            BufferedReader br = new BufferedReader(inputReader);
             String line;
             StringBuilder buffer = new StringBuilder();
             while ((line = br.readLine()) != null) {
@@ -279,18 +283,19 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         Set<Map<String, String>> mySet = new LinkedHashSet<>(list);
         list = new ArrayList<>(mySet);
 
-        ListView listView = findViewById(R.id.listView);
-        SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(), list, R.layout.list_item_layout, new String[]{"estampille", "entreprise"}, new int[]{R.id.item1, R.id.item2});
+        //Changes the adapter list
+        SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(), list, R.layout.list_item_layout, new String[]{"estampille", "transformateur"}, new int[]{R.id.item1, R.id.item2});
         listView.setAdapter(adapter);
 
+        //Adds listener for each list item : go to the information page of a transformer
+        Object[] tab = setH.toArray();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Object[] tab = setH.toArray();
-                String line = (String) tab[i];
+                String infos = (String)tab[i];
                 Intent intent = new Intent(context, DisplayMap.class);
                 Bundle mapBundle = new Bundle();
-                mapBundle.putStringArray("Infos", line.split(";"));
+                mapBundle.putStringArray("Infos", infos.split(";"));
                 intent.putExtras(mapBundle);
                 startActivity(intent);
             }

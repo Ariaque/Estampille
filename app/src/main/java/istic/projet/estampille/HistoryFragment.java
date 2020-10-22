@@ -70,8 +70,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private boolean success;
     private ViewPager viewPager;
     private int OCRcounter = 0;
-
-
     private ListView listView;
 
     /**
@@ -93,17 +91,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         scanButton.setOnClickListener(this);
         this.containerView = rootView;
         viewPager = getActivity().findViewById(R.id.pager);
-
-
-        ArrayList<Map<String, String>> list = new ArrayList<>();
-        try {
-            list = this.readFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        SimpleAdapter adapter = new SimpleAdapter(getContext(), list, R.layout.list_item_layout, new String[]{"entreprise", "adresse"}, new int[]{R.id.item1, R.id.item2});
-        listView.setAdapter(adapter);
-        instance = this;
 
         return rootView;
     }
@@ -179,33 +166,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE1_CAPTURE);
             }
         }
-    }
-
-    /**
-     * Do a recognition stamp in the bitmap in parameter
-     */
-    public ArrayList<Map<String, String>> readFile() throws IOException {
-        String fileName = "historyFile.txt";
-        ArrayList<Map<String, String>> list = new ArrayList<>();
-
-        BufferedReader br = new BufferedReader((new InputStreamReader(getActivity().openFileInput(fileName))));
-        String line;
-        StringBuffer buffer = new StringBuffer();
-        while ((line = br.readLine()) != null) {
-            Map<String, String> data = new HashMap<>();
-            buffer.append(line).append("\n");
-            String[] infos = line.split(";");
-            data.put("entreprise", infos[0]);
-            data.put("adresse", infos[1]);
-            list.add(data);
-        }
-        br.close();
-        Set<Map<String, String>> mySet = new LinkedHashSet<>();
-        mySet.addAll(list);
-        list = new ArrayList<>(mySet);
-        System.out.println("taille" + list.size());
-
-        return list;
     }
 
     /**
