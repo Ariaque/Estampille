@@ -14,8 +14,20 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Arrays;
 
+/**
+ * Class to handle the permissions.
+ */
 public class PermissionsUtils {
 
+    static final int REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE = 2;
+    static final int REQUEST_CODE_PERMISSION_CAMERA = 1;
+    static final int REQUEST_CODE_LOCATION = 3;
+    static final String permission_geoloc_explain = "La permission de géolocalisation est désactivée";
+    static final String permission_geoloc_params = "La permission de géolocalisation est nécessaire pour vous situer sur la carte";
+    static final String permission_storage_explain = "La permission d'accès au stockage est désactivée";
+    static final String permission_storage_params = "La permission d'accès au stockage est nécessaire pour charger les données";
+    static final String permission_camera_explain = "La permission d'accès à la caméra est désactivée";
+    static final String permission_camera_params = "La permission d'accès à la caméra est nécessaire pour scanner les estampilles";
 
     /**
      * Check if the permissions or granted and ask them if it is not.
@@ -47,7 +59,6 @@ public class PermissionsUtils {
      * @param requestCode   requestCode
      */
     public static void checkPermission(Fragment fragment, View containerView, String[] permissions, String rational_text, int requestCode) {
-        Log.e("permission", "checkpermission f " + Arrays.toString(permissions));
         for (String permission : permissions) {
             if (fragment.getActivity().shouldShowRequestPermissionRationale(permission)) {
                 explain(fragment.getActivity(), containerView, permission, requestCode, rational_text);
@@ -97,5 +108,4 @@ public class PermissionsUtils {
             }
         }).show();
     }
-
 }

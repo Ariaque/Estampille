@@ -67,7 +67,6 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback,
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.d("Display map", "onMapReady");
         LatLng coords = new LatLng(lat, lon);
         googleMap.addMarker(new MarkerOptions()
                 .position(coords)

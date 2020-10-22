@@ -2,10 +2,6 @@ package istic.projet.estampille;
 
 public class Constants {
 
-    static final int REQUEST_CODE_PERMISSION_CAMERA = 1;
-    static final int REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE = 2;
-    static final int REQUEST_CODE_LOCATION = 3;
-
     static final String KEY_DATA_GOUV_URLS = "KEY_DATA_GOUV_URLs";
     static final String[] urls_data_gouv_array =
             {"https://www.data.gouv.fr/fr/datasets/r/c2d33407-ce1a-4f34-8c6e-72066ce05c2b",
@@ -62,5 +58,4 @@ public class Constants {
                     "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA_PROD_RAFF.txt",
                     "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA4_ASCCC_PRV.txt",
                     "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA4_AGSANLPL_PRV2.txt"};
-
 }
