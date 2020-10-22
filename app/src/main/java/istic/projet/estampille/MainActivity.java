@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     private Context context;
     private Toolbar mToolBar;
+    private Fragment historyFragment;
     private FragmentPagerAdapter fragmentPagerAdapter;
     private ImageButton deleteButton;
     private ViewPager viewPager;
@@ -65,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
         this.containerView = findViewById(R.id.main_container);
+
+        //Checks permission
         if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PermissionsUtils.permission_storage_explain, PermissionsUtils.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
         } else {
@@ -270,8 +273,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 Map<String, String> data = new HashMap<>();
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
-                data.put("estampille", infos[0]);
-                data.put("entreprise", infos[2]);
+                data.put("estampille",infos[0]);
+                data.put("transformateur", infos[2]);
                 setH.add(line);
                 list.add(data);
             }
@@ -280,6 +283,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             e.printStackTrace();
         }
 
+        //Deletes duplicates line
         Set<Map<String, String>> mySet = new LinkedHashSet<>(list);
         list = new ArrayList<>(mySet);
 
@@ -327,4 +331,5 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+
 }
