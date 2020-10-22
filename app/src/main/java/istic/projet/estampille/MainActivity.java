@@ -10,12 +10,14 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -46,27 +48,20 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener {
 
-    int PERMISSION_ALL = 1;
-    String[] PERMISSIONS = {
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            android.Manifest.permission.CAMERA,
-            Manifest.permission.ACCESS_FINE_LOCATION
-    };
     private Context context;
     private Toolbar mToolBar;
+    private Fragment historyFragment;
     private FragmentPagerAdapter fragmentPagerAdapter;
     private ImageButton deleteButton;
     private ViewPager viewPager;
     private MenuItem historyMenuItem;
     private MenuItem searchMenuItem;
     private MenuItem lookAroundMenuItem;
-    private Fragment historyFragment;
     private int foodOriginDarkBlue;
     private int foodOriginWhite;
     private ConstraintLayout containerView;
     private ArrayList<Map<String, String>> list;
     private Set<String> setH;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +70,9 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         context = MainActivity.this;
         this.containerView = findViewById(R.id.main_container);
 
+        //Checks permission
         if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, "L'écriture en mémoire est requise pour le chargment des données", Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
+            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PermissionsUtils.permission_storage_explain, PermissionsUtils.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
         } else {
             launchDownloadWorker();
         }
@@ -89,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         viewPager.setOffscreenPageLimit(2);
         foodOriginDarkBlue = ResourcesCompat.getColor(getResources(), R.color.FoodOriginDarkOrange, null);
         foodOriginWhite = ResourcesCompat.getColor(getResources(), R.color.FoodOriginWhite, null);
+
         //Detect everything that's potentially suspect and write it in log
         StrictMode.VmPolicy builder = new StrictMode.VmPolicy.Builder()
                 .detectAll()
@@ -246,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private void setFocusOnLookAroundItem() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                    "La localisation est nécessaire pour voir les industries autour de vous", Constants.REQUEST_CODE_LOCATION);
+                    PermissionsUtils.permission_geoloc_explain, PermissionsUtils.REQUEST_CODE_LOCATION);
         }
         deleteButton.setVisibility(View.INVISIBLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -261,15 +258,18 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     }
 
     /**
-     * Reads the history file content.
+     * Reads the history file content and diplays the history in the main page
      */
     public void readFile() {
         String fileName = "historyFile.txt";
+        ListView listView = findViewById(R.id.listView);
         list = new ArrayList<>();
         setH = new LinkedHashSet<>();
 
+        //Reads the file
         try {
-            BufferedReader br = new BufferedReader((new InputStreamReader(openFileInput(fileName))));
+            InputStreamReader inputReader = new InputStreamReader(openFileInput(fileName));
+            BufferedReader br = new BufferedReader(inputReader);
             String line;
             StringBuilder buffer = new StringBuilder();
             while ((line = br.readLine()) != null) {
@@ -277,30 +277,41 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
                 data.put("estampille",infos[0]);
-                data.put("entreprise", infos[2]);
+                data.put("transformateur", infos[2]);
                 setH.add(line);
                 list.add(data);
             }
             br.close();
+
+            ImageView imageView = findViewById(R.id.tuto_image);
+            if(list.size() == 0)
+            {
+                HistoryFragment.getInstance().setTutoVisibility(true);
+            }
+            else{
+                HistoryFragment.getInstance().setTutoVisibility(false);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        //Deletes duplicates line
         Set<Map<String, String>> mySet = new LinkedHashSet<>(list);
         list = new ArrayList<>(mySet);
 
-        ListView listView = findViewById(R.id.listView);
-        SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(), list, R.layout.list_item_layout, new String[]{"estampille", "entreprise"}, new int[]{R.id.item1, R.id.item2});
+        //Changes the adapter list
+        SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(), list, R.layout.list_item_layout, new String[]{"estampille", "transformateur"}, new int[]{R.id.item1, R.id.item2});
         listView.setAdapter(adapter);
 
+        //Adds listener for each list item : go to the information page of a transformer
+        Object[] tab = setH.toArray();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Object[] tab = setH.toArray();
-                String line = (String)tab[i];
+                String infos = (String)tab[i];
                 Intent intent = new Intent(context, DisplayMap.class);
                 Bundle mapBundle = new Bundle();
-                mapBundle.putStringArray("Infos", line.split(";"));
+                mapBundle.putStringArray("Infos", infos.split(";"));
                 intent.putExtras(mapBundle);
                 startActivity(intent);
             }
@@ -309,26 +320,28 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == Constants.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE) {
+        if (requestCode == PermissionsUtils.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 launchDownloadWorker();
             } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
-                PermissionsUtils.displayOptions(this, containerView, "La permission d'accès au stockage est désactivée");
+                PermissionsUtils.displayOptions(this, containerView, PermissionsUtils.permission_storage_params);
             } else {
-                PermissionsUtils.explain(this, containerView, permissions[0], requestCode, "La permission d'accès au stockage est nécessaire pour charger les données");
+                PermissionsUtils.explain(this, containerView, permissions[0], requestCode, PermissionsUtils.permission_storage_explain);
             }
-        } else if (requestCode == Constants.REQUEST_CODE_LOCATION) {
+        } else if (requestCode == PermissionsUtils.REQUEST_CODE_LOCATION) {
             if (grantResults.length > 0 && permissions.length > 0) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Fragment lookAroundFragment = (LookAroundFragment) fragmentPagerAdapter.instantiateItem(viewPager, 2);
+                    lookAroundFragment.onResume();
                 } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
-                    PermissionsUtils.displayOptions(this, containerView, "La permission de géolocalisation est désactivée");
+                    PermissionsUtils.displayOptions(this, containerView, PermissionsUtils.permission_geoloc_params);
                 } else {
-                    PermissionsUtils.explain(this, containerView, permissions[0], requestCode, "La permission de géolocalisation est nécessaire vous situer sur la carte");
+                    PermissionsUtils.explain(this, containerView, permissions[0], requestCode, PermissionsUtils.permission_geoloc_explain);
                 }
-            } else {
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+
 }

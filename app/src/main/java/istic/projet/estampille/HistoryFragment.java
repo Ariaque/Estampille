@@ -18,13 +18,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -38,21 +40,19 @@ import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -98,16 +98,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         scanButton.setOnClickListener(this);
         this.containerView = rootView;
         viewPager = getActivity().findViewById(R.id.pager);
-
-
-        ArrayList<Map<String, String>> list = new ArrayList<>();
-        try {
-            list = this.readFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        SimpleAdapter adapter = new SimpleAdapter(getContext(), list, R.layout.list_item_layout, new String[]{"entreprise", "adresse"}, new int[]{R.id.item1, R.id.item2});
-        listView.setAdapter(adapter);
         instance = this;
 
         return rootView;
@@ -155,7 +145,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (this.getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.CAMERA}, "la caméra est nécessaire pour scanner les estmapilles", Constants.REQUEST_CODE_PERMISSION_CAMERA);
+            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.CAMERA}, "La caméra est nécessaire pour scanner les estampilles", PermissionsUtils.REQUEST_CODE_PERMISSION_CAMERA);
         } else {
             openCamera();
         }
@@ -167,7 +157,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     public void openCamera() {
         //Intent to open the camera
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
         if (takePictureIntent.resolveActivity(context.getPackageManager()) != null) {
             File photoFile = null;
             try {
@@ -184,33 +173,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE1_CAPTURE);
             }
         }
-    }
-
-    /**
-     * Do a recognition stamp in the bitmap in parameter
-     */
-    public ArrayList<Map<String, String>> readFile() throws IOException {
-        String fileName = "historyFile.txt";
-        ArrayList<Map<String, String>> list = new ArrayList<>();
-
-        BufferedReader br = new BufferedReader((new InputStreamReader(getActivity().openFileInput(fileName))));
-        String line;
-        StringBuffer buffer = new StringBuffer();
-        while ((line = br.readLine()) != null) {
-            Map<String, String> data = new HashMap<>();
-            buffer.append(line).append("\n");
-            String[] infos = line.split(";");
-            data.put("entreprise", infos[0]);
-            data.put("adresse", infos[1]);
-            list.add(data);
-        }
-        br.close();
-        Set<Map<String, String>> mySet = new LinkedHashSet<>();
-        mySet.addAll(list);
-        list = new ArrayList<>(mySet);
-        System.out.println("taille" + list.size());
-
-        return list;
     }
 
     /**
@@ -327,22 +289,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         return found;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == Constants.REQUEST_CODE_PERMISSION_CAMERA) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openCamera();
-            } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
-                PermissionsUtils.displayOptions(this.getActivity(), containerView, "La permission d'accès à la caméra est désactivée");
-            } else {
-                PermissionsUtils.explain(this.getActivity(), containerView, permissions[0], requestCode, "Cette permission est nécessaire pour scanner les estampilles");
-                Toast.makeText(this.getActivity(), "Write external storage permission was not granted", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
     /**
      * Clear the file which contains the search history
      */
@@ -363,6 +309,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                                 writer.close();
                             }
                             dialog.dismiss();
+                            setTutoVisibility(true);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -375,5 +322,33 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public void setTutoVisibility(boolean isTutoVisible){
+        ImageView imageView = getView().findViewById(R.id.tuto_image);
+        if(isTutoVisible){
+            imageView.setVisibility(View.VISIBLE);
+            final ConstraintLayout.LayoutParams layoutparams = (ConstraintLayout.LayoutParams)imageView.getLayoutParams();
+            layoutparams.setMargins(0,0,0,0);
+            imageView.setLayoutParams(layoutparams);
+        }else{
+            imageView.setVisibility(View.INVISIBLE);
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PermissionsUtils.REQUEST_CODE_PERMISSION_CAMERA) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera();
+            } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
+                PermissionsUtils.displayOptions(this.getActivity(), containerView, PermissionsUtils.permission_camera_params);
+            } else {
+                PermissionsUtils.explain(this.getActivity(), containerView, permissions[0], requestCode, PermissionsUtils.permission_camera_explain);
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 }
