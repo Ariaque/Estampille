@@ -53,9 +53,6 @@ public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
             mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_test);
             mapFragment.getMapAsync(this);
         }
-
-        // R.id.map is a FrameLayout, not a Fragment
-        //getChildFragmentManager().beginTransaction().replace(R.id.map_test, mapFragment).commit();
         return rootView;
     }
 
