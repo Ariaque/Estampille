@@ -18,12 +18,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -287,6 +290,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                                 writer.close();
                             }
                             dialog.dismiss();
+                            setTutoVisibility(true);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -299,6 +303,18 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public void setTutoVisibility(boolean isTutoVisible){
+        ImageView imageView = getView().findViewById(R.id.tuto_image);
+        if(isTutoVisible){
+            imageView.setVisibility(View.VISIBLE);
+            final ConstraintLayout.LayoutParams layoutparams = (ConstraintLayout.LayoutParams)imageView.getLayoutParams();
+            layoutparams.setMargins(0,0,0,0);
+            imageView.setLayoutParams(layoutparams);
+        }else{
+            imageView.setVisibility(View.INVISIBLE);
+        }
     }
 
 
