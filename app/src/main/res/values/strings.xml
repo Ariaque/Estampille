@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FoodOrigin</string>
     <string name="button_search_estampille">Rechercher</string>
@@ -22,4 +23,9 @@
     <string name="yes">Oui</string>
     <string name="no">Non</string>
     <string name="dialog_delete_message">Désirez-vous supprimer définitivement votre historique ?</string>
+    <string name="info_title">Informations de fabrication</string>
+    <string name="siret"><![CDATA[<b>SIRET :</b>]]> %1$s</string>
+    <string name="adress"><![CDATA[<b>Adresse :</b>]]> %1$s</string>
+    <string name="name"><![CDATA[<b>Nom :</b>]]> %1$s</string>
+    <string name="wip">WORK IN PROGRESS</string>
 </resources>

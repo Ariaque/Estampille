@@ -3,6 +3,10 @@ package istic.projet.estampille;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.Html;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback {
+public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener{
 
     double lon = 0;
     double lat = 0;
@@ -28,7 +32,7 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback 
     String address = "";
     String siret = "";
     String name = "";
-
+    private ImageButton backButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,13 +50,15 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback 
             lat = latLng.latitude;
         }
 
-        TextView view8 = findViewById(R.id.textView8);
-        TextView view9 = findViewById(R.id.textView9);
-        TextView view10 = findViewById(R.id.textView10);
+        TextView textViewAdress = (TextView) findViewById(R.id.textViewAdress);
+        TextView textViewSiret = (TextView) findViewById(R.id.textViewSiret);
+        TextView textViewName = (TextView) findViewById(R.id.textViewName);
+        backButton = findViewById(R.id.backButton);
+        textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress,address)));
+        textViewSiret.setText(Html.fromHtml(getResources().getString(R.string.siret,siret)));
+        textViewName.setText(Html.fromHtml(getResources().getString(R.string.name,name)));
 
-        view8.setText(name);
-        view9.setText(address);
-        view10.setText(siret);
+        backButton.setOnClickListener(this);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         Objects.requireNonNull(mapFragment).getMapAsync(this);
@@ -64,7 +70,7 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback 
         googleMap.addMarker(new MarkerOptions()
                 .position(coords)
                 .title(name));
-        CameraPosition camPos = new CameraPosition.Builder().target(coords).zoom(9).build();
+        CameraPosition camPos = new CameraPosition.Builder().target(coords).zoom(8).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
     }
 
@@ -84,6 +90,15 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback 
         } else {
             LatLng latLng = new LatLng(0, 0);
             return latLng;
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view.getId() == R.id.backButton){
+            Intent otherActivity = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(otherActivity);
+            finish();
         }
     }
 }

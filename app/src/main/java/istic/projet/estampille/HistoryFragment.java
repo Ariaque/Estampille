@@ -13,12 +13,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -70,6 +72,10 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private boolean success;
     private ViewPager viewPager;
     private int OCRcounter = 0;
+    private static final Pattern normalStamp = Pattern.compile("[0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
+    private static final Pattern domTomStamp = Pattern.compile("[0-9][0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
+    private static final Pattern corsicaStamp = Pattern.compile("[0-9](A|B)[.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
+    private LinearLayout listViewItemLayout;
     private ListView listView;
 
     /**
@@ -83,11 +89,14 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_history, container, false);
         context = rootView.getContext();
         scanButton = rootView.findViewById(R.id.scan_button);
         listView = rootView.findViewById(R.id.listView);
+
+
         scanButton.setOnClickListener(this);
         this.containerView = rootView;
         viewPager = getActivity().findViewById(R.id.pager);
@@ -100,11 +109,11 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        //Call after that user takes a photo
+        //Calls after that user takes a photo
         if (resultCode == Activity.RESULT_OK) {
             Bitmap bmp = null;
             try {
-                //Create a bitmap from the stamp image
+                //Creates a bitmap from the stamp image
                 InputStream is = context.getContentResolver().openInputStream(photoURI1);
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 bmp = BitmapFactory.decodeStream(is, null, options);
@@ -114,9 +123,8 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 Log.i(getClass().getSimpleName(), ex.getMessage());
                 Toast.makeText(context, R.string.conversion_fail_toast, Toast.LENGTH_SHORT).show();
             }
-            //Start the stamp recognition
+            //Starts the stamp recognition
             doOCR(bmp);
-
             OutputStream os;
             try {
                 os = new FileOutputStream(photoURI1.getPath());
@@ -129,7 +137,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 Log.e(getClass().getSimpleName(), ex.getMessage());
                 Toast.makeText(context, R.string.file_creation_fail_toast, Toast.LENGTH_SHORT).show();
             }
-
         } else {
             photoURI1 = oldPhotoURI;
         }
@@ -145,7 +152,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * Open camera.
+     * Opens camera.
      */
     public void openCamera() {
         //Intent to open the camera
@@ -281,7 +288,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * Clear the file which contains the search history
+     * Clears the file which contains the search history
      */
     public void clearFile() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -316,8 +323,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * Set the visibility of the tuto_image on the HistoryFragmet
-     *
+     * Sets the visibility of the tutorial image on the HistoryFragment
      * @param isTutoVisible true if the image must be visible, false otherwise
      */
     public void setTutoVisibility(boolean isTutoVisible) {
