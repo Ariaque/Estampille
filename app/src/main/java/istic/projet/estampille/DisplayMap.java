@@ -43,9 +43,9 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback,
         if(mapBundle != null){
             tab = mapBundle.getStringArray("Infos");
             assert tab != null;
-            siret = tab[1];
-            name = tab[2];
-            address = tab[3] + ", " + tab[4] + " " + tab[5];
+            siret = tab[2];
+            name = tab[3];
+            address = tab[4] + ", " + tab[5] + " " + tab[6];
             LatLng latLng = getCoords(address);
             lon = latLng.longitude;
             lat = latLng.latitude;
