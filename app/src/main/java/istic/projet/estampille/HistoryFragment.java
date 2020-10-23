@@ -26,7 +26,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -53,14 +52,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     private static final int REQUEST_IMAGE1_CAPTURE = 1;
+    private static final Pattern normalStamp = Pattern.compile("[0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
+    private static final Pattern domTomStamp = Pattern.compile("[0-9][0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
+    private static final Pattern corsicaStamp = Pattern.compile("[0-9](A|B)[.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
     private static HistoryFragment instance;
     protected String mCurrentPhotoPath;
     private ProgressDialog mProgressDialog;
@@ -72,11 +70,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private boolean success;
     private ViewPager viewPager;
     private int OCRcounter = 0;
-    private static final Pattern normalStamp = Pattern.compile("[0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
-    private static final Pattern domTomStamp = Pattern.compile("[0-9][0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
-    private static final Pattern corsicaStamp = Pattern.compile("[0-9](A|B)[.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
-
-
     private ListView listView;
 
     /**
@@ -276,13 +269,11 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             Matcher domTomMatcher = domTomStamp.matcher(tempText);
             Matcher corsicaMatcher = corsicaStamp.matcher(tempText);
             TextInputEditText editText = getActivity().findViewById(R.id.tf_estampille);
-            if(normalMatcher.find()) {
+            if (normalMatcher.find()) {
                 editText.setText(normalMatcher.group(0));
-            }
-            else if (domTomMatcher.find()) {
+            } else if (domTomMatcher.find()) {
                 editText.setText(domTomMatcher.group(0));
-            }
-            else if (corsicaMatcher.find()) {
+            } else if (corsicaMatcher.find()) {
                 editText.setText(corsicaMatcher.group(0));
             }
         }
@@ -326,16 +317,17 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Set the visibility of the tuto_image on the HistoryFragmet
+     *
      * @param isTutoVisible true if the image must be visible, false otherwise
      */
-    public void setTutoVisibility(boolean isTutoVisible){
+    public void setTutoVisibility(boolean isTutoVisible) {
         ImageView imageView = getView().findViewById(R.id.tuto_image);
-        if(isTutoVisible){
+        if (isTutoVisible) {
             imageView.setVisibility(View.VISIBLE);
-            final ConstraintLayout.LayoutParams layoutparams = (ConstraintLayout.LayoutParams)imageView.getLayoutParams();
-            layoutparams.setMargins(0,0,0,0);
+            final ConstraintLayout.LayoutParams layoutparams = (ConstraintLayout.LayoutParams) imageView.getLayoutParams();
+            layoutparams.setMargins(0, 0, 0, 0);
             imageView.setLayoutParams(layoutparams);
-        }else{
+        } else {
             imageView.setVisibility(View.INVISIBLE);
         }
     }

@@ -3,7 +3,6 @@ package istic.projet.estampille;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
+public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback {
 
     double lon = 0;
     double lat = 0;
@@ -36,7 +35,7 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
         setContentView(R.layout.activity_display_map);
 
         Bundle mapBundle = getIntent().getExtras();
-        if(mapBundle != null){
+        if (mapBundle != null) {
             tab = mapBundle.getStringArray("Infos");
             assert tab != null;
             siret = tab[1];
@@ -47,9 +46,9 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
             lat = latLng.latitude;
         }
 
-        TextView view8 = (TextView) findViewById(R.id.textView8);
-        TextView view9 = (TextView) findViewById(R.id.textView9);
-        TextView view10 = (TextView) findViewById(R.id.textView10);
+        TextView view8 = findViewById(R.id.textView8);
+        TextView view9 = findViewById(R.id.textView9);
+        TextView view10 = findViewById(R.id.textView10);
 
         view8.setText(name);
         view9.setText(address);
@@ -69,7 +68,7 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
     }
 
-    private LatLng getCoords(String address){
+    private LatLng getCoords(String address) {
         Geocoder geocoder = new Geocoder(this.getApplicationContext());
         List<Address> addresses = new ArrayList<Address>();
         try {
@@ -77,13 +76,12 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(addresses.size() > 0) {
-            double latitude= addresses.get(0).getLatitude();
-            double longitude= addresses.get(0).getLongitude();
+        if (addresses.size() > 0) {
+            double latitude = addresses.get(0).getLatitude();
+            double longitude = addresses.get(0).getLongitude();
             LatLng latLng = new LatLng(latitude, longitude);
             return latLng;
-        }
-        else{
+        } else {
             LatLng latLng = new LatLng(0, 0);
             return latLng;
         }

@@ -10,8 +10,6 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.Log;
-import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -276,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 Map<String, String> data = new HashMap<>();
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
-                data.put("estampille",infos[0]);
+                data.put("estampille", infos[0]);
                 data.put("transformateur", infos[2]);
                 setH.add(line);
                 list.add(data);
@@ -284,13 +282,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             br.close();
 
             ImageView imageView = findViewById(R.id.tuto_image);
-            if(list.size() == 0)
-            {
-                HistoryFragment.getInstance().setTutoVisibility(true);
-            }
-            else{
-                HistoryFragment.getInstance().setTutoVisibility(false);
-            }
+            HistoryFragment.getInstance().setTutoVisibility(list.size() == 0);
         } catch (IOException e) {
             e.printStackTrace();
             HistoryFragment.getInstance().setTutoVisibility(true);
@@ -309,7 +301,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String infos = (String)tab[i];
+                String infos = (String) tab[i];
                 Intent intent = new Intent(context, DisplayMap.class);
                 Bundle mapBundle = new Bundle();
                 mapBundle.putStringArray("Infos", infos.split(";"));
