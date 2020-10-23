@@ -28,4 +28,5 @@
     <string name="adress"><![CDATA[<b>Adresse :</b>]]> %1$s</string>
     <string name="name"><![CDATA[<b>Nom :</b>]]> %1$s</string>
     <string name="wip">WORK IN PROGRESS</string>
+    <string name="ocr_dialog_message">Reconnaissance en cours…</string>
 </resources>

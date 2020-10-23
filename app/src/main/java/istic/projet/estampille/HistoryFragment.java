@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +27,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -53,10 +51,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -206,8 +200,10 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private void doOCR(final Bitmap bitmap) {
         //Open a waiting pop up during the treatment
         OCRcounter = 0;
-        mProgressDialog = ProgressDialog.show(getActivity(), "Processing",
-                "Doing OCR...", true);
+        mProgressDialog = new ProgressDialog(getActivity(), R.style.FoodOriginAlertDialog);
+        mProgressDialog.setMessage(getString(R.string.ocr_dialog_message));
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.show();
         success = false;
         int rotationDegree = 90;
         TextRecognizer recognizer = TextRecognition.getClient();
