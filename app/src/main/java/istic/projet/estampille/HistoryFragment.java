@@ -72,9 +72,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private boolean success;
     private ViewPager viewPager;
     private int OCRcounter = 0;
-    private static final Pattern normalStamp = Pattern.compile("[0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
-    private static final Pattern domTomStamp = Pattern.compile("[0-9][0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
-    private static final Pattern corsicaStamp = Pattern.compile("[0-9](A|B)[.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
     private LinearLayout listViewItemLayout;
     private ListView listView;
 
