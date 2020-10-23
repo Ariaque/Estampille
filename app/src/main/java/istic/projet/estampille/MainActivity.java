@@ -10,9 +10,6 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +37,7 @@ import androidx.work.WorkManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -271,6 +269,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
         //Reads the file
         try {
+            OutputStreamWriter output = new OutputStreamWriter(openFileOutput(fileName, Context.MODE_APPEND));
             InputStreamReader inputReader = new InputStreamReader(openFileInput(fileName));
             BufferedReader br = new BufferedReader(inputReader);
             String line;
@@ -279,8 +278,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 Map<String, String> data = new HashMap<>();
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
-                data.put("estampille", infos[0]);
-                data.put("transformateur", infos[2]);
+                data.put("estampille",infos[1]);
+                data.put("transformateur", infos[3]);
                 setH.add(line);
                 list.add(data);
             }
