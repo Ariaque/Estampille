@@ -78,8 +78,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private static final Pattern domTomStamp = Pattern.compile("[0-9][0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
     private static final Pattern corsicaStamp = Pattern.compile("[0-9](A|B)[.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
     private LinearLayout listViewItemLayout;
-
-
     private ListView listView;
 
     /**
@@ -113,11 +111,11 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        //Call after that user takes a photo
+        //Calls after that user takes a photo
         if (resultCode == Activity.RESULT_OK) {
             Bitmap bmp = null;
             try {
-                //Create a bitmap from the stamp image
+                //Creates a bitmap from the stamp image
                 InputStream is = context.getContentResolver().openInputStream(photoURI1);
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 bmp = BitmapFactory.decodeStream(is, null, options);
@@ -127,9 +125,8 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 Log.i(getClass().getSimpleName(), ex.getMessage());
                 Toast.makeText(context, R.string.conversion_fail_toast, Toast.LENGTH_SHORT).show();
             }
-            //Start the stamp recognition
+            //Starts the stamp recognition
             doOCR(bmp);
-
             OutputStream os;
             try {
                 os = new FileOutputStream(photoURI1.getPath());
@@ -142,7 +139,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 Log.e(getClass().getSimpleName(), ex.getMessage());
                 Toast.makeText(context, R.string.file_creation_fail_toast, Toast.LENGTH_SHORT).show();
             }
-
         } else {
             photoURI1 = oldPhotoURI;
         }
@@ -158,7 +154,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * Open camera.
+     * Opens camera.
      */
     public void openCamera() {
         //Intent to open the camera
@@ -296,7 +292,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * Clear the file which contains the search history
+     * Clears the file which contains the search history
      */
     public void clearFile() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -331,7 +327,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * Set the visibility of the tuto_image on the HistoryFragmet
+     * Sets the visibility of the tutorial image on the HistoryFragment
      * @param isTutoVisible true if the image must be visible, false otherwise
      */
     public void setTutoVisibility(boolean isTutoVisible){

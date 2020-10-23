@@ -77,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         } else {
             launchDownloadWorker();
         }
+
+        //Configures design elements
         mToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         foodOriginDarkBlue = ResourcesCompat.getColor(getResources(), R.color.FoodOriginDarkOrange, null);
         foodOriginWhite = ResourcesCompat.getColor(getResources(), R.color.FoodOriginWhite, null);
 
-        //Detect everything that's potentially suspect and write it in log
+        //Detects everything that's potentially suspect and write it in log
         StrictMode.VmPolicy builder = new StrictMode.VmPolicy.Builder()
                 .detectAll()
                 .penaltyLog()
@@ -259,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     }
 
     /**
-     * Reads the history file content and diplays the history in the main page
+     * Reads the history file content and displays the history in the main page
      */
     public void readFile() {
         String fileName = "historyFile.txt";
@@ -283,18 +285,19 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 list.add(data);
             }
             br.close();
-
-            ImageView imageView = findViewById(R.id.tuto_image);
-            if(list.size() == 0)
-            {
-                HistoryFragment.getInstance().setTutoVisibility(true);
-            }
-            else{
-                HistoryFragment.getInstance().setTutoVisibility(false);
-            }
         } catch (IOException e) {
             e.printStackTrace();
             HistoryFragment.getInstance().setTutoVisibility(true);
+        }
+
+        //Displays the tutorial image if there are no history
+        ImageView imageView = findViewById(R.id.tuto_image);
+        if(list.size() == 0)
+        {
+            HistoryFragment.getInstance().setTutoVisibility(true);
+        }
+        else{
+            HistoryFragment.getInstance().setTutoVisibility(false);
         }
 
         //Deletes duplicates line

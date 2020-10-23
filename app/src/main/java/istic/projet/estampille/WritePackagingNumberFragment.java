@@ -108,7 +108,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
             e.printStackTrace();
         }
 
-        //If the stamp has no similarity in the CSV, the error page appears
+        //If the stamp has no similarity in the CSV, a message error appears
         if (!find) {
             Toast.makeText(context, context.getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
         }
