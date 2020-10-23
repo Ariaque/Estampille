@@ -4,7 +4,8 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.Editable;
+import android.text.Html;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -50,14 +51,13 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback,
             lat = latLng.latitude;
         }
 
-        TextView view8 = (TextView) findViewById(R.id.textView8);
-        TextView view9 = (TextView) findViewById(R.id.textView9);
-        TextView view10 = (TextView) findViewById(R.id.textView10);
+        TextView textViewAdress = (TextView) findViewById(R.id.textViewAdress);
+        TextView textViewSiret = (TextView) findViewById(R.id.textViewSiret);
+        TextView textViewName = (TextView) findViewById(R.id.textViewName);
         backButton = findViewById(R.id.backButton);
-
-        view8.setText(name);
-        view9.setText(address);
-        view10.setText(siret);
+        textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress,address)));
+        textViewSiret.setText(Html.fromHtml(getResources().getString(R.string.siret,siret)));
+        textViewName.setText(Html.fromHtml(getResources().getString(R.string.name,name)));
 
         backButton.setOnClickListener(this);
 
