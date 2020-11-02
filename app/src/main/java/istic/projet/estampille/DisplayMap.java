@@ -39,7 +39,7 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_map);
         Bundle mapBundle = getIntent().getExtras();
-        if(mapBundle != null){
+        if (mapBundle != null) {
             tab = mapBundle.getStringArray("Infos");
             assert tab != null;
             siret = tab[2];
@@ -74,7 +74,7 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback,
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
     }
 
-    private LatLng getCoords(String address){
+    private LatLng getCoords(String address) {
         Geocoder geocoder = new Geocoder(this.getApplicationContext());
         List<Address> addresses = new ArrayList<Address>();
         try {
@@ -82,13 +82,12 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback,
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(addresses.size() > 0) {
-            double latitude= addresses.get(0).getLatitude();
-            double longitude= addresses.get(0).getLongitude();
+        if (addresses.size() > 0) {
+            double latitude = addresses.get(0).getLatitude();
+            double longitude = addresses.get(0).getLongitude();
             LatLng latLng = new LatLng(latitude, longitude);
             return latLng;
-        }
-        else{
+        } else {
             LatLng latLng = new LatLng(0, 0);
             return latLng;
         }

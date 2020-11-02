@@ -62,6 +62,9 @@ import java.util.regex.Pattern;
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     private static final int REQUEST_IMAGE1_CAPTURE = 1;
+    private static final Pattern normalStamp = Pattern.compile("[0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
+    private static final Pattern domTomStamp = Pattern.compile("[0-9][0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
+    private static final Pattern corsicaStamp = Pattern.compile("[0-9](A|B)[.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
     private static HistoryFragment instance;
     protected String mCurrentPhotoPath;
     private ProgressDialog mProgressDialog;
@@ -73,9 +76,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private boolean success;
     private ViewPager viewPager;
     private int OCRcounter = 0;
-    private static final Pattern normalStamp = Pattern.compile("[0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
-    private static final Pattern domTomStamp = Pattern.compile("[0-9][0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
-    private static final Pattern corsicaStamp = Pattern.compile("[0-9](A|B)[.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
     private LinearLayout listViewItemLayout;
     private ListView listView;
 
@@ -380,14 +380,14 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
      * Sets the visibility of the tutorial image on the HistoryFragment
      * @param isTutoVisible true if the image must be visible, false otherwise
      */
-    public void setTutoVisibility(boolean isTutoVisible){
+    public void setTutoVisibility(boolean isTutoVisible) {
         ImageView imageView = getView().findViewById(R.id.tuto_image);
-        if(isTutoVisible){
+        if (isTutoVisible) {
             imageView.setVisibility(View.VISIBLE);
-            final ConstraintLayout.LayoutParams layoutparams = (ConstraintLayout.LayoutParams)imageView.getLayoutParams();
-            layoutparams.setMargins(0,0,0,0);
+            final ConstraintLayout.LayoutParams layoutparams = (ConstraintLayout.LayoutParams) imageView.getLayoutParams();
+            layoutparams.setMargins(0, 0, 0, 0);
             imageView.setLayoutParams(layoutparams);
-        }else{
+        } else {
             imageView.setVisibility(View.INVISIBLE);
         }
     }
