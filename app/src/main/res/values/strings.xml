@@ -23,9 +23,9 @@
     <string name="yes">Oui</string>
     <string name="no">Non</string>
     <string name="dialog_delete_message">Désirez-vous supprimer définitivement votre historique ?</string>
-    <string name="info_title">Informations de fabrication</string>
-    <string name="siret"><![CDATA[<b>SIRET :</b>]]> %1$s</string>
+    <string name="info_title">Informations lieu de fabrication</string>
     <string name="adress"><![CDATA[<b>Adresse :</b>]]> %1$s</string>
-    <string name="name"><![CDATA[<b>Nom :</b>]]> %1$s</string>
+    <string name="name"><![CDATA[<b>Industriel :</b>]]> %1$s</string>
     <string name="wip">WORK IN PROGRESS</string>
+    <string name="know_more">En savoir plus</string>
 </resources>
