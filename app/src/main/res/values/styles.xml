@@ -10,5 +10,9 @@
         <!--<item name="colorControlActivated">#FF006BA3</item>
         <item name="colorControlHighlight">#FF006BA3</item>-->
     </style>
+    <style name="FoodOriginAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/FoodOriginDarkOrange</item>
+    </style>
+
 
 </resources>

@@ -42,7 +42,6 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_map);
-
         Bundle mapBundle = getIntent().getExtras();
         if (mapBundle != null) {
             tab = mapBundle.getStringArray("Infos");

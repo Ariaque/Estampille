@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,12 +40,17 @@ import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -201,8 +205,10 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private void doOCR(final Bitmap bitmap) {
         //Open a waiting pop up during the treatment
         OCRcounter = 0;
-        mProgressDialog = ProgressDialog.show(getActivity(), "Processing",
-                "Doing OCR...", true);
+        mProgressDialog = new ProgressDialog(getActivity(), R.style.FoodOriginAlertDialog);
+        mProgressDialog.setMessage(getString(R.string.ocr_dialog_message));
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.show();
         success = false;
         int rotationDegree = 90;
         TextRecognizer recognizer = TextRecognition.getClient();
@@ -235,9 +241,8 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
      * @param ocrSuccess indicates if the recognition has been successful (true) or not (false).
      */
     private void imageResult(boolean ocrSuccess) {
-        if (ocrSuccess) {
-            viewPager.setCurrentItem(1);
-        } else {
+
+        if(!ocrSuccess){
             OCRcounter++;
             if (OCRcounter == 4) {
                 TextInputEditText editText = getActivity().findViewById(R.id.tf_estampille);
@@ -273,15 +278,67 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             Matcher domTomMatcher = domTomStamp.matcher(tempText);
             Matcher corsicaMatcher = corsicaStamp.matcher(tempText);
             TextInputEditText editText = getActivity().findViewById(R.id.tf_estampille);
-            if (normalMatcher.find()) {
-                editText.setText(normalMatcher.group(0));
-            } else if (domTomMatcher.find()) {
-                editText.setText(domTomMatcher.group(0));
-            } else if (corsicaMatcher.find()) {
-                editText.setText(corsicaMatcher.group(0));
+            if(normalMatcher.find()) {
+                this.readCsv(normalMatcher.group(0));
+                //editText.setText(normalMatcher.group(0));
+            }
+            else if (domTomMatcher.find()) {
+                this.readCsv(domTomMatcher.group(0));
+                //editText.setText(domTomMatcher.group(0));
+            }
+            else if (corsicaMatcher.find()) {
+                this.readCsv(corsicaMatcher.group(0));
+                //editText.setText(corsicaMatcher.group(0));
             }
         }
         return found;
+    }
+
+    private void readCsv(String result) {
+        InputStream is = getResources().openRawResource(R.raw.bdd_test);
+        boolean find = false;
+        String txt = "";
+
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(is, StandardCharsets.UTF_8)
+        );
+
+        //Recover the stamp in the text field
+        txt = result;
+
+        String line = "";
+
+        try {
+            while ((line = reader.readLine()) != null) {
+                String[] tab = line.split(";");
+                if (txt.equals(tab[1])) {
+                    String fileName = "historyFile.txt";
+                    try {
+                        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(getActivity().openFileOutput(fileName, Context.MODE_APPEND)));
+                        bw.write(tab[0] + ";" + tab[1]+ ";" + tab[2]+";" + tab[3]+";" + tab[4]+ ";" + tab[5] + ";" + tab[6] + "\n");
+                        bw.close();
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+
+                    Intent intent = new Intent(context, DisplayMap.class);
+                    Bundle mapBundle = new Bundle();
+                    mapBundle.putStringArray("Infos", tab);
+                    intent.putExtras(mapBundle);
+                    startActivity(intent);
+                    find = true;
+                }
+            }
+
+        } catch (IOException e){
+            Log.wtf("Erreur dans la lecture du CSV " + line, e);
+            e.printStackTrace();
+        }
+
+        //If the stamp has no similarity in the CSV, a message error appears
+        if (!find) {
+            Toast.makeText(context, context.getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
