@@ -76,7 +76,7 @@
             android:layout_weight="1">
 
             <TextView
-                android:id="@+id/textViewSiret"
+                android:id="@+id/textViewAdress"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -89,13 +89,13 @@
             android:layout_height="match_parent"
             android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/textViewAdress"
+            <Button
+                android:id="@+id/button_know_more"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@color/FoodOriginLightGrey"
-                android:textColor="@color/FoodOriginBlack" />
+                android:layout_height="wrap_content"
+                android:onClick="onClick"
+                android:text="@string/know_more" />
+
         </TableRow>
 
         <TableRow
