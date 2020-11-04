@@ -28,6 +28,7 @@
             android:value="@string/maps_api_key" />
 
         <activity android:name=".DisplayMap" android:screenOrientation="portrait"/>
+        <activity android:name=".TutorialActivity" android:screenOrientation="portrait"/>
         <activity android:name=".MainActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

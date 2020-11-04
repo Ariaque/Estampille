@@ -4,12 +4,13 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#C6533C</color>
     <color name="FoodOriginOrange">#F06449</color>
-    <color name="FoodOriginLightOrange">#FFB86B</color>
-    <color name="FoodOriginDarkOrange">#C6533C</color>
+    <color name="FoodOriginOrangeYellow">#FFB86B</color>
+    <color name="FoodOriginDarkOrangeYellow">#FCAD56</color>
+    <color name="FoodOriginDarkOrange">#E63629</color>
     <color name="FoodOriginWhite">#FFFFFF</color>
     <color name="FoodOriginLightGrey">#FAFAFA</color>
     <color name="FoodOriginGrey">#EAEDED</color>
     <color name="colorGrey">#9b9b9b</color>
-    <color name="colorBlack"> #000000</color>
+    <color name="FoodOriginBlack"> #000000</color>
     <color name="transparent">#00000000</color>
 </resources>

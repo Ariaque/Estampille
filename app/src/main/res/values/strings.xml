@@ -29,4 +29,12 @@
     <string name="name"><![CDATA[<b>Nom :</b>]]> %1$s</string>
     <string name="wip">WORK IN PROGRESS</string>
     <string name="ocr_dialog_message">Reconnaissance en cours…</string>
+    <string name="txt_scan_tile">Scanner une estampille</string>
+    <string name="txt_search_tile">Saisir une estampille</string>
+    <string name="txt_hisotry_tile">Historique</string>
+    <string name="txt_look_around_tile">Autour de vous</string>
+    <string name="txt_empty_history">L\'historique est vide</string>
+    <string name="txt_delete_history">Supprimer l\'historique</string>
+    <string name="txt_stamp_input_help">Complétez l\'estampille virtuelle pour effectuer une recherche</string>
+
 </resources>

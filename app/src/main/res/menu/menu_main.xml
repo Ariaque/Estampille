@@ -10,6 +10,14 @@
         android:title=""
         app:showAsAction="always" />
     <item
+        android:id="@+id/action_history"
+        android:focusable="true"
+        android:gravity="left"
+        android:icon="@drawable/ic_baseline_history_24"
+        android:background="?attr/selectableItemBackground"
+        android:title=""
+        app:showAsAction="always" />
+    <item
         android:id="@+id/action_write_code"
         android:focusable="true"
         android:gravity="left"
@@ -18,10 +26,10 @@
         android:title=""
         app:showAsAction="always" />
     <item
-        android:id="@+id/action_history"
+        android:id="@+id/action_home"
         android:focusable="true"
         android:gravity="left"
-        android:icon="@drawable/ic_baseline_history_24"
+        android:icon="@drawable/ic_baseline_home_24"
         android:background="?attr/selectableItemBackground"
         android:title=""
         app:showAsAction="always" />

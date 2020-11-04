@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -26,9 +29,11 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class WritePackagingNumberFragment extends Fragment implements View.OnTouchListener, View.OnClickListener, View.OnFocusChangeListener {
+public class WritePackagingNumberFragment extends Fragment implements View.OnTouchListener, View.OnClickListener, View.OnFocusChangeListener, TextWatcher {
 
-    private TextInputEditText textFieldEstampille;
+    private TextInputEditText textFieldEstampille1;
+    private TextInputEditText textFieldEstampille2;
+    private TextInputEditText textFieldEstampille3;
     private MaterialButton searchButton;
     private Context context;
 
@@ -38,8 +43,14 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_write_packaging_number, container, false);
         context = rootView.getContext();
-        textFieldEstampille = rootView.findViewById(R.id.tf_estampille);
-        textFieldEstampille.setOnFocusChangeListener(this::onFocusChange);
+        textFieldEstampille1 = rootView.findViewById(R.id.tf_estampille_1);
+        textFieldEstampille1.setOnFocusChangeListener(this::onFocusChange);
+        textFieldEstampille1.addTextChangedListener(this);
+        textFieldEstampille2 = rootView.findViewById(R.id.tf_estampille_2);
+        textFieldEstampille2.addTextChangedListener(this);
+        textFieldEstampille2.setOnFocusChangeListener(this::onFocusChange);
+        textFieldEstampille3 = rootView.findViewById(R.id.tf_estampille_3);
+        textFieldEstampille3.setOnFocusChangeListener(this::onFocusChange);
         searchButton = rootView.findViewById(R.id.button_pckg_nb);
         searchButton.setOnClickListener(this);
         rootView.setOnTouchListener(this);
@@ -48,7 +59,10 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-        textFieldEstampille.clearFocus();
+        textFieldEstampille1.clearFocus();
+        textFieldEstampille2.clearFocus();
+        textFieldEstampille3.clearFocus();
+
         return true;
     }
 
@@ -77,7 +91,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
         );
 
         //Recover the stamp in the text field
-        txt = this.textFieldEstampille.getText().toString();
+        txt = this.textFieldEstampille1.getText().toString()+"."+this.textFieldEstampille2.getText().toString()+"."+this.textFieldEstampille3.getText().toString();
 
         String line = "";
 
@@ -122,5 +136,27 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
     public void hideKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        if(textFieldEstampille2.hasFocus()) {
+            if(textFieldEstampille2.getText().length() == 2 && textFieldEstampille1.getText().length() == 3) {
+                textFieldEstampille3.requestFocus();
+            }
+            else if(textFieldEstampille2.getText().length() == 3 && textFieldEstampille1.getText().length() == 2) {
+                textFieldEstampille3.requestFocus();
+            }
+        }
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+
     }
 }

@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -51,12 +50,13 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private Toolbar mToolBar;
     private Fragment historyFragment;
     private FragmentPagerAdapter fragmentPagerAdapter;
-    private ImageButton deleteButton;
+    private ImageButton helpButton;
     private ViewPager viewPager;
+    private MenuItem homeMenuItem;
     private MenuItem historyMenuItem;
     private MenuItem searchMenuItem;
     private MenuItem lookAroundMenuItem;
-    private int foodOriginDarkBlue;
+    private int foodOriginDarkOrange;
     private int foodOriginWhite;
     private ConstraintLayout containerView;
     private ArrayList<Map<String, String>> list;
@@ -83,8 +83,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         viewPager = findViewById(R.id.pager);
         fragmentPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPager.setAdapter(fragmentPagerAdapter);
-        viewPager.setOffscreenPageLimit(2);
-        foodOriginDarkBlue = ResourcesCompat.getColor(getResources(), R.color.FoodOriginDarkOrange, null);
+        viewPager.setOffscreenPageLimit(3);
+        foodOriginDarkOrange = ResourcesCompat.getColor(getResources(), R.color.FoodOriginDarkOrange, null);
         foodOriginWhite = ResourcesCompat.getColor(getResources(), R.color.FoodOriginWhite, null);
 
         //Detects everything that's potentially suspect and write it in log
@@ -128,8 +128,9 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.deleteButton) {
-            HistoryFragment.getInstance().clearFile();
+        if (view.getId() == R.id.helpButton) {
+            Intent intent = new Intent(this, TutorialActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -137,13 +138,14 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        homeMenuItem = menu.findItem(R.id.action_home);
         historyMenuItem = menu.findItem(R.id.action_history);
         searchMenuItem = menu.findItem(R.id.action_write_code);
         lookAroundMenuItem = menu.findItem(R.id.action_look_around);
-        deleteButton = findViewById(R.id.deleteButton);
-        deleteButton.setOnClickListener(this);
+        helpButton = findViewById(R.id.helpButton);
+        helpButton.setOnClickListener(this);
         try {
-            setFocusOnHistoryItem();
+            setFocusOnHomeItem();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -154,23 +156,31 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_history:
+            case R.id.action_home:
                 try {
-                    setFocusOnHistoryItem();
+                    setFocusOnHomeItem();
+                    viewPager.setCurrentItem(0);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                viewPager.setCurrentItem(0);
-
                 return true;
             case R.id.action_write_code:
                 setFocusOnSearchItem();
                 viewPager.setCurrentItem(1);
 
                 return true;
+            case R.id.action_history:
+                try {
+                    setFocusOnHistoryItem();
+                    viewPager.setCurrentItem(2);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return true;
             case R.id.action_look_around:
                 setFocusOnLookAroundItem();
-                viewPager.setCurrentItem(2);
+                viewPager.setCurrentItem(3);
 
                 return true;
             default:
@@ -187,13 +197,20 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     public void onPageSelected(int position) {
         if (position == 0) {
             try {
-                setFocusOnHistoryItem();
+                setFocusOnHomeItem();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else if (position == 1) {
             setFocusOnSearchItem();
         } else if (position == 2) {
+            try {
+                setFocusOnHistoryItem();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (position == 3) {
             setFocusOnLookAroundItem();
         }
     }
@@ -204,56 +221,79 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     }
 
     /**
-     * Sets the focus on the "history" (first from left) menu item. Displays the button to delete the history.
+     * Sets the focus on the "home" (first from left) menu item. Displays the button to delete the history.
+     *
+     * @throws IOException throws an {@link IOException} if something goes wrong
+     */
+    private void setFocusOnHomeItem() throws IOException {
+        this.readFile();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            homeMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginWhite, BlendMode.SRC_ATOP));
+            historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
+            searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
+            lookAroundMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
+        } else {
+            homeMenuItem.getIcon().setColorFilter(foodOriginWhite, PorterDuff.Mode.SRC_ATOP);
+            historyMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
+            searchMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
+            lookAroundMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
+        }
+    }
+
+    /**
+     * Sets the focus on the "search" (third from left) menu item. Displays the button to delete the history.
+     */
+    private void setFocusOnSearchItem() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            homeMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
+            historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
+            searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginWhite, BlendMode.SRC_ATOP));
+            lookAroundMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
+        } else {
+            homeMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
+            historyMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
+            searchMenuItem.getIcon().setColorFilter(foodOriginWhite, PorterDuff.Mode.SRC_ATOP);
+            lookAroundMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
+        }
+    }
+
+    /**
+     * Sets the focus on the "history" (second from left) menu item. Displays the button to delete the history.
      *
      * @throws IOException throws an {@link IOException} if something goes wrong
      */
     private void setFocusOnHistoryItem() throws IOException {
         this.readFile();
-        deleteButton.setVisibility(View.VISIBLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            homeMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
             historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginWhite, BlendMode.SRC_ATOP));
-            searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
-            lookAroundMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
+            searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
+            lookAroundMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
         } else {
+            homeMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
             historyMenuItem.getIcon().setColorFilter(foodOriginWhite, PorterDuff.Mode.SRC_ATOP);
-            searchMenuItem.getIcon().setColorFilter(foodOriginDarkBlue, PorterDuff.Mode.SRC_ATOP);
-            lookAroundMenuItem.getIcon().setColorFilter(foodOriginDarkBlue, PorterDuff.Mode.SRC_ATOP);
+            searchMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
+            lookAroundMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
         }
     }
 
     /**
-     * Sets the focus on the "search" (second from left) menu item. Displays the button to delete the history.
-     */
-    private void setFocusOnSearchItem() {
-        deleteButton.setVisibility(View.INVISIBLE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
-            searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginWhite, BlendMode.SRC_ATOP));
-            lookAroundMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
-        } else {
-            historyMenuItem.getIcon().setColorFilter(foodOriginDarkBlue, PorterDuff.Mode.SRC_ATOP);
-            searchMenuItem.getIcon().setColorFilter(foodOriginWhite, PorterDuff.Mode.SRC_ATOP);
-            lookAroundMenuItem.getIcon().setColorFilter(foodOriginDarkBlue, PorterDuff.Mode.SRC_ATOP);
-        }
-    }
-
-    /**
-     * Sets the focus on the "look around" (third from left) menu item. Displays the button to delete the history.
+     * Sets the focus on the "look around" (fourth from left) menu item. Displays the button to delete the history.
      */
     private void setFocusOnLookAroundItem() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                     PermissionsUtils.permission_geoloc_explain, PermissionsUtils.REQUEST_CODE_LOCATION);
         }
-        deleteButton.setVisibility(View.INVISIBLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
-            searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkBlue, BlendMode.SRC_ATOP));
+            homeMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
+            historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
+            searchMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
             lookAroundMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginWhite, BlendMode.SRC_ATOP));
         } else {
-            historyMenuItem.getIcon().setColorFilter(foodOriginDarkBlue, PorterDuff.Mode.SRC_ATOP);
-            searchMenuItem.getIcon().setColorFilter(foodOriginDarkBlue, PorterDuff.Mode.SRC_ATOP);
+            homeMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
+            historyMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
+            searchMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
             lookAroundMenuItem.getIcon().setColorFilter(foodOriginWhite, PorterDuff.Mode.SRC_ATOP);
         }
     }
@@ -286,17 +326,19 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             br.close();
         } catch (IOException e) {
             e.printStackTrace();
-            HistoryFragment.getInstance().setTutoVisibility(true);
+            //HistoryFragment.getInstance().setTutoVisibility(true);
         }
 
         //Displays the tutorial image if there are no history
-        ImageView imageView = findViewById(R.id.tuto_image);
+        //ImageView imageView = findViewById(R.id.tuto_image);
         if(list.size() == 0)
         {
-            HistoryFragment.getInstance().setTutoVisibility(true);
+            HistoryFragment.getInstance().setHistoryFragmentComponentsVisibility(true);
+            //HistoryFragment.getInstance().setTutoVisibility(true);
         }
         else{
-            HistoryFragment.getInstance().setTutoVisibility(false);
+            //HistoryFragment.getInstance().setTutoVisibility(false);
+            HistoryFragment.getInstance().setHistoryFragmentComponentsVisibility(false);
         }
 
         //Deletes duplicates line
