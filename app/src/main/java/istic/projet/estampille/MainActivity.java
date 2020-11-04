@@ -309,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
         //Reads the file
         try {
-            OutputStreamWriter output = new OutputStreamWriter(openFileOutput(fileName, Context.MODE_APPEND));
+            //OutputStreamWriter output = new OutputStreamWriter(openFileOutput(fileName, Context.MODE_APPEND));
             InputStreamReader inputReader = new InputStreamReader(openFileInput(fileName));
             BufferedReader br = new BufferedReader(inputReader);
             String line;
@@ -377,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         } else if (requestCode == PermissionsUtils.REQUEST_CODE_LOCATION) {
             if (grantResults.length > 0 && permissions.length > 0) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Fragment lookAroundFragment = (LookAroundFragment) fragmentPagerAdapter.instantiateItem(viewPager, 2);
+                    Fragment lookAroundFragment = (LookAroundFragment) fragmentPagerAdapter.instantiateItem(viewPager, 3);
                     lookAroundFragment.onResume();
                 } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
                     PermissionsUtils.displayOptions(this, containerView, PermissionsUtils.permission_geoloc_params);
