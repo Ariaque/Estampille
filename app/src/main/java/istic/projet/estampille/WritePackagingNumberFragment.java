@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,11 +22,12 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class WritePackagingNumberFragment extends Fragment implements View.OnTouchListener, View.OnClickListener, View.OnFocusChangeListener, TextWatcher {
@@ -82,7 +83,14 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
      * Displays information about the origins of the product.
      */
     private void readCsv() {
-        InputStream is = getResources().openRawResource(R.raw.bdd_test);
+        InputStream is = null;
+        try {
+            is = new FileInputStream(Environment
+                    .getExternalStorageDirectory().toString()
+                    + "/data/foodorigin_datagouv.txt");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         boolean find = false;
         String txt = "";
 
@@ -91,18 +99,18 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
         );
 
         //Recover the stamp in the text field
-        txt = this.textFieldEstampille1.getText().toString()+"."+this.textFieldEstampille2.getText().toString()+"."+this.textFieldEstampille3.getText().toString();
+        txt = this.textFieldEstampille1.getText().toString() + "." + this.textFieldEstampille2.getText().toString() + "." + this.textFieldEstampille3.getText().toString();
 
         String line = "";
 
         try {
             while ((line = reader.readLine()) != null) {
                 String[] tab = line.split(";");
-                if (txt.equals(tab[1])) {
+                if (txt.equals(tab[0])) {
                     String fileName = "historyFile.txt";
                     try {
                         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(getActivity().openFileOutput(fileName, Context.MODE_APPEND)));
-                        bw.write(tab[0] + ";" + tab[1]+ ";" + tab[2]+";" + tab[3]+";" + tab[4]+ ";" + tab[5] + ";" + tab[6] + "\n");
+                        bw.write(tab[0] + ";" + tab[1] + ";" + tab[2] + ";" + tab[3] + ";" + tab[4] + ";" + tab[5] + "\n");
                         bw.close();
                     } catch (Exception e) {
                         Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
@@ -117,7 +125,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
                 }
             }
 
-        } catch (IOException e){
+        } catch (IOException e) {
             Log.wtf("Erreur dans la lecture du CSV " + line, e);
             e.printStackTrace();
         }
@@ -145,11 +153,10 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        if(textFieldEstampille2.hasFocus()) {
-            if(textFieldEstampille2.getText().length() == 2 && textFieldEstampille1.getText().length() == 3) {
+        if (textFieldEstampille2.hasFocus()) {
+            if (textFieldEstampille2.getText().length() == 2 && textFieldEstampille1.getText().length() == 3) {
                 textFieldEstampille3.requestFocus();
-            }
-            else if(textFieldEstampille2.getText().length() == 3 && textFieldEstampille1.getText().length() == 2) {
+            } else if (textFieldEstampille2.getText().length() == 3 && textFieldEstampille1.getText().length() == 2) {
                 textFieldEstampille3.requestFocus();
             }
         }
