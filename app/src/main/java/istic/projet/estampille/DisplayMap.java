@@ -1,13 +1,10 @@
 package istic.projet.estampille;
 
-import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -28,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener{
+public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
 
     double lon = 0;
     double lat = 0;
@@ -38,6 +35,7 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback,
     String name = "";
 
     private ImageButton backButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,19 +44,19 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback,
         if (mapBundle != null) {
             tab = mapBundle.getStringArray("Infos");
             assert tab != null;
-            siret = tab[2];
-            name = tab[3];
-            address = tab[4] + ", " + tab[5] + " " + tab[6];
+            siret = tab[1];
+            name = tab[2];
+            address = tab[3] + ", " + tab[4] + " " + tab[5];
             LatLng latLng = getCoords(address);
             lon = latLng.longitude;
             lat = latLng.latitude;
         }
 
-        TextView textViewAdress = (TextView) findViewById(R.id.textViewAdress);
-        TextView textViewName = (TextView) findViewById(R.id.textViewName);
+        TextView textViewAdress = findViewById(R.id.textViewAdress);
+        TextView textViewName = findViewById(R.id.textViewName);
         backButton = findViewById(R.id.backButton);
-        textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress,address)));
-        textViewName.setText(Html.fromHtml(getResources().getString(R.string.name,name)));
+        textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress, address)));
+        textViewName.setText(Html.fromHtml(getResources().getString(R.string.name, name)));
 
         backButton.setOnClickListener(this);
 
@@ -97,12 +95,12 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback,
 
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.backButton){
+        if (view.getId() == R.id.backButton) {
             Intent otherActivity = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(otherActivity);
             finish();
         }
-        if(view.getId() == R.id.button_know_more){
+        if (view.getId() == R.id.button_know_more) {
             Toast.makeText(getApplicationContext(), R.string.wip, Toast.LENGTH_SHORT).show();
         }
     }
