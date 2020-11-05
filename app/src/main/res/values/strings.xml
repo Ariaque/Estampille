@@ -36,5 +36,6 @@
     <string name="txt_empty_history">L\'historique est vide</string>
     <string name="txt_delete_history">Supprimer l\'historique</string>
     <string name="txt_stamp_input_help">Complétez l\'estampille virtuelle pour effectuer une recherche</string>
+    <string name="txt_stamp_fr">FR</string>
 
 </resources>

@@ -22,8 +22,8 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onClick(View view) {
         if(view.getId() == R.id.backButton){
-            Intent otherActivity = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(otherActivity);
+            /**Intent otherActivity = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(otherActivity);*/
             finish();
         }
     }

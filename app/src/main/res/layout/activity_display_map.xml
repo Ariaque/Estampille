@@ -88,13 +88,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1">
-
-            <Button
-                android:id="@+id/button_know_more"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="onClick"
-                android:text="@string/know_more" />
+                android:layout_height="match_parent"
+                android:layout_weight="7">
+
+                <Button
+                    android:id="@+id/button_know_more"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="onClick"
+                    android:text="@string/know_more"
+                    android:background="@color/FoodOriginOrange"
+                    android:textColor="@color/FoodOriginWhite"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </TableRow>
 
