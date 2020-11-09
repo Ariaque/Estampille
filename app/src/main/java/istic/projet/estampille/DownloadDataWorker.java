@@ -31,9 +31,11 @@ public class DownloadDataWorker extends Worker {
     public Result doWork() {
         Log.d(DownloadDataWorker.class.getName(), "Starting periodic backup job");
         try {
-            FileWriter fstream = new FileWriter(Environment
-                    .getExternalStorageDirectory().toString()
-                    + "/data/foodorigin_datagouv.txt");
+//            FileWriter fstream = new FileWriter(Environment
+//                    .getExternalStorageDirectory().toString()
+//                    + "/data/foodorigin_datagouv.txt");
+            FileWriter fstream = new FileWriter(getApplicationContext().getApplicationContext().getFilesDir().toString()
+                    + "/foodorigin_datagouv.txt");
             BufferedWriter bufferedWriter = new BufferedWriter(fstream);
             String[] dataGouvUrlsArray = getInputData().getStringArray(Constants.KEY_DATA_GOUV_URLS);
             for (int i = 0; i < Objects.requireNonNull(dataGouvUrlsArray).length; i++) {
