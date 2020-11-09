@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 Map<String, String> data = new HashMap<>();
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
-                data.put("estampille",infos[1]);
+                data.put("estampille",infos[0]);
                 data.put("transformateur", infos[3]);
                 setH.add(line);
                 list.add(data);
