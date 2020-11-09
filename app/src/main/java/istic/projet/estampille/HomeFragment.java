@@ -38,6 +38,8 @@ import com.google.mlkit.vision.text.TextRecognizer;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -291,7 +293,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void readCsv(String result) {
-        InputStream is = getResources().openRawResource(R.raw.bdd_test);
+//        InputStream is = getResources().openRawResource(R.raw.bdd_test);
+        InputStream is = null;
+        try {
+            is = new FileInputStream(getActivity().getApplicationContext().getFilesDir().toString()
+                    + "/foodorigin_datagouv.txt");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         boolean find = false;
         String txt = "";
 
@@ -307,7 +316,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         try {
             while ((line = reader.readLine()) != null) {
                 String[] tab = line.split(";");
-                if (txt.equals(tab[1])) {
+                if (txt.equals(tab[0])) {
                     String fileName = "historyFile.txt";
                     try {
                         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(getActivity().openFileOutput(fileName, Context.MODE_APPEND)));

@@ -24,11 +24,13 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class WritePackagingNumberFragment extends Fragment implements View.OnTouchListener, View.OnClickListener, View.OnFocusChangeListener, TextWatcher {
 
@@ -85,9 +87,8 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
     private void readCsv() {
         InputStream is = null;
         try {
-            is = new FileInputStream(Environment
-                    .getExternalStorageDirectory().toString()
-                    + "/data/foodorigin_datagouv.txt");
+            is = new FileInputStream(Objects.requireNonNull(getActivity()).getFilesDir().toString()
+                    + "/foodorigin_datagouv.txt");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
