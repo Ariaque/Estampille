@@ -3,6 +3,7 @@ package istic.projet.estampille;
 public class Constants {
 
     static final String KEY_DATA_GOUV_URLS = "KEY_DATA_GOUV_URLs";
+    // French gouvernement's data API : dead links since mid October 2020
     static final String[] urls_data_gouv_array =
             {"https://www.data.gouv.fr/fr/datasets/r/c2d33407-ce1a-4f34-8c6e-72066ce05c2b",
                     "https://www.data.gouv.fr/fr/datasets/r/1632c783-c523-4424-a97a-bea967279be7",

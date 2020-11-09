@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
+public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
 
     double lon = 0;
     double lat = 0;
@@ -33,8 +33,6 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback,
     String address = "";
     String siret = "";
     String name = "";
-
-    private ImageButton backButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +52,7 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback,
 
         TextView textViewAdress = findViewById(R.id.textViewAdress);
         TextView textViewName = findViewById(R.id.textViewName);
-        backButton = findViewById(R.id.backButton);
+        ImageButton backButton = findViewById(R.id.backButton);
         textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress, address)));
         textViewName.setText(Html.fromHtml(getResources().getString(R.string.name, name)));
 
@@ -85,11 +83,9 @@ public class DisplayMap extends AppCompatActivity implements OnMapReadyCallback,
         if (addresses.size() > 0) {
             double latitude = addresses.get(0).getLatitude();
             double longitude = addresses.get(0).getLongitude();
-            LatLng latLng = new LatLng(latitude, longitude);
-            return latLng;
+            return new LatLng(latitude, longitude);
         } else {
-            LatLng latLng = new LatLng(0, 0);
-            return latLng;
+            return new LatLng(0, 0);
         }
     }
 

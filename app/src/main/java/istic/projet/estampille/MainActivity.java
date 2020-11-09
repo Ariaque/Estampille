@@ -36,11 +36,11 @@ import androidx.work.WorkManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     private Context context;
     private Toolbar mToolBar;
-    private Fragment historyFragment;
     private FragmentPagerAdapter fragmentPagerAdapter;
     private ImageButton helpButton;
     private ViewPager viewPager;
@@ -79,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         //Configures design elements
         mToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolBar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
         viewPager = findViewById(R.id.pager);
         fragmentPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         viewPager.setAdapter(fragmentPagerAdapter);
@@ -167,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             case R.id.action_write_code:
                 setFocusOnSearchItem();
                 viewPager.setCurrentItem(1);
-
                 return true;
             case R.id.action_history:
                 try {
@@ -176,12 +174,10 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
                 return true;
             case R.id.action_look_around:
                 setFocusOnLookAroundItem();
                 viewPager.setCurrentItem(3);
-
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -209,8 +205,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        else if (position == 3) {
+        } else if (position == 3) {
             setFocusOnLookAroundItem();
         }
     }
@@ -226,7 +221,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
      * @throws IOException throws an {@link IOException} if something goes wrong
      */
     private void setFocusOnHomeItem() throws IOException {
-        this.readFile();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             homeMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginWhite, BlendMode.SRC_ATOP));
             historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
@@ -263,7 +257,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
      * @throws IOException throws an {@link IOException} if something goes wrong
      */
     private void setFocusOnHistoryItem() throws IOException {
-        this.readFile();
+        this.loadHistoryFragment();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             homeMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginDarkOrange, BlendMode.SRC_ATOP));
             historyMenuItem.getIcon().setColorFilter(new BlendModeColorFilter(foodOriginWhite, BlendMode.SRC_ATOP));
@@ -301,7 +295,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     /**
      * Reads the history file content and displays the history in the main page
      */
-    public void readFile() {
+    public void loadHistoryFragment() {
         String fileName = "historyFile.txt";
         ListView listView = findViewById(R.id.listView);
         list = new ArrayList<>();
@@ -318,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 Map<String, String> data = new HashMap<>();
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
-                data.put("estampille",infos[0]);
+                data.put("estampille", infos[0]);
                 data.put("transformateur", infos[3]);
                 setH.add(line);
                 list.add(data);
@@ -330,16 +324,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
 
         //Displays the tutorial image if there are no history
-        //ImageView imageView = findViewById(R.id.tuto_image);
-        if(list.size() == 0)
-        {
-            HistoryFragment.getInstance().setHistoryFragmentComponentsVisibility(true);
-            //HistoryFragment.getInstance().setTutoVisibility(true);
-        }
-        else{
-            //HistoryFragment.getInstance().setTutoVisibility(false);
-            HistoryFragment.getInstance().setHistoryFragmentComponentsVisibility(false);
-        }
+        HistoryFragment.getInstance().setHistoryFragmentComponentsVisibility(list.size() == 0);
 
         //Deletes duplicates line
         Set<Map<String, String>> mySet = new LinkedHashSet<>(list);
@@ -355,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String infos = (String) tab[i];
-                Intent intent = new Intent(context, DisplayMap.class);
+                Intent intent = new Intent(context, DisplayMapActivity.class);
                 Bundle mapBundle = new Bundle();
                 mapBundle.putStringArray("Infos", infos.split(";"));
                 intent.putExtras(mapBundle);

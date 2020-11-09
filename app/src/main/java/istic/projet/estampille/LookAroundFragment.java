@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
     private final HashMap<String, LatLng> markersToAdd = new HashMap<>();
@@ -57,6 +58,7 @@ public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
+     *
      * @param googleMap
      * @param markersToAdd
      */
@@ -83,17 +85,15 @@ public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
         if (addresses.size() > 0) {
             double latitude = addresses.get(0).getLatitude();
             double longitude = addresses.get(0).getLongitude();
-            LatLng latLng = new LatLng(latitude, longitude);
-            return latLng;
+            return new LatLng(latitude, longitude);
         } else {
-            LatLng latLng = new LatLng(0, 0);
-            return latLng;
+            return new LatLng(0, 0);
         }
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(),
+        if (ActivityCompat.checkSelfPermission(Objects.requireNonNull(getActivity()).getApplicationContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(),
                         Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -104,7 +104,7 @@ public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
         LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         Location location = null;
         try {
-            location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+            location = locationManager.getLastKnownLocation(Objects.requireNonNull(locationManager.getBestProvider(criteria, true)));
         } catch (Exception e) {
             Toast.makeText(getActivity().getApplicationContext(), getActivity().getApplicationContext().getString(R.string.no_gps_found), Toast.LENGTH_SHORT).show();
         }

@@ -1,6 +1,5 @@
 package istic.projet.estampille;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -21,9 +20,9 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.backButton){
-            /**Intent otherActivity = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(otherActivity);*/
+        if (view.getId() == R.id.backButton) {
+//            Intent otherActivity = new Intent(getApplicationContext(), MainActivity.class);
+//            startActivity(otherActivity);
             finish();
         }
     }
