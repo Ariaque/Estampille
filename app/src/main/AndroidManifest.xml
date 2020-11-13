@@ -27,7 +27,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/maps_api_key" />
 
-        <activity android:name=".DisplayMap" android:screenOrientation="portrait"/>
+        <activity android:name=".DisplayMapActivity" android:screenOrientation="portrait"/>
         <activity android:name=".TutorialActivity" android:screenOrientation="portrait"/>
         <activity android:name=".MainActivity" android:screenOrientation="portrait">
             <intent-filter>

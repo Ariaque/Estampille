@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -21,14 +20,11 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -37,7 +33,6 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
     private TextInputEditText textFieldEstampille1;
     private TextInputEditText textFieldEstampille2;
     private TextInputEditText textFieldEstampille3;
-    private Button searchButton;
     private Context context;
 
     @Override
@@ -54,7 +49,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
         textFieldEstampille2.setOnFocusChangeListener(this::onFocusChange);
         textFieldEstampille3 = rootView.findViewById(R.id.tf_estampille_3);
         textFieldEstampille3.setOnFocusChangeListener(this::onFocusChange);
-        searchButton = rootView.findViewById(R.id.button_pckg_nb);
+        Button searchButton = rootView.findViewById(R.id.button_pckg_nb);
         searchButton.setOnClickListener(this);
         rootView.setOnTouchListener(this);
         return rootView;
@@ -65,7 +60,6 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
         textFieldEstampille1.clearFocus();
         textFieldEstampille2.clearFocus();
         textFieldEstampille3.clearFocus();
-
         return true;
     }
 
@@ -78,13 +72,13 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
 
     @Override
     public void onClick(View view) {
-        readCsv();
+        searchStampInCSV();
     }
 
     /**
      * Displays information about the origins of the product.
      */
-    private void readCsv() {
+    private void searchStampInCSV() {
         InputStream is = null;
         try {
             is = new FileInputStream(Objects.requireNonNull(getActivity()).getFilesDir().toString()
@@ -100,7 +94,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
         );
 
         //Recover the stamp in the text field
-        txt = this.textFieldEstampille1.getText().toString() + "." + this.textFieldEstampille2.getText().toString() + "." + this.textFieldEstampille3.getText().toString();
+        txt = Objects.requireNonNull(this.textFieldEstampille1.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille2.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille3.getText()).toString();
 
         String line = "";
 
@@ -108,16 +102,9 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
             while ((line = reader.readLine()) != null) {
                 String[] tab = line.split(";");
                 if (txt.equals(tab[0])) {
-                    String fileName = "historyFile.txt";
-                    try {
-                        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(getActivity().openFileOutput(fileName, Context.MODE_APPEND)));
-                        bw.write(tab[0] + ";" + tab[1] + ";" + tab[2] + ";" + tab[3] + ";" + tab[4] + ";" + tab[5] + "\n");
-                        bw.close();
-                    } catch (Exception e) {
-                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
+                    HistoryFragment.writeSearchInCSV(this.getActivity(), tab);
 
-                    Intent intent = new Intent(context, DisplayMap.class);
+                    Intent intent = new Intent(context, DisplayMapActivity.class);
                     Bundle mapBundle = new Bundle();
                     mapBundle.putStringArray("Infos", tab);
                     intent.putExtras(mapBundle);
@@ -125,7 +112,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
                     find = true;
                 }
             }
-
+            is.close();
         } catch (IOException e) {
             Log.wtf("Erreur dans la lecture du CSV " + line, e);
             e.printStackTrace();
@@ -155,9 +142,9 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
         if (textFieldEstampille2.hasFocus()) {
-            if (textFieldEstampille2.getText().length() == 2 && textFieldEstampille1.getText().length() == 3) {
+            if (Objects.requireNonNull(textFieldEstampille2.getText()).length() == 2 && Objects.requireNonNull(textFieldEstampille1.getText()).length() == 3) {
                 textFieldEstampille3.requestFocus();
-            } else if (textFieldEstampille2.getText().length() == 3 && textFieldEstampille1.getText().length() == 2) {
+            } else if (textFieldEstampille2.getText().length() == 3 && Objects.requireNonNull(textFieldEstampille1.getText()).length() == 2) {
                 textFieldEstampille3.requestFocus();
             }
         }

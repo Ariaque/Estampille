@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 
 import androidx.core.app.ActivityCompat;
@@ -12,7 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Class to handle the permissions.
@@ -60,7 +59,7 @@ public class PermissionsUtils {
      */
     public static void checkPermission(Fragment fragment, View containerView, String[] permissions, String rational_text, int requestCode) {
         for (String permission : permissions) {
-            if (fragment.getActivity().shouldShowRequestPermissionRationale(permission)) {
+            if (Objects.requireNonNull(fragment.getActivity()).shouldShowRequestPermissionRationale(permission)) {
                 explain(fragment.getActivity(), containerView, permission, requestCode, rational_text);
             } else {
                 fragment.requestPermissions(new String[]{permission},

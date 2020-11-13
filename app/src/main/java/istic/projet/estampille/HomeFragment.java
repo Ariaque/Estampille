@@ -17,8 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,14 +27,12 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -45,12 +41,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,10 +65,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private boolean success;
     private ViewPager viewPager;
     private int OCRcounter = 0;
-    private ImageButton scanTile;
-    private ImageButton searchTile;
-    private ImageButton historyTile;
-    private ImageButton lookAroundTile;
 
 
     @Override
@@ -82,11 +74,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 R.layout.fragment_home, container, false);
         context = rootView.getContext();
         this.containerView = rootView;
-        viewPager = getActivity().findViewById(R.id.pager);
-        scanTile = rootView.findViewById(R.id.tile_scan);
-        searchTile = rootView.findViewById(R.id.tile_search);
-        historyTile = rootView.findViewById(R.id.tile_history);
-        lookAroundTile = rootView.findViewById(R.id.tile_look_around);
+        viewPager = Objects.requireNonNull(getActivity()).findViewById(R.id.pager);
+        ImageButton scanTile = rootView.findViewById(R.id.tile_scan);
+        ImageButton searchTile = rootView.findViewById(R.id.tile_search);
+        ImageButton historyTile = rootView.findViewById(R.id.tile_history);
+        ImageButton lookAroundTile = rootView.findViewById(R.id.tile_look_around);
         scanTile.setOnClickListener(this);
         searchTile.setOnClickListener(this);
         historyTile.setOnClickListener(this);
@@ -98,26 +90,23 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.tile_scan) {
-            if (this.getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+        if (view.getId() == R.id.tile_scan) {
+            if (Objects.requireNonNull(this.getActivity()).checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.CAMERA}, "La caméra est nécessaire pour scanner les estampilles", PermissionsUtils.REQUEST_CODE_PERMISSION_CAMERA);
             } else {
                 openCamera();
             }
-        }
-        else if(view.getId() == R.id.tile_search) {
+        } else if (view.getId() == R.id.tile_search) {
             viewPager.setCurrentItem(1);
-        }
-        else if(view.getId() == R.id.tile_history) {
+        } else if (view.getId() == R.id.tile_history) {
             viewPager.setCurrentItem(2);
-        }
-        else if(view.getId() == R.id.tile_look_around) {
+        } else if (view.getId() == R.id.tile_look_around) {
             viewPager.setCurrentItem(3);
         }
     }
 
     /**
-     * Opens camera.
+     * Opens the camera to scan the stamp.
      */
     private void openCamera() {
         //Intent to open the camera
@@ -175,7 +164,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 is.close();
 
             } catch (Exception ex) {
-                Log.i(getClass().getSimpleName(), ex.getMessage());
+                Log.i(getClass().getSimpleName(), Objects.requireNonNull(ex.getMessage()));
                 Toast.makeText(context, R.string.conversion_fail_toast, Toast.LENGTH_SHORT).show();
             }
             //Starts the stamp recognition
@@ -189,7 +178,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 os.flush();
                 os.close();
             } catch (Exception ex) {
-                Log.e(getClass().getSimpleName(), ex.getMessage());
+                Log.e(getClass().getSimpleName(), Objects.requireNonNull(ex.getMessage()));
                 Toast.makeText(context, R.string.file_creation_fail_toast, Toast.LENGTH_SHORT).show();
             }
         } else {
@@ -242,7 +231,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
      * @param ocrSuccess indicates if the recognition has been successful (true) or not (false).
      */
     private void imageResult(boolean ocrSuccess) {
-
         if (!ocrSuccess) {
             OCRcounter++;
             if (OCRcounter == 4) {
@@ -277,27 +265,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             Matcher normalMatcher = normalStamp.matcher(tempText);
             Matcher domTomMatcher = domTomStamp.matcher(tempText);
             Matcher corsicaMatcher = corsicaStamp.matcher(tempText);
-            if(normalMatcher.find()) {
-                this.readCsv(normalMatcher.group(0));
+            if (normalMatcher.find()) {
+                this.searchStampInCSV(normalMatcher.group(0));
                 //editText.setText(normalMatcher.group(0));
-            }
-            else if (domTomMatcher.find()) {
-                this.readCsv(domTomMatcher.group(0));
+            } else if (domTomMatcher.find()) {
+                this.searchStampInCSV(domTomMatcher.group(0));
                 //editText.setText(domTomMatcher.group(0));
-            }
-            else if (corsicaMatcher.find()) {
-                this.readCsv(corsicaMatcher.group(0));
+            } else if (corsicaMatcher.find()) {
+                this.searchStampInCSV(corsicaMatcher.group(0));
                 //editText.setText(corsicaMatcher.group(0));
             }
         }
         return found;
     }
 
-    private void readCsv(String result) {
-//        InputStream is = getResources().openRawResource(R.raw.bdd_test);
+    private void searchStampInCSV(String result) {
         InputStream is = null;
         try {
-            is = new FileInputStream(getActivity().getApplicationContext().getFilesDir().toString()
+            is = new FileInputStream(Objects.requireNonNull(getActivity()).getApplicationContext().getFilesDir().toString()
                     + "/foodorigin_datagouv.txt");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -318,16 +303,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             while ((line = reader.readLine()) != null) {
                 String[] tab = line.split(";");
                 if (txt.equals(tab[0])) {
-                    String fileName = "historyFile.txt";
-                    try {
-                        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(getActivity().openFileOutput(fileName, Context.MODE_APPEND)));
-                        bw.write(tab[0] + ";" + tab[1]+ ";" + tab[2]+";" + tab[3]+";" + tab[4]+ ";" + tab[5] + ";" + tab[6] + "\n");
-                        bw.close();
-                    } catch (Exception e) {
-                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
+                    HistoryFragment.writeSearchInCSV(this.getActivity(), tab);
 
-                    Intent intent = new Intent(context, DisplayMap.class);
+                    Intent intent = new Intent(context, DisplayMapActivity.class);
                     Bundle mapBundle = new Bundle();
                     mapBundle.putStringArray("Infos", tab);
                     intent.putExtras(mapBundle);
@@ -335,8 +313,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     find = true;
                 }
             }
-
-        } catch (IOException e){
+            is.close();
+        } catch (IOException e) {
             Log.wtf("Erreur dans la lecture du CSV " + line, e);
             e.printStackTrace();
         }
