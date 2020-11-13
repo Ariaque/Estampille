@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 buffer.append(line).append("\n");
                 String[] infos = line.split(";");
                 data.put("estampille", infos[0]);
-                data.put("transformateur", infos[3]);
+                data.put("transformateur", infos[2]);
                 setH.add(line);
                 list.add(data);
             }

@@ -33,6 +33,7 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
     String address = "";
     String siret = "";
     String name = "";
+    String street = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,8 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
             assert tab != null;
             siret = tab[1];
             name = tab[2];
-            address = tab[3] + ", " + tab[4] + " " + tab[5];
+            street = tab[3].trim().isEmpty() ? tab[3] : tab[3] + ", ";
+            address = street + tab[4] + " " + tab[5];
             LatLng latLng = getCoords(address);
             lon = latLng.longitude;
             lat = latLng.latitude;
