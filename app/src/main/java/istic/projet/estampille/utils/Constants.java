@@ -1,10 +1,10 @@
-package istic.projet.estampille;
+package istic.projet.estampille.utils;
 
 public class Constants {
 
-    static final String KEY_DATA_GOUV_URLS = "KEY_DATA_GOUV_URLs";
+    public static final String KEY_DATA_GOUV_URLS = "KEY_DATA_GOUV_URLs";
     // French gouvernement's data API : dead links since mid October 2020
-    static final String[] urls_data_gouv_array =
+    public static final String[] urls_data_gouv_array =
             {"https://www.data.gouv.fr/fr/datasets/r/c2d33407-ce1a-4f34-8c6e-72066ce05c2b",
                     "https://www.data.gouv.fr/fr/datasets/r/1632c783-c523-4424-a97a-bea967279be7",
                     "https://www.data.gouv.fr/fr/datasets/r/61560678-9f30-459e-824c-12ba45777b7d",
@@ -39,7 +39,7 @@ public class Constants {
                     "https://www.data.gouv.fr/fr/datasets/r/c4fc7247-7f2c-4b75-9255-44fd31606859",
                     "https://www.data.gouv.fr/fr/datasets/r/3d3c933b-56de-4076-971d-93961f497302"};
 
-    static final String[] urls_data_gouv_array_2 =
+    public static final String[] urls_data_gouv_array_2 =
             {"https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA1_ACTIV_GEN.txt",
                     "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA1_VIAN_ONG_DOM.txt",
                     "https://fichiers-publics.agriculture.gouv.fr/dgal/ListesOfficielles/SSA1_VIAN_COL_LAGO.txt",

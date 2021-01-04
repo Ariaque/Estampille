@@ -44,6 +44,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import istic.projet.estampille.utils.Constants;
+import istic.projet.estampille.utils.PermissionsUtils;
+
 public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener {
 
     private Context context;
@@ -72,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PermissionsUtils.permission_storage_explain, PermissionsUtils.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
         } else {
-            launchDownloadWorker();
+//            launchDownloadWorker();
         }
 
         //Configures design elements
@@ -98,21 +101,21 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     /**
      * Downloading of the lists of CE-approved establishments every 7 days.
      */
-    private void launchDownloadWorker() {
-        if (this.getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            Constraints constraints = new Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build();
-            final long repeatInterval = 7;
-            PeriodicWorkRequest downloadDataGouv =
-                    new PeriodicWorkRequest.Builder(DownloadDataWorker.class, repeatInterval, TimeUnit.DAYS)
-                            .setConstraints(constraints)
-                            .setInputData(createInputDataForDownloadWorker())
-                            .build();
-            WorkManager.getInstance(getApplicationContext())
-                    .enqueue(downloadDataGouv);
-        }
-    }
+//    private void launchDownloadWorker() {
+//        if (this.getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+//            Constraints constraints = new Constraints.Builder()
+//                    .setRequiredNetworkType(NetworkType.CONNECTED)
+//                    .build();
+//            final long repeatInterval = 7;
+//            PeriodicWorkRequest downloadDataGouv =
+//                    new PeriodicWorkRequest.Builder(DownloadDataWorker.class, repeatInterval, TimeUnit.DAYS)
+//                            .setConstraints(constraints)
+//                            .setInputData(createInputDataForDownloadWorker())
+//                            .build();
+//            WorkManager.getInstance(getApplicationContext())
+//                    .enqueue(downloadDataGouv);
+//        }
+//    }
 
     /**
      * Gives the urls that allows to access the lists of CE-approved establishments
@@ -353,7 +356,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PermissionsUtils.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                launchDownloadWorker();
+//                launchDownloadWorker();
             } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
                 PermissionsUtils.displayOptions(this, containerView, PermissionsUtils.permission_storage_params);
             } else {

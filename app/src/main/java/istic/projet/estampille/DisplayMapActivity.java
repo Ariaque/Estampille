@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import istic.projet.estampille.models.APITransformateur;
+
 public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
 
     double lon = 0;
@@ -40,24 +42,26 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_map);
         Bundle mapBundle = getIntent().getExtras();
+        APITransformateur transformateur = null;
         if (mapBundle != null) {
-            tab = mapBundle.getStringArray("Infos");
-            assert tab != null;
-            siret = tab[1];
-            name = tab[2];
-            street = tab[3].trim().isEmpty() ? tab[3] : tab[3] + ", ";
-            address = street + tab[4] + " " + tab[5];
-            LatLng latLng = getCoords(address);
-            lon = latLng.longitude;
-            lat = latLng.latitude;
+//            tab = mapBundle.getStringArray("Infos");
+//            assert tab != null;
+//            siret = tab[1];
+//            name = tab[2];
+//            street = tab[3].trim().isEmpty() ? tab[3] : tab[3] + ", ";
+//            address = street + tab[4] + " " + tab[5];
+//            LatLng latLng = getCoords(address);
+//            lon = latLng.longitude;
+//            lat = latLng.latitude;
+            transformateur = (APITransformateur) mapBundle.get("Transformateur");
         }
-
-        TextView textViewAdress = findViewById(R.id.textViewAdress);
-        TextView textViewName = findViewById(R.id.textViewName);
+        if(transformateur!=null){
+            TextView textViewAdress = findViewById(R.id.textViewAdress);
+            TextView textViewName = findViewById(R.id.textViewName);
+            textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress, transformateur.getAdresse())));
+            textViewName.setText(Html.fromHtml(getResources().getString(R.string.name, transformateur.getRaisonSociale())));
+        }
         ImageButton backButton = findViewById(R.id.backButton);
-        textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress, address)));
-        textViewName.setText(Html.fromHtml(getResources().getString(R.string.name, name)));
-
         backButton.setOnClickListener(this);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);

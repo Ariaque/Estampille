@@ -50,6 +50,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import istic.projet.estampille.utils.PermissionsUtils;
+
 public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private static final int REQUEST_IMAGE1_CAPTURE = 1;
