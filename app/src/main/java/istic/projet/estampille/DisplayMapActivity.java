@@ -5,6 +5,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -41,9 +42,10 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_map);
-        Bundle mapBundle = getIntent().getExtras();
+        Intent intent = getIntent();
         APITransformateur transformateur = null;
-        if (mapBundle != null) {
+        transformateur = (APITransformateur) intent.getSerializableExtra("searchedTransformateur");
+        if (transformateur != null) {
 //            tab = mapBundle.getStringArray("Infos");
 //            assert tab != null;
 //            siret = tab[1];
@@ -53,9 +55,7 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
 //            LatLng latLng = getCoords(address);
 //            lon = latLng.longitude;
 //            lat = latLng.latitude;
-            transformateur = (APITransformateur) mapBundle.get("Transformateur");
-        }
-        if(transformateur!=null){
+            Log.wtf("API : result act2: ", transformateur.toString());
             TextView textViewAdress = findViewById(R.id.textViewAdress);
             TextView textViewName = findViewById(R.id.textViewName);
             textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress, transformateur.getAdresse())));

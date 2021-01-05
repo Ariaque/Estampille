@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import istic.projet.estampille.models.APITransformateur;
+
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     private static HistoryFragment instance;
@@ -40,11 +42,14 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         return instance;
     }
 
-    static void writeSearchInCSV(Activity activity, String[] tab) {
+    static void writeSearchInCSV(Activity activity, APITransformateur transformateur) {
         String fileName = "historyFile.txt";
         try {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(activity.openFileOutput(fileName, Context.MODE_APPEND)));
-            bw.write(tab[0] + ";" + tab[1] + ";" + tab[2] + ";" + tab[3] + ";" + tab[4] + ";" + tab[5] + ";" + tab[6] + "\n");
+//            bw.write(tab[0] + ";" + tab[1] + ";" + tab[2] + ";" + tab[3] + ";" + tab[4] + ";" + tab[5] + ";" + tab[6] + "\n");
+            bw.write(transformateur.getNumAgrement() + ";" + transformateur.getSiret()
+                    + ";" + transformateur.getAdresse() + ";" + transformateur.getCodePostal() + ";" + transformateur.getCommune()
+                    + ";" + transformateur.getLongitude() + ";" + transformateur.getLatitude() + "\n");
             bw.close();
         } catch (Exception e) {
             Toast.makeText(activity.getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();

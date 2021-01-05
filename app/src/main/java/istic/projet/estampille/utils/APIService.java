@@ -40,7 +40,6 @@ public interface APIService {
         @Override
         public Response intercept(Chain chain) throws IOException {
             Request request = chain.request();
-
             long t1 = System.nanoTime();
             Log.wtf("API : ", String.format("--> Sending request %s on %s%n%s", request.url(), chain.connection(), request.headers()));
             Log.wtf("API : request", String.valueOf(request));
@@ -50,7 +49,7 @@ public interface APIService {
             Log.wtf("API : ", requestBuffer.readUtf8());
 
             okhttp3.Response response = chain.proceed(request);
-            System.out.println("RESPONSE : " + response);
+            Log.wtf("RESPONSE : ", String.valueOf(response));
             long t2 = System.nanoTime();
             Log.wtf("API : ", String.format("<-- Received response for %s in %.1fms%n%s", response.request().url(), (t2 - t1) / 1e6d, response.headers()));
 

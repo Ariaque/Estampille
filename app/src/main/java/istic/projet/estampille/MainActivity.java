@@ -122,11 +122,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
      *
      * @return the input
      */
-    private Data createInputDataForDownloadWorker() {
-        Data.Builder builder = new Data.Builder();
-        builder.putStringArray(Constants.KEY_DATA_GOUV_URLS, Constants.urls_data_gouv_array_2);
-        return builder.build();
-    }
+//    private Data createInputDataForDownloadWorker() {
+//        Data.Builder builder = new Data.Builder();
+//        builder.putStringArray(Constants.KEY_DATA_GOUV_URLS, Constants.urls_data_gouv_array_2);
+//        return builder.build();
+//    }
 
     @Override
     public void onClick(View view) {

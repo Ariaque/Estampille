@@ -13,12 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 import istic.projet.estampille.models.APITransformateur;
@@ -26,8 +26,6 @@ import istic.projet.estampille.utils.APIService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-//import istic.projet.estampille.utils.APICalls;
-//import istic.projet.estampille.utils.NetworkAsyncTask;
 
 public class WritePackagingNumberFragment extends Fragment implements View.OnTouchListener, View.OnClickListener, View.OnFocusChangeListener, TextWatcher {
 
@@ -159,47 +157,28 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
 
     private void executeHttpRequestWithRetrofit(String estampille) {
         APIService apiService = APIService.retrofit.create(APIService.class);
-
         Call<APITransformateur> call = apiService.getTansformateur(estampille);
         call.enqueue(new Callback<APITransformateur>() {
             @Override
             public void onResponse(Call<APITransformateur> call, Response<APITransformateur> response) {
-                APITransformateur myItem = response.body();
-                if (myItem != null) {
+                APITransformateur searchedTransformateur = response.body();
+                if (searchedTransformateur != null) {
+                                        HistoryFragment.writeSearchInCSV(WritePackagingNumberFragment.super.getActivity(), searchedTransformateur);
+                    Log.wtf("API : result : act1 ", searchedTransformateur.toString());
+//                    Intent intent = new Intent(WritePackagingNumberFragment.this.getContext(), DisplayMapActivity.class);
                     Intent intent = new Intent(context, DisplayMapActivity.class);
-                    Bundle mapBundle = new Bundle();
-                    mapBundle.putSerializable("Transformateur", myItem);
-                    intent.putExtras(mapBundle);
+                    intent.putExtra("searchedTransformateur", searchedTransformateur);
                     startActivity(intent);
                 }
             }
 
             @Override
             public void onFailure(Call<APITransformateur> call, Throwable t) {
-                //Handle failure
-                Log.wtf("API : ", "onFailure: Failed :(");
                 Log.wtf("API : ", "onResponseFailed: " + call.request().url());
-                Log.wtf("API : ","error : ");
                 t.printStackTrace();
-                Log.wtf("API : ","end error : ");
+                Toast.makeText(context, context.getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
             }
         });
     }
-
-//    private void executeHttpRequestWithRetrofit(String estampille) {
-//        APIService apiService = APIService.retrofit.create(APIService.class);
-//
-//        Call<APITransformateur> callSync = apiService.getTansformateur(estampille);
-//
-//        try {
-//            Response<APITransformateur> response = callSync.execute();
-//            APITransformateur apiResponse = response.body();
-//
-//            //API response
-//            System.out.println("api response : " + apiResponse);
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        }
-//    }
 }
 

@@ -47,13 +47,11 @@ public class APITransformateur implements Serializable {
 
     /**
      * No args constructor for use in serialization
-     *
      */
     public APITransformateur() {
     }
 
     /**
-     *
      * @param categorie
      * @param raisonSociale
      * @param commune
@@ -82,6 +80,7 @@ public class APITransformateur implements Serializable {
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
 
     public Integer getId() {
         return id;
@@ -179,10 +178,17 @@ public class APITransformateur implements Serializable {
         this.longitude = longitude;
     }
 
-//    @Override
-//    public String toString() {
-//        return new ToStringBuilder(this).append("id", id).append("numAgrement", numAgrement).append("siret", siret).append("raisonSociale", raisonSociale).append("adresse", adresse).append("codePostal", codePostal).append("commune", commune).append("categorie", categorie).append("actAssociees", actAssociees).append("espece", espece).append("latitude", latitude).append("longitude", longitude).toString();
-//    }
-
+    @Override
+    public String toString() {
+        return "APITransformateur{" +
+                "id=" + id +
+                ", numAgrement='" + numAgrement + '\'' +
+                ", siret='" + siret + '\'' +
+                ", raisonSociale='" + raisonSociale + '\'' +
+                ", adresse='" + adresse + '\'' +
+                ", codePostal='" + codePostal + '\'' +
+                ", commune='" + commune + '\'' +
+                '}';
+    }
 }
 

@@ -50,7 +50,12 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import istic.projet.estampille.models.APITransformateur;
+import istic.projet.estampille.utils.APIService;
 import istic.projet.estampille.utils.PermissionsUtils;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
 
@@ -282,51 +287,77 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
     private void searchStampInCSV(String result) {
-        InputStream is = null;
-        try {
-            is = new FileInputStream(Objects.requireNonNull(getActivity()).getApplicationContext().getFilesDir().toString()
-                    + "/foodorigin_datagouv.txt");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        boolean find = false;
+//        InputStream is = null;
+//        try {
+//            is = new FileInputStream(Objects.requireNonNull(getActivity()).getApplicationContext().getFilesDir().toString()
+//                    + "/foodorigin_datagouv.txt");
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        boolean find = false;
         String txt = "";
-
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(is, StandardCharsets.UTF_8)
-        );
+//
+//        BufferedReader reader = new BufferedReader(
+//                new InputStreamReader(is, StandardCharsets.UTF_8)
+//        );
 
         //Recover the stamp in the text field
         txt = result;
 
         String line = "";
 
-        try {
-            while ((line = reader.readLine()) != null) {
-                String[] tab = line.split(";");
-                if (txt.equals(tab[0])) {
-                    HistoryFragment.writeSearchInCSV(this.getActivity(), tab);
+//        try {
+//            while ((line = reader.readLine()) != null) {
+//                String[] tab = line.split(";");
+//                if (txt.equals(tab[0])) {
+//                    HistoryFragment.writeSearchInCSV(this.getActivity(), tab);
+//
+//                    Intent intent = new Intent(context, DisplayMapActivity.class);
+//                    Bundle mapBundle = new Bundle();
+//                    mapBundle.putStringArray("Infos", tab);
+//                    intent.putExtras(mapBundle);
+//                    startActivity(intent);
+//                    find = true;
+//                }
+//            }
+//            is.close();
+//        } catch (IOException e) {
+//            Log.wtf("Erreur dans la lecture du CSV " + line, e);
+//            e.printStackTrace();
+//        }
+//
+//        //If the stamp has no similarity in the CSV, a message error appears
+//        if (!find) {
+//            Toast.makeText(context, context.getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
+//        }
 
+        this.executeHttpRequestWithRetrofit(txt);
+    }
+    private void executeHttpRequestWithRetrofit(String estampille) {
+        APIService apiService = APIService.retrofit.create(APIService.class);
+        Call<APITransformateur> call = apiService.getTansformateur(estampille);
+        call.enqueue(new Callback<APITransformateur>() {
+            @Override
+            public void onResponse(Call<APITransformateur> call, Response<APITransformateur> response) {
+                APITransformateur searchedTransformateur = response.body();
+                if (searchedTransformateur != null) {
+                    HistoryFragment.writeSearchInCSV(HomeFragment.super.getActivity(), searchedTransformateur);
+                    Log.wtf("API : result : act1 ", searchedTransformateur.toString());
+//                    Intent intent = new Intent(WritePackagingNumberFragment.this.getContext(), DisplayMapActivity.class);
                     Intent intent = new Intent(context, DisplayMapActivity.class);
-                    Bundle mapBundle = new Bundle();
-                    mapBundle.putStringArray("Infos", tab);
-                    intent.putExtras(mapBundle);
+                    intent.putExtra("searchedTransformateur", searchedTransformateur);
                     startActivity(intent);
-                    find = true;
                 }
             }
-            is.close();
-        } catch (IOException e) {
-            Log.wtf("Erreur dans la lecture du CSV " + line, e);
-            e.printStackTrace();
-        }
 
-        //If the stamp has no similarity in the CSV, a message error appears
-        if (!find) {
-            Toast.makeText(context, context.getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
-        }
+            @Override
+            public void onFailure(Call<APITransformateur> call, Throwable t) {
+                Log.wtf("API : ", "onResponseFailed: " + call.request().url());
+                t.printStackTrace();
+                Toast.makeText(context, context.getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PermissionsUtils.REQUEST_CODE_PERMISSION_CAMERA) {
