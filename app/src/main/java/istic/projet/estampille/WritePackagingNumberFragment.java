@@ -22,6 +22,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.Objects;
 
 import istic.projet.estampille.models.APITransformateur;
+import istic.projet.estampille.utils.APICalls;
 import istic.projet.estampille.utils.APIService;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -97,7 +98,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
         txt = Objects.requireNonNull(this.textFieldEstampille1.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille2.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille3.getText()).toString();
 
         String line = "";
-        this.executeHttpRequestWithRetrofit(txt);
+        APICalls.executeHttpRequestWithRetrofit(this.getActivity(), txt);
 //        try {
 //            while ((line = reader.readLine()) != null) {
 //                String[] tab = line.split(";");
@@ -155,30 +156,6 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
 
     }
 
-    private void executeHttpRequestWithRetrofit(String estampille) {
-        APIService apiService = APIService.retrofit.create(APIService.class);
-        Call<APITransformateur> call = apiService.getTansformateur(estampille);
-        call.enqueue(new Callback<APITransformateur>() {
-            @Override
-            public void onResponse(Call<APITransformateur> call, Response<APITransformateur> response) {
-                APITransformateur searchedTransformateur = response.body();
-                if (searchedTransformateur != null) {
-                                        HistoryFragment.writeSearchInCSV(WritePackagingNumberFragment.super.getActivity(), searchedTransformateur);
-                    Log.wtf("API : result : act1 ", searchedTransformateur.toString());
-//                    Intent intent = new Intent(WritePackagingNumberFragment.this.getContext(), DisplayMapActivity.class);
-                    Intent intent = new Intent(context, DisplayMapActivity.class);
-                    intent.putExtra("searchedTransformateur", searchedTransformateur);
-                    startActivity(intent);
-                }
-            }
 
-            @Override
-            public void onFailure(Call<APITransformateur> call, Throwable t) {
-                Log.wtf("API : ", "onResponseFailed: " + call.request().url());
-                t.printStackTrace();
-                Toast.makeText(context, context.getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 }
 

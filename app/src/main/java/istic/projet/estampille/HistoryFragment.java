@@ -42,7 +42,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         return instance;
     }
 
-    static void writeSearchInCSV(Activity activity, APITransformateur transformateur) {
+    public static void writeSearchInCSV(Activity activity, APITransformateur transformateur) {
         String fileName = "historyFile.txt";
         try {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(activity.openFileOutput(fileName, Context.MODE_APPEND)));

@@ -51,6 +51,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import istic.projet.estampille.models.APITransformateur;
+import istic.projet.estampille.utils.APICalls;
 import istic.projet.estampille.utils.APIService;
 import istic.projet.estampille.utils.PermissionsUtils;
 import retrofit2.Call;
@@ -331,33 +332,33 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 //            Toast.makeText(context, context.getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
 //        }
 
-        this.executeHttpRequestWithRetrofit(txt);
+        APICalls.executeHttpRequestWithRetrofit(this.getActivity(), txt);
     }
-    private void executeHttpRequestWithRetrofit(String estampille) {
-        APIService apiService = APIService.retrofit.create(APIService.class);
-        Call<APITransformateur> call = apiService.getTansformateur(estampille);
-        call.enqueue(new Callback<APITransformateur>() {
-            @Override
-            public void onResponse(Call<APITransformateur> call, Response<APITransformateur> response) {
-                APITransformateur searchedTransformateur = response.body();
-                if (searchedTransformateur != null) {
-                    HistoryFragment.writeSearchInCSV(HomeFragment.super.getActivity(), searchedTransformateur);
-                    Log.wtf("API : result : act1 ", searchedTransformateur.toString());
-//                    Intent intent = new Intent(WritePackagingNumberFragment.this.getContext(), DisplayMapActivity.class);
-                    Intent intent = new Intent(context, DisplayMapActivity.class);
-                    intent.putExtra("searchedTransformateur", searchedTransformateur);
-                    startActivity(intent);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<APITransformateur> call, Throwable t) {
-                Log.wtf("API : ", "onResponseFailed: " + call.request().url());
-                t.printStackTrace();
-                Toast.makeText(context, context.getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+//    private void executeHttpRequestWithRetrofit(String estampille) {
+//        APIService apiService = APIService.retrofit.create(APIService.class);
+//        Call<APITransformateur> call = apiService.getTansformateur(estampille);
+//        call.enqueue(new Callback<APITransformateur>() {
+//            @Override
+//            public void onResponse(Call<APITransformateur> call, Response<APITransformateur> response) {
+//                APITransformateur searchedTransformateur = response.body();
+//                if (searchedTransformateur != null) {
+//                    HistoryFragment.writeSearchInCSV(HomeFragment.super.getActivity(), searchedTransformateur);
+//                    Log.wtf("API : result : act1 ", searchedTransformateur.toString());
+////                    Intent intent = new Intent(WritePackagingNumberFragment.this.getContext(), DisplayMapActivity.class);
+//                    Intent intent = new Intent(context, DisplayMapActivity.class);
+//                    intent.putExtra("searchedTransformateur", searchedTransformateur);
+//                    startActivity(intent);
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<APITransformateur> call, Throwable t) {
+//                Log.wtf("API : ", "onResponseFailed: " + call.request().url());
+//                t.printStackTrace();
+//                Toast.makeText(context, context.getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PermissionsUtils.REQUEST_CODE_PERMISSION_CAMERA) {

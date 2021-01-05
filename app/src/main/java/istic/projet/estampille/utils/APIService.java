@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import okio.Buffer;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -25,9 +26,7 @@ public interface APIService {
 //            .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .addInterceptor(new LoggingInterceptor())
             .build();
-    //            .baseUrl("http://localhost:8080/")
     Retrofit retrofit = new Retrofit.Builder()
-//            .baseUrl("http://10.188.77.125:8080/")
             .baseUrl("http://192.168.43.194:8080/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
@@ -43,20 +42,13 @@ public interface APIService {
             long t1 = System.nanoTime();
             Log.wtf("API : ", String.format("--> Sending request %s on %s%n%s", request.url(), chain.connection(), request.headers()));
             Log.wtf("API : request", String.valueOf(request));
-
-            Buffer requestBuffer = new Buffer();
-//            request.body().writeTo(requestBuffer);
-            Log.wtf("API : ", requestBuffer.readUtf8());
-
             okhttp3.Response response = chain.proceed(request);
-            Log.wtf("RESPONSE : ", String.valueOf(response));
             long t2 = System.nanoTime();
             Log.wtf("API : ", String.format("<-- Received response for %s in %.1fms%n%s", response.request().url(), (t2 - t1) / 1e6d, response.headers()));
-
+            Log.wtf("API : response : ", String.valueOf(response));
+            assert response.body() != null;
             MediaType contentType = response.body().contentType();
             String content = response.body().string();
-            Log.wtf("API : ", content);
-
             ResponseBody wrappedBody = ResponseBody.create(contentType, content);
             return response.newBuilder().body(wrappedBody).build();
         }

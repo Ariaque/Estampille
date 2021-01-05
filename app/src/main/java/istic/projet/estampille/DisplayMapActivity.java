@@ -32,7 +32,6 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
 
     double lon = 0;
     double lat = 0;
-    String[] tab = new String[0];
     String address = "";
     String siret = "";
     String name = "";
@@ -43,23 +42,19 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_map);
         Intent intent = getIntent();
-        APITransformateur transformateur = null;
-        transformateur = (APITransformateur) intent.getSerializableExtra("searchedTransformateur");
+        APITransformateur transformateur = (APITransformateur) intent.getSerializableExtra("searchedTransformateur");
         if (transformateur != null) {
-//            tab = mapBundle.getStringArray("Infos");
-//            assert tab != null;
-//            siret = tab[1];
-//            name = tab[2];
-//            street = tab[3].trim().isEmpty() ? tab[3] : tab[3] + ", ";
-//            address = street + tab[4] + " " + tab[5];
-//            LatLng latLng = getCoords(address);
-//            lon = latLng.longitude;
-//            lat = latLng.latitude;
-            Log.wtf("API : result act2: ", transformateur.toString());
+            siret = transformateur.getSiret();
+            name = transformateur.getRaisonSociale();
+            street = transformateur.getAdresse().trim().isEmpty() ? transformateur.getAdresse() : transformateur.getAdresse() + ", ";
+            address = street + transformateur.getCodePostal() + " " + transformateur.getCommune();
+            LatLng latLng = getCoords(address);
+            lon = latLng.longitude;
+            lat = latLng.latitude;
             TextView textViewAdress = findViewById(R.id.textViewAdress);
             TextView textViewName = findViewById(R.id.textViewName);
-            textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress, transformateur.getAdresse())));
-            textViewName.setText(Html.fromHtml(getResources().getString(R.string.name, transformateur.getRaisonSociale())));
+            textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress, address)));
+            textViewName.setText(Html.fromHtml(getResources().getString(R.string.name, name)));
         }
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(this);
