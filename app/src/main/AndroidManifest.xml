@@ -18,7 +18,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
+        <!-- android:usesCleartextTraffic="true" à enlever si passage en https (mise en prod), sert pour communiquer avec l'API distante -->
 
         <meta-data
             android:name="com.google.android.gms.version"
