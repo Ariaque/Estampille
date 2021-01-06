@@ -5,6 +5,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -25,11 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import istic.projet.estampille.models.APITransformateur;
+
 public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
 
     double lon = 0;
     double lat = 0;
-    String[] tab = new String[0];
     String address = "";
     String siret = "";
     String name = "";
@@ -39,25 +41,22 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_map);
-        Bundle mapBundle = getIntent().getExtras();
-        if (mapBundle != null) {
-            tab = mapBundle.getStringArray("Infos");
-            assert tab != null;
-            siret = tab[1];
-            name = tab[2];
-            street = tab[3].trim().isEmpty() ? tab[3] : tab[3] + ", ";
-            address = street + tab[4] + " " + tab[5];
+        Intent intent = getIntent();
+        APITransformateur transformateur = (APITransformateur) intent.getSerializableExtra("searchedTransformateur");
+        if (transformateur != null) {
+            siret = transformateur.getSiret();
+            name = transformateur.getRaisonSociale();
+            street = transformateur.getAdresse().trim().isEmpty() ? transformateur.getAdresse() : transformateur.getAdresse() + ", ";
+            address = street + transformateur.getCodePostal() + " " + transformateur.getCommune();
             LatLng latLng = getCoords(address);
             lon = latLng.longitude;
             lat = latLng.latitude;
+            TextView textViewAdress = findViewById(R.id.textViewAdress);
+            TextView textViewName = findViewById(R.id.textViewName);
+            textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress, address)));
+            textViewName.setText(Html.fromHtml(getResources().getString(R.string.name, name)));
         }
-
-        TextView textViewAdress = findViewById(R.id.textViewAdress);
-        TextView textViewName = findViewById(R.id.textViewName);
         ImageButton backButton = findViewById(R.id.backButton);
-        textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress, address)));
-        textViewName.setText(Html.fromHtml(getResources().getString(R.string.name, name)));
-
         backButton.setOnClickListener(this);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);

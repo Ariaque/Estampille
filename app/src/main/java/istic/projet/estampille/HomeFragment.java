@@ -32,16 +32,11 @@ import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -49,6 +44,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import istic.projet.estampille.utils.APICalls;
+import istic.projet.estampille.utils.PermissionsUtils;
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
 
@@ -83,7 +81,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         searchTile.setOnClickListener(this);
         historyTile.setOnClickListener(this);
         lookAroundTile.setOnClickListener(this);
-
 
         return rootView;
     }
@@ -186,7 +183,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-
     /**
      * Recognizes the text from the bitmap in parameter.
      *
@@ -221,7 +217,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                                         public void onFailure(@NonNull Exception e) {
                                         }
                                     });
-
         }
     }
 
@@ -266,63 +261,25 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             Matcher domTomMatcher = domTomStamp.matcher(tempText);
             Matcher corsicaMatcher = corsicaStamp.matcher(tempText);
             if (normalMatcher.find()) {
-                this.searchStampInCSV(normalMatcher.group(0));
+                this.searchStampInDB(normalMatcher.group(0));
                 //editText.setText(normalMatcher.group(0));
             } else if (domTomMatcher.find()) {
-                this.searchStampInCSV(domTomMatcher.group(0));
+                this.searchStampInDB(domTomMatcher.group(0));
                 //editText.setText(domTomMatcher.group(0));
             } else if (corsicaMatcher.find()) {
-                this.searchStampInCSV(corsicaMatcher.group(0));
+                this.searchStampInDB(corsicaMatcher.group(0));
                 //editText.setText(corsicaMatcher.group(0));
             }
         }
         return found;
     }
 
-    private void searchStampInCSV(String result) {
-        InputStream is = null;
-        try {
-            is = new FileInputStream(Objects.requireNonNull(getActivity()).getApplicationContext().getFilesDir().toString()
-                    + "/foodorigin_datagouv.txt");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        boolean find = false;
-        String txt = "";
-
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(is, StandardCharsets.UTF_8)
-        );
-
-        //Recover the stamp in the text field
-        txt = result;
-
-        String line = "";
-
-        try {
-            while ((line = reader.readLine()) != null) {
-                String[] tab = line.split(";");
-                if (txt.equals(tab[0])) {
-                    HistoryFragment.writeSearchInCSV(this.getActivity(), tab);
-
-                    Intent intent = new Intent(context, DisplayMapActivity.class);
-                    Bundle mapBundle = new Bundle();
-                    mapBundle.putStringArray("Infos", tab);
-                    intent.putExtras(mapBundle);
-                    startActivity(intent);
-                    find = true;
-                }
-            }
-            is.close();
-        } catch (IOException e) {
-            Log.wtf("Erreur dans la lecture du CSV " + line, e);
-            e.printStackTrace();
-        }
-
-        //If the stamp has no similarity in the CSV, a message error appears
-        if (!find) {
-            Toast.makeText(context, context.getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
-        }
+    /**
+     * Launch the search of the stamp in the remote database.
+     * @param estampilleSearched
+     */
+    private void searchStampInDB(String estampilleSearched) {
+        APICalls.executeHttpRequestWithRetrofit(this.getActivity(), estampilleSearched);
     }
 
     @Override

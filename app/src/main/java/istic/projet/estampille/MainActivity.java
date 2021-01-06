@@ -15,10 +15,8 @@ import android.os.StrictMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,22 +27,18 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-import androidx.work.Constraints;
-import androidx.work.Data;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
 
-import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+
+import istic.projet.estampille.models.APITransformateur;
+import istic.projet.estampille.utils.Constants;
+import istic.projet.estampille.utils.PermissionsUtils;
 
 public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener {
 
@@ -60,8 +54,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private int foodOriginDarkOrange;
     private int foodOriginWhite;
     private ConstraintLayout containerView;
-    private ArrayList<Map<String, String>> list;
-    private Set<String> setH;
+    private ArrayList<APITransformateur> listHistoryItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +67,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         //Checks permission
         if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PermissionsUtils.permission_storage_explain, PermissionsUtils.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
-        } else {
-            launchDownloadWorker();
         }
 
         //Configures design elements
@@ -321,64 +312,56 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
      * Reads the history file content and displays the history in the main page
      */
     public void loadHistoryFragment() {
-        String fileName = "historyFile.txt";
+        String fileName = Constants.HISTORY_FILE_NAME;
         ListView listView = findViewById(R.id.listView);
-        list = new ArrayList<>();
-        setH = new LinkedHashSet<>();
-
-        //Reads the file
-        try {
-            //OutputStreamWriter output = new OutputStreamWriter(openFileOutput(fileName, Context.MODE_APPEND));
-            InputStreamReader inputReader = new InputStreamReader(openFileInput(fileName));
-            BufferedReader br = new BufferedReader(inputReader);
-            String line;
-            StringBuilder buffer = new StringBuilder();
-            while ((line = br.readLine()) != null) {
-                Map<String, String> data = new HashMap<>();
-                buffer.append(line).append("\n");
-                String[] infos = line.split(";");
-                data.put("estampille", infos[0]);
-                data.put("transformateur", infos[2]);
-                setH.add(line);
-                list.add(data);
+        listHistoryItems = new ArrayList<APITransformateur>();
+        Object objectRead = null;
+        File file = new File(this.context.getFilesDir(), "" + File.separator + fileName);
+        if (file.exists()) {
+            try {
+                FileInputStream fileInputStream = context.openFileInput(fileName);
+                ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+                while ((objectRead = objectInputStream.readObject()) != null) {
+                    if (objectRead instanceof APITransformateur) {
+                        boolean alreadyPresent = false;
+                        // delete the duplicate lines
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            APITransformateur finalObjectRead = (APITransformateur) objectRead;
+                            alreadyPresent = listHistoryItems.stream().anyMatch(o -> o.getNumAgrement().equals((finalObjectRead).getNumAgrement()));
+                        } else {
+                            Iterator it = listHistoryItems.iterator();
+                            while (!alreadyPresent && it.hasNext()) {
+                                Object finalObjectRead = it.next();
+                                if (finalObjectRead != null && finalObjectRead.equals(objectRead)) {
+                                    alreadyPresent = true;
+                                }
+                            }
+                        }
+                        if (!alreadyPresent) {
+                            listHistoryItems.add((APITransformateur) objectRead);
+                        }
+                    }
+                }
+                objectInputStream.close();
+                fileInputStream.close();
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
             }
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            //HistoryFragment.getInstance().setTutoVisibility(true);
+
+            //Displays the tutorial image if there are no history
+            HistoryFragment.getInstance().setHistoryFragmentComponentsVisibility(listHistoryItems.size() == 0);
+
+            //Changes the adapter list
+            HistoryAdapter adapter = new HistoryAdapter(this, listHistoryItems);
+            listView.setAdapter(adapter);
         }
-
-        //Displays the tutorial image if there are no history
-        HistoryFragment.getInstance().setHistoryFragmentComponentsVisibility(list.size() == 0);
-
-        //Deletes duplicates line
-        Set<Map<String, String>> mySet = new LinkedHashSet<>(list);
-        list = new ArrayList<>(mySet);
-
-        //Changes the adapter list
-        SimpleAdapter adapter = new SimpleAdapter(getApplicationContext(), list, R.layout.list_item_layout, new String[]{"transformateur", "estampille"}, new int[]{R.id.item1, R.id.item2});
-        listView.setAdapter(adapter);
-
-        //Adds listener for each list item : go to the information page of a transformer
-        Object[] tab = setH.toArray();
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String infos = (String) tab[i];
-                Intent intent = new Intent(context, DisplayMapActivity.class);
-                Bundle mapBundle = new Bundle();
-                mapBundle.putStringArray("Infos", infos.split(";"));
-                intent.putExtras(mapBundle);
-                startActivity(intent);
-            }
-        });
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PermissionsUtils.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                launchDownloadWorker();
+//                launchDownloadWorker();
             } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
                 PermissionsUtils.displayOptions(this, containerView, PermissionsUtils.permission_storage_params);
             } else {
