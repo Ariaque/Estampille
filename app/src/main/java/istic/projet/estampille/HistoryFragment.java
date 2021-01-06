@@ -4,10 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -16,13 +16,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import istic.projet.estampille.models.APITransformateur;
@@ -31,6 +28,7 @@ import istic.projet.estampille.utils.Constants;
 
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
+    private static final String TAG = HistoryFragment.class.getName();
     private static HistoryFragment instance;
     private ListView listView;
     private TextView textEmptyHistory;
@@ -43,6 +41,30 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
      */
     public static HistoryFragment getInstance() {
         return instance;
+    }
+
+    /**
+     * Serialize the searched {@link APITransformateur} in a file.
+     *
+     * @param activity
+     * @param transformateur the {@link APITransformateur} to serialize
+     */
+    public static void writeSearchInHistory(Activity activity, APITransformateur transformateur) {
+        String fileName = Constants.HISTORY_FILE_NAME;
+        File file = new File(activity.getFilesDir(), "" + File.separator + fileName);
+        boolean append = file.exists();
+        FileOutputStream fout;
+        ObjectOutputStream oout;
+        try {
+            fout = activity.getApplicationContext().openFileOutput(fileName, Context.MODE_PRIVATE | Context.MODE_APPEND);
+            // if file exists then append the object, otherwise create new and write headers (see AppendableObjectOutputStream)
+            oout = new AppendableObjectOutputStream(fout, append);
+            oout.writeObject(transformateur);
+            oout.close();
+            fout.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -59,28 +81,6 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * Serialize the searched {@link APITransformateur} in a file.
-     * @param activity
-     * @param transformateur the {@link APITransformateur} to serialize
-     */
-    public static void writeSearchInHistory(Activity activity, APITransformateur transformateur) {
-        String fileName = Constants.HISTORY_FILE_NAME;
-        File file = new File(activity.getFilesDir(), "" + File.separator + fileName);
-        boolean append = file.exists();
-        FileOutputStream fout;
-        ObjectOutputStream oout;
-        try {
-            fout = activity.getApplicationContext().openFileOutput(fileName, Context.MODE_PRIVATE | Context.MODE_APPEND);
-            // if file exists then append the object, otherwise create new and write headers (see AppendableObjectOutputStream)
-            oout = new AppendableObjectOutputStream(fout, append);
-            oout.writeObject(transformateur);
-            oout.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * Clears the file which contains the search history
      */
     public void clearHistoryFile() {
@@ -88,16 +88,14 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         builder.setMessage(R.string.dialog_delete_message)
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        List<String> list = new ArrayList<>();
-                        ArrayAdapter adapter = new ArrayAdapter(Objects.requireNonNull(getContext()), R.layout.list_item_layout, list);
+                        ArrayList<APITransformateur> list = new ArrayList<>();
+                        HistoryAdapter adapter = new HistoryAdapter(HistoryFragment.super.getContext(), list);
                         listView.setAdapter(adapter);
-                        File file = new File(Objects.requireNonNull(getActivity()).getFilesDir() + "/historyFile.txt");
+                        File file = new File(HistoryFragment.super.getContext().getFilesDir(), "" + File.separator + Constants.HISTORY_FILE_NAME);
                         try {
                             if (file.exists()) {
-                                PrintWriter writer = new PrintWriter(file);
-                                System.out.println("DELETED");
-                                writer.print("");
-                                writer.close();
+                                boolean deleted = file.delete();
+                                Log.d(TAG, "history file deleted : " + deleted);
                                 list.clear();
                             }
                             dialog.dismiss();

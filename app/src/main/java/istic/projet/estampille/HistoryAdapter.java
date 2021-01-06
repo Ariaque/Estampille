@@ -49,7 +49,6 @@ public class HistoryAdapter extends ArrayAdapter<APITransformateur> {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HistoryFragment.writeSearchInHistory((Activity) context, transformateurs.get(position));
                 Intent intent = new Intent(context, DisplayMapActivity.class);
                 intent.putExtra("searchedTransformateur", transformateurs.get(position));
                 context.startActivity(intent);

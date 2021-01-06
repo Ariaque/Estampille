@@ -32,9 +32,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Objects;
-import java.util.Set;
 
 import istic.projet.estampille.models.APITransformateur;
 import istic.projet.estampille.utils.Constants;
@@ -54,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private int foodOriginDarkOrange;
     private int foodOriginWhite;
     private ConstraintLayout containerView;
-    private ArrayList<APITransformateur> list;
+    private ArrayList<APITransformateur> listHistoryItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -260,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     public void loadHistoryFragment() {
         String fileName = Constants.HISTORY_FILE_NAME;
         ListView listView = findViewById(R.id.listView);
-        list = new ArrayList<APITransformateur>();
+        listHistoryItems = new ArrayList<APITransformateur>();
         Object objectRead = null;
         File file = new File(this.context.getFilesDir(), "" + File.separator + fileName);
         if (file.exists()) {
@@ -273,9 +271,9 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                         // delete the duplicate lines
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             APITransformateur finalObjectRead = (APITransformateur) objectRead;
-                            alreadyPresent = list.stream().anyMatch(o -> o.getNumAgrement().equals((finalObjectRead).getNumAgrement()));
+                            alreadyPresent = listHistoryItems.stream().anyMatch(o -> o.getNumAgrement().equals((finalObjectRead).getNumAgrement()));
                         } else {
-                            Iterator it = list.iterator();
+                            Iterator it = listHistoryItems.iterator();
                             while (!alreadyPresent && it.hasNext()) {
                                 Object finalObjectRead = it.next();
                                 if (finalObjectRead != null && finalObjectRead.equals(objectRead)) {
@@ -284,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                             }
                         }
                         if (!alreadyPresent) {
-                            list.add((APITransformateur) objectRead);
+                            listHistoryItems.add((APITransformateur) objectRead);
                         }
                     }
                 }
@@ -295,10 +293,10 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             }
 
             //Displays the tutorial image if there are no history
-            HistoryFragment.getInstance().setHistoryFragmentComponentsVisibility(list.size() == 0);
+            HistoryFragment.getInstance().setHistoryFragmentComponentsVisibility(listHistoryItems.size() == 0);
 
             //Changes the adapter list
-            HistoryAdapter adapter = new HistoryAdapter(this, list);
+            HistoryAdapter adapter = new HistoryAdapter(this, listHistoryItems);
             listView.setAdapter(adapter);
         }
     }
@@ -327,9 +325,5 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-    }
-
-    public void setList(ArrayList<APITransformateur> list) {
-        this.list = list;
     }
 }
