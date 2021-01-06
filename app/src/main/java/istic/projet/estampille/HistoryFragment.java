@@ -11,20 +11,23 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.OutputStreamWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import istic.projet.estampille.models.APITransformateur;
+import istic.projet.estampille.utils.AppendableObjectOutputStream;
+import istic.projet.estampille.utils.Constants;
 
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
@@ -42,23 +45,8 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         return instance;
     }
 
-    public static void writeSearchInCSV(Activity activity, APITransformateur transformateur) {
-        String fileName = "historyFile.txt";
-        try {
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(activity.openFileOutput(fileName, Context.MODE_APPEND)));
-//            bw.write(tab[0] + ";" + tab[1] + ";" + tab[2] + ";" + tab[3] + ";" + tab[4] + ";" + tab[5] + ";" + tab[6] + "\n");
-            bw.write(transformateur.getNumAgrement() + ";" + transformateur.getSiret()
-                    + ";" + transformateur.getAdresse() + ";" + transformateur.getCodePostal() + ";" + transformateur.getCommune()
-                    + ";" + transformateur.getLongitude() + ";" + transformateur.getLatitude() + "\n");
-            bw.close();
-        } catch (Exception e) {
-            Toast.makeText(activity.getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_history, container, false);
         listView = rootView.findViewById(R.id.listView);
@@ -68,6 +56,28 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         buttonDeleteHistory.setVisibility(View.INVISIBLE);
         instance = this;
         return rootView;
+    }
+
+    /**
+     * Serialize the searched {@link APITransformateur} in a file.
+     * @param activity
+     * @param transformateur the {@link APITransformateur} to serialize
+     */
+    public static void writeSearchInHistory(Activity activity, APITransformateur transformateur) {
+        String fileName = Constants.HISTORY_FILE_NAME;
+        File file = new File(activity.getFilesDir(), "" + File.separator + fileName);
+        boolean append = file.exists();
+        FileOutputStream fout;
+        ObjectOutputStream oout;
+        try {
+            fout = activity.getApplicationContext().openFileOutput(fileName, Context.MODE_PRIVATE | Context.MODE_APPEND);
+            // if file exists then append the object, otherwise create new and write headers (see AppendableObjectOutputStream)
+            oout = new AppendableObjectOutputStream(fout, append);
+            oout.writeObject(transformateur);
+            oout.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -84,10 +94,11 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                         File file = new File(Objects.requireNonNull(getActivity()).getFilesDir() + "/historyFile.txt");
                         try {
                             if (file.exists()) {
-                                System.out.println("DELETED");
                                 PrintWriter writer = new PrintWriter(file);
+                                System.out.println("DELETED");
                                 writer.print("");
                                 writer.close();
+                                list.clear();
                             }
                             dialog.dismiss();
                             setHistoryFragmentComponentsVisibility(true);

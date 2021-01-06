@@ -34,7 +34,6 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
     private TextInputEditText textFieldEstampille2;
     private TextInputEditText textFieldEstampille3;
     private Context context;
-    private APITransformateur transformateurSearched;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,56 +72,11 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
 
     @Override
     public void onClick(View view) {
-        searchStampInCSV();
-    }
-
-    /**
-     * Displays information about the origins of the product.
-     */
-    private void searchStampInCSV() {
-//        InputStream is = null;
-//        try {
-//            is = new FileInputStream(Objects.requireNonNull(getActivity()).getFilesDir().toString()
-//                    + "/foodorigin_datagouv.txt");
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-        boolean find = false;
         String txt = "";
-
-//        BufferedReader reader = new BufferedReader(
-//                new InputStreamReader(is, StandardCharsets.UTF_8)
-//        );
-
         //Recover the stamp in the text field
         txt = Objects.requireNonNull(this.textFieldEstampille1.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille2.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille3.getText()).toString();
-
-        String line = "";
+        // calling the remote API
         APICalls.executeHttpRequestWithRetrofit(this.getActivity(), txt);
-//        try {
-//            while ((line = reader.readLine()) != null) {
-//                String[] tab = line.split(";");
-//                if (txt.equals(tab[0])) {
-//                    HistoryFragment.writeSearchInCSV(this.getActivity(), tab);
-//
-//                    Intent intent = new Intent(context, DisplayMapActivity.class);
-//                    Bundle mapBundle = new Bundle();
-//                    mapBundle.putStringArray("Infos", tab);
-//                    intent.putExtras(mapBundle);
-//                    startActivity(intent);
-//                    find = true;
-//                }
-//            }
-//            is.close();
-//        } catch (IOException e) {
-//            Log.wtf("Erreur dans la lecture du CSV " + line, e);
-//            e.printStackTrace();
-//        }
-
-        //If the stamp has no similarity in the CSV, a message error appears
-//        if (!find) {
-//            Toast.makeText(context, context.getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
-//        }
     }
 
     /**
@@ -155,7 +109,5 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
     public void afterTextChanged(Editable editable) {
 
     }
-
-
 }
 

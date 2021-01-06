@@ -5,8 +5,15 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Objects;
 
+/**
+ * Class using gson annotations.
+ * Allows to reify objects received from the remote API.
+ */
 public class APITransformateur implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @SerializedName("id")
     @Expose
@@ -176,6 +183,20 @@ public class APITransformateur implements Serializable {
 
     public void setLongitude(String longitude) {
         this.longitude = longitude;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof APITransformateur)) return false;
+        APITransformateur that = (APITransformateur) o;
+        return getNumAgrement().equals(that.getNumAgrement()) &&
+                getSiret().equals(that.getSiret());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getNumAgrement(), getSiret());
     }
 
     @Override

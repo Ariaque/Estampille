@@ -15,18 +15,28 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Class which calls the remote API
+ */
 public class APICalls {
+
+    private static final String TAG = APICalls.class.getName();
 
     public static void executeHttpRequestWithRetrofit(Activity activity, String estampille) {
         APIService apiService = APIService.retrofit.create(APIService.class);
         Call<APITransformateur> call = apiService.getTansformateur(estampille);
         call.enqueue(new Callback<APITransformateur>() {
+            /**
+             * If a response is given by the API, we reify the received object.
+             * @param call
+             * @param response
+             */
             @Override
             public void onResponse(Call<APITransformateur> call, Response<APITransformateur> response) {
                 APITransformateur searchedTransformateur = response.body();
                 if (searchedTransformateur != null) {
-                    HistoryFragment.writeSearchInCSV(activity, searchedTransformateur);
-                    Log.wtf("API : result : act1 ", searchedTransformateur.toString());
+                    HistoryFragment.writeSearchInHistory(activity, searchedTransformateur);
+                    // showing the searchedTransformateur details
                     Intent intent = new Intent(activity.getApplicationContext(), DisplayMapActivity.class);
                     intent.putExtra("searchedTransformateur", searchedTransformateur);
                     activity.startActivity(intent);
@@ -37,7 +47,7 @@ public class APICalls {
 
             @Override
             public void onFailure(@NonNull Call<APITransformateur> call, @NonNull Throwable t) {
-                Log.wtf("API : ", "onResponseFailed: " + call.request().url());
+                Log.wtf(TAG, "onResponseFailed : " + call.request().url());
                 t.printStackTrace();
                 Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.api_problem), Toast.LENGTH_SHORT).show();
             }
