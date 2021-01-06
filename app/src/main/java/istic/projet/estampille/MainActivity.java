@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
 import android.graphics.PorterDuff;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         context = MainActivity.this;
         this.containerView = findViewById(R.id.main_container);
@@ -93,7 +96,22 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 .build();
         StrictMode.setVmPolicy(builder);
 
+        checkInternetConnexion();
     }
+
+    private boolean checkInternetConnexion(){
+        boolean result = true;
+
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)) {
+            Intent intent = new Intent(this, NoInternetActivity.class);
+            startActivity(intent);
+            result = false;
+        }
+        return result;
+    }
+
 
     /**
      * Downloading of the lists of CE-approved establishments every 7 days.
@@ -154,33 +172,38 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_home:
-                try {
-                    setFocusOnHomeItem();
-                    viewPager.setCurrentItem(0);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return true;
-            case R.id.action_write_code:
-                setFocusOnSearchItem();
-                viewPager.setCurrentItem(1);
-                return true;
-            case R.id.action_history:
-                try {
-                    setFocusOnHistoryItem();
-                    viewPager.setCurrentItem(2);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return true;
-            case R.id.action_look_around:
-                setFocusOnLookAroundItem();
-                viewPager.setCurrentItem(3);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if(checkInternetConnexion()){
+            switch (item.getItemId()) {
+                case R.id.action_home:
+                    try {
+                        setFocusOnHomeItem();
+                        viewPager.setCurrentItem(0);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return true;
+                case R.id.action_write_code:
+                    setFocusOnSearchItem();
+                    viewPager.setCurrentItem(1);
+                    return true;
+                case R.id.action_history:
+                    try {
+                        setFocusOnHistoryItem();
+                        viewPager.setCurrentItem(2);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return true;
+                case R.id.action_look_around:
+                    setFocusOnLookAroundItem();
+                    viewPager.setCurrentItem(3);
+                    return true;
+                default:
+                    return super.onOptionsItemSelected(item);
+            }
+        }
+        else{
+            return true;
         }
     }
 
@@ -191,22 +214,24 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onPageSelected(int position) {
-        if (position == 0) {
-            try {
-                setFocusOnHomeItem();
-            } catch (IOException e) {
-                e.printStackTrace();
+        if(checkInternetConnexion()) {
+            if (position == 0) {
+                try {
+                    setFocusOnHomeItem();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (position == 1) {
+                setFocusOnSearchItem();
+            } else if (position == 2) {
+                try {
+                    setFocusOnHistoryItem();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (position == 3) {
+                setFocusOnLookAroundItem();
             }
-        } else if (position == 1) {
-            setFocusOnSearchItem();
-        } else if (position == 2) {
-            try {
-                setFocusOnHistoryItem();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else if (position == 3) {
-            setFocusOnLookAroundItem();
         }
     }
 
@@ -374,5 +399,4 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
-
 }
