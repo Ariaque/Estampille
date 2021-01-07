@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.io.IOException;
 
+import istic.projet.estampille.models.APIInfosTransformateur;
 import istic.projet.estampille.models.APITransformateur;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -15,6 +16,7 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
@@ -29,7 +31,7 @@ public interface APIService {
             .build();
 
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://000.000.000.000:8080/") // TODO: If tests are done on a device and as long as the API run on a localhost:
+            .baseUrl("http://000.000.00.000:8080/") // TODO: If tests are done on a device and as long as the API run on a localhost:
             // TODO: put the IP of the machine on which the API is running. The device and the computer must be connected to the same network in order for the device to be able to call the API.
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
@@ -37,6 +39,9 @@ public interface APIService {
 
     @GET("transformateur")
     Call<APITransformateur> getTansformateur(@Query("estampille") String estampille);
+
+    @GET("/infoTransformateur/transformateur/{id}")
+    Call<APIInfosTransformateur> getInfosTansformateur(@Path("id") String estampille);
 
     /**
      * Custom Interceptor.

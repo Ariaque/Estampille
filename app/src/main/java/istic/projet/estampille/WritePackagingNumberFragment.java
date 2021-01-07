@@ -76,7 +76,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
         //Recover the stamp in the text field
         txt = Objects.requireNonNull(this.textFieldEstampille1.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille2.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille3.getText()).toString();
         // calling the remote API
-        APICalls.executeHttpRequestWithRetrofit(this.getActivity(), txt);
+        APICalls.searchStampInRemoteAPI(this.getActivity(), txt);
     }
 
     /**
