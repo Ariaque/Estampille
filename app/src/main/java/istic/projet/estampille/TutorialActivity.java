@@ -5,15 +5,18 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 public class TutorialActivity extends AppCompatActivity implements View.OnClickListener {
 
-    ImageButton backButton;
+    private ImageButton backButton;
+    private FragmentManager fm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tutorial);
+        fm = this.getSupportFragmentManager();
         backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(this);
     }
@@ -23,6 +26,7 @@ public class TutorialActivity extends AppCompatActivity implements View.OnClickL
         if (view.getId() == R.id.backButton) {
 //            Intent otherActivity = new Intent(getApplicationContext(), MainActivity.class);
 //            startActivity(otherActivity);
+            fm.popBackStack();
             finish();
         }
     }

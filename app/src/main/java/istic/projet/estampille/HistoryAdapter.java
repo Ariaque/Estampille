@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog;
 import java.util.ArrayList;
 
 import istic.projet.estampille.models.APITransformateur;
+import istic.projet.estampille.utils.Constants;
 
 /**
  * Custom Adapter for R.layout.list_item_layout.
@@ -50,7 +51,7 @@ public class HistoryAdapter extends ArrayAdapter<APITransformateur> {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, DisplayMapActivity.class);
-                intent.putExtra("searchedTransformateur", transformateurs.get(position));
+                intent.putExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR, transformateurs.get(position));
                 context.startActivity(intent);
             }
         });

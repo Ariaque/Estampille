@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,23 +29,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import istic.projet.estampille.models.APIInfosTransformateur;
 import istic.projet.estampille.models.APITransformateur;
+import istic.projet.estampille.utils.APICalls;
+import istic.projet.estampille.utils.Constants;
 
 public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
 
-    double lon = 0;
-    double lat = 0;
-    String address = "";
-    String siret = "";
-    String name = "";
-    String street = "";
+    private double lon = 0;
+    private double lat = 0;
+    private String address = "";
+    private String siret = "";
+    private String name = "";
+    private String street = "";
+    private FragmentManager fm;
+    private APITransformateur transformateur;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_map);
         Intent intent = getIntent();
+        fm = this.getSupportFragmentManager();
         APITransformateur transformateur = (APITransformateur) intent.getSerializableExtra("searchedTransformateur");
+        transformateur = (APITransformateur) intent.getSerializableExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR);
         if (transformateur != null) {
             siret = transformateur.getSiret();
             name = transformateur.getRaisonSociale();
@@ -58,6 +66,7 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
             textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress, address)));
             textViewName.setText(Html.fromHtml(getResources().getString(R.string.name, name)));
         }
+
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(this);
 
@@ -109,12 +118,13 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
     public void onClick(View view) {
         if (view.getId() == R.id.backButton) {
             Intent otherActivity = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(otherActivity);
+            /*startActivity(otherActivity);*/
+            fm.popBackStack();
             finish();
         }
         if (view.getId() == R.id.button_know_more) {
             if(checkInternetConnexion()){
-                Toast.makeText(getApplicationContext(), R.string.wip, Toast.LENGTH_SHORT).show();
+                APICalls.searchMoreInRemoteAPI(this, String.valueOf(transformateur.getId()));
             }
         }
     }

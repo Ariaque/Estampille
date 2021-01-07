@@ -296,7 +296,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
      * @param estampilleSearched
      */
     private void searchStampInDB(String estampilleSearched) {
-        APICalls.executeHttpRequestWithRetrofit(this.getActivity(), estampilleSearched);
+        APICalls.searchStampInRemoteAPI(this.getActivity(), estampilleSearched);
     }
 
     @Override

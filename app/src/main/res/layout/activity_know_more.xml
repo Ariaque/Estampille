@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".KnowMoreActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/FoodOriginOrange"
+        android:minHeight="?attr/actionBarSize"
+        app:contentInsetStartWithNavigation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleTextColor="@android:color/white" />
+
+    <TableRow
+        android:id="@+id/tableRow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:paddingTop="10dp">
+
+        <TextView
+            android:id="@+id/know_more_title"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:layout_weight="7"
+            android:background="@color/FoodOriginLightGrey"
+            android:gravity="center"
+            android:text="@string/know_more_title"
+            android:textColor="@color/FoodOriginBlack"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+    </TableRow>
+
+    <TextView
+        android:id="@+id/know_more_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tableRow" />
+
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="60dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/selectableItemBackground"
+        android:backgroundTint="@color/FoodOriginOrange"
+        android:focusable="true"
+        android:tint="#FFFFFF"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/abc_vector_test" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
