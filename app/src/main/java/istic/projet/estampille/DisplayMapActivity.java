@@ -1,11 +1,13 @@
 package istic.projet.estampille;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -63,6 +65,19 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
         Objects.requireNonNull(mapFragment).getMapAsync(this);
     }
 
+    private boolean checkInternetConnexion(){
+        boolean result = true;
+
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)) {
+            Intent intent = new Intent(this, NoInternetActivity.class);
+            startActivity(intent);
+            result = false;
+        }
+        return result;
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng coords = new LatLng(lat, lon);
@@ -98,7 +113,9 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
             finish();
         }
         if (view.getId() == R.id.button_know_more) {
-            Toast.makeText(getApplicationContext(), R.string.wip, Toast.LENGTH_SHORT).show();
+            if(checkInternetConnexion()){
+                Toast.makeText(getApplicationContext(), R.string.wip, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }
