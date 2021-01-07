@@ -103,37 +103,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         return result;
     }
 
-
-    /**
-     * Downloading of the lists of CE-approved establishments every 7 days.
-     */
-    private void launchDownloadWorker() {
-        if (this.getApplicationContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            Constraints constraints = new Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build();
-            final long repeatInterval = 7;
-            PeriodicWorkRequest downloadDataGouv =
-                    new PeriodicWorkRequest.Builder(DownloadDataWorker.class, repeatInterval, TimeUnit.DAYS)
-                            .setConstraints(constraints)
-                            .setInputData(createInputDataForDownloadWorker())
-                            .build();
-            WorkManager.getInstance(getApplicationContext())
-                    .enqueue(downloadDataGouv);
-        }
-    }
-
-    /**
-     * Gives the urls that allows to access the lists of CE-approved establishments
-     *
-     * @return the input
-     */
-    private Data createInputDataForDownloadWorker() {
-        Data.Builder builder = new Data.Builder();
-        builder.putStringArray(Constants.KEY_DATA_GOUV_URLS, Constants.urls_data_gouv_array_2);
-        return builder.build();
-    }
-
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.helpButton) {
