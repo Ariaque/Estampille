@@ -192,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             searchMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
             lookAroundMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
         }
+        viewPager.clearFocus();
     }
 
     /**
@@ -229,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             searchMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
             lookAroundMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
         }
+        viewPager.clearFocus();
     }
 
     /**
@@ -250,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             searchMenuItem.getIcon().setColorFilter(foodOriginDarkOrange, PorterDuff.Mode.SRC_ATOP);
             lookAroundMenuItem.getIcon().setColorFilter(foodOriginWhite, PorterDuff.Mode.SRC_ATOP);
         }
+        viewPager.clearFocus();
     }
 
     /**

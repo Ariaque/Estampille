@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -30,18 +31,20 @@ import istic.projet.estampille.models.APITransformateur;
 
 public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
 
-    double lon = 0;
-    double lat = 0;
-    String address = "";
-    String siret = "";
-    String name = "";
-    String street = "";
+    private double lon = 0;
+    private double lat = 0;
+    private String address = "";
+    private String siret = "";
+    private String name = "";
+    private String street = "";
+    private FragmentManager fm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_map);
         Intent intent = getIntent();
+        fm = this.getSupportFragmentManager();
         APITransformateur transformateur = (APITransformateur) intent.getSerializableExtra("searchedTransformateur");
         if (transformateur != null) {
             siret = transformateur.getSiret();
@@ -94,7 +97,8 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
     public void onClick(View view) {
         if (view.getId() == R.id.backButton) {
             Intent otherActivity = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(otherActivity);
+            /*startActivity(otherActivity);*/
+            fm.popBackStack();
             finish();
         }
         if (view.getId() == R.id.button_know_more) {
