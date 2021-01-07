@@ -304,9 +304,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PermissionsUtils.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                launchDownloadWorker();
-            } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
+            if (!shouldShowRequestPermissionRationale(permissions[0])) {
                 PermissionsUtils.displayOptions(this, containerView, PermissionsUtils.permission_storage_params);
             } else {
                 PermissionsUtils.explain(this, containerView, permissions[0], requestCode, PermissionsUtils.permission_storage_explain);
