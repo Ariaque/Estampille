@@ -13,9 +13,9 @@ public class APIInfosTransformateur implements Serializable {
     @SerializedName("id")
     @Expose
     private Integer id;
-//    @SerializedName("transformateur")
-//    @Expose
-//    private APITransformateur transformateur;
+    @SerializedName("transformateur")
+    @Expose
+    private APITransformateur transformateur;
     @SerializedName("description")
     @Expose
     private String description;
@@ -70,10 +70,10 @@ public class APIInfosTransformateur implements Serializable {
      * @param id
      * @param groupe
      */
-    public APIInfosTransformateur(Integer id, String description, String nombreEmployes, String urlSite, String urlFacebook, String urlTwitter, Object urlInstagram, Boolean appartientGroupe, Object groupe, List<Object> labels, List<Object> certifications, List<Object> urls) {
+    public APIInfosTransformateur(Integer id, APITransformateur transformateur, String description, String nombreEmployes, String urlSite, String urlFacebook, String urlTwitter, Object urlInstagram, Boolean appartientGroupe, Object groupe, List<Object> labels, List<Object> certifications, List<Object> urls) {
         super();
         this.id = id;
-//        this.transformateur = transformateur;
+        this.transformateur = transformateur;
         this.description = description;
         this.nombreEmployes = nombreEmployes;
         this.urlSite = urlSite;
@@ -95,13 +95,13 @@ public class APIInfosTransformateur implements Serializable {
         this.id = id;
     }
 
-//    public APITransformateur getTransformateur() {
-//        return transformateur;
-//    }
-//
-//    public void setTransformateur(APITransformateur transformateur) {
-//        this.transformateur = transformateur;
-//    }
+    public APITransformateur getTransformateur() {
+        return transformateur;
+    }
+
+    public void setTransformateur(APITransformateur transformateur) {
+        this.transformateur = transformateur;
+    }
 
     public String getDescription() {
         return description;
@@ -204,9 +204,9 @@ public class APIInfosTransformateur implements Serializable {
                 ", urlInstagram=" + urlInstagram +
                 ", appartientGroupe=" + appartientGroupe +
                 ", groupe=" + groupe +
-                ", labels=" + labels +
+                //", labels=" + labels +
                 ", certifications=" + certifications +
-                ", urls=" + urls +
+                //", urls=" + urls +
                 '}';
     }
 }

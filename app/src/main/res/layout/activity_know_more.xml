@@ -12,42 +12,12 @@
         android:layout_height="wrap_content"
         android:background="@color/FoodOriginOrange"
         android:minHeight="?attr/actionBarSize"
+        android:elevation="16dp"
         app:contentInsetStartWithNavigation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextColor="@android:color/white" />
-
-    <TableRow
-        android:id="@+id/tableRow"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:paddingTop="10dp">
-
-        <TextView
-            android:id="@+id/know_more_title"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:layout_weight="7"
-            android:background="@color/FoodOriginLightGrey"
-            android:gravity="center"
-            android:text="@string/know_more_title"
-            android:textColor="@color/FoodOriginBlack"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-    </TableRow>
-
-    <TextView
-        android:id="@+id/know_more_desc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableRow" />
 
     <ImageButton
         android:id="@+id/backButton"
@@ -55,10 +25,131 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/selectableItemBackground"
         android:backgroundTint="@color/FoodOriginOrange"
+        android:elevation="16dp"
         android:focusable="true"
         android:tint="#FFFFFF"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/abc_vector_test" />
+
+    <LinearLayout
+        android:layout_width="414dp"
+        android:layout_height="675dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            android:textAlignment="center"
+            android:textColor="@color/FoodOriginBlack"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <com.denzcoskun.imageslider.ImageSlider
+            android:id="@+id/imageSlider"
+            android:layout_width="wrap_content"
+            android:layout_height="210dp"
+            app:iss_auto_cycle="true"
+            app:iss_delay="0"
+            app:iss_period="1000">
+
+        </com.denzcoskun.imageslider.ImageSlider>
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/imageButtonFb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:elevation="1dp"
+                app:srcCompat="@drawable/facebook_logo" />
+
+            <ImageButton
+                android:id="@+id/imageButtonIns"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:elevation="1dp"
+                app:srcCompat="@drawable/instagram_logo" />
+
+            <ImageButton
+                android:id="@+id/imageButtonTw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:elevation="1dp"
+                app:srcCompat="@drawable/twitter_logo" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView17"
+                android:layout_width="match_parent"
+                android:layout_height="103dp"
+                android:text="TextView" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/buttonSeeMore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@color/FoodOriginOrange"
+                    android:backgroundTint="@color/FoodOriginOrange"
+                    android:text="@string/txt_see_more"
+                    android:textColor="@color/FoodOriginWhite"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <Button
+                android:id="@+id/accessToVideosButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="@color/FoodOriginOrange"
+                android:backgroundTint="@color/FoodOriginOrange"
+                android:text="@string/txt_contenu_video"
+                android:textColor="@color/FoodOriginWhite" />
+
+            <com.denzcoskun.imageslider.ImageSlider
+                android:id="@+id/imageSliderLabels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iss_auto_cycle="true"
+                app:iss_delay="0"
+                app:iss_period="1000" />
+        </LinearLayout>
+
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
