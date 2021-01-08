@@ -86,8 +86,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 .penaltyLog()
                 .build();
         StrictMode.setVmPolicy(builder);
-
-        checkInternetConnexion();
     }
 
     private boolean checkInternetConnexion(){
@@ -132,38 +130,37 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(checkInternetConnexion()){
-            switch (item.getItemId()) {
-                case R.id.action_home:
-                    try {
-                        setFocusOnHomeItem();
-                        viewPager.setCurrentItem(0);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return true;
-                case R.id.action_write_code:
+        switch (item.getItemId()) {
+            case R.id.action_home:
+                try {
+                    setFocusOnHomeItem();
+                    viewPager.setCurrentItem(0);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return true;
+            case R.id.action_write_code:
+                if(checkInternetConnexion()){
                     setFocusOnSearchItem();
                     viewPager.setCurrentItem(1);
-                    return true;
-                case R.id.action_history:
-                    try {
-                        setFocusOnHistoryItem();
-                        viewPager.setCurrentItem(2);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return true;
-                case R.id.action_look_around:
+                }
+                return true;
+            case R.id.action_history:
+                try {
+                    setFocusOnHistoryItem();
+                    viewPager.setCurrentItem(2);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return true;
+            case R.id.action_look_around:
+                if(checkInternetConnexion()){
                     setFocusOnLookAroundItem();
                     viewPager.setCurrentItem(3);
-                    return true;
-                default:
-                    return super.onOptionsItemSelected(item);
-            }
-        }
-        else{
-            return true;
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -174,22 +171,24 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onPageSelected(int position) {
-        if(checkInternetConnexion()) {
-            if (position == 0) {
-                try {
-                    setFocusOnHomeItem();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else if (position == 1) {
+        if (position == 0) {
+            try {
+                setFocusOnHomeItem();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (position == 1) {
+            if(checkInternetConnexion()) {
                 setFocusOnSearchItem();
-            } else if (position == 2) {
-                try {
-                    setFocusOnHistoryItem();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else if (position == 3) {
+            }
+        } else if (position == 2) {
+            try {
+                setFocusOnHistoryItem();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (position == 3) {
+            if(checkInternetConnexion()) {
                 setFocusOnLookAroundItem();
             }
         }

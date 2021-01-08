@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -85,13 +87,28 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
+    private boolean checkInternetConnexion(){
+        boolean result = true;
+
+        ConnectivityManager connectivityManager = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)) {
+            Intent intent = new Intent(getActivity(), NoInternetActivity.class);
+            startActivity(intent);
+            result = false;
+        }
+        return result;
+    }
+
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.tile_scan) {
-            if (Objects.requireNonNull(this.getActivity()).checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.CAMERA}, "La caméra est nécessaire pour scanner les estampilles", PermissionsUtils.REQUEST_CODE_PERMISSION_CAMERA);
-            } else {
-                openCamera();
+            if(checkInternetConnexion()){
+                if (Objects.requireNonNull(this.getActivity()).checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.CAMERA}, "La caméra est nécessaire pour scanner les estampilles", PermissionsUtils.REQUEST_CODE_PERMISSION_CAMERA);
+                } else {
+                    openCamera();
+                }
             }
         } else if (view.getId() == R.id.tile_search) {
             viewPager.setCurrentItem(1);
@@ -207,7 +224,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                                 public void onSuccess(Text visionText) {
                                     List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
                                     success = extractCode(recognizedText);
-                                    mProgressDialog.cancel();
+                                    if(success){
+                                        mProgressDialog.cancel();
+                                    }
                                     imageResult(success);
                                 }
                             })
