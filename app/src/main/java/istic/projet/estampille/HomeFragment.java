@@ -224,7 +224,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                                 public void onSuccess(Text visionText) {
                                     List<Text.TextBlock> recognizedText = visionText.getTextBlocks();
                                     success = extractCode(recognizedText);
-                                    mProgressDialog.cancel();
+                                    if(success){
+                                        mProgressDialog.cancel();
+                                    }
                                     imageResult(success);
                                 }
                             })
