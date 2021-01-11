@@ -69,7 +69,7 @@ public class APICalls {
      * @param activity
      * @param idTransformateur
      */
-    public static void searchMoreInRemoteAPI(Activity activity, String idTransformateur) {
+    public static void searchMoreInRemoteAPI(Activity activity, String idTransformateur, ProgressDialog progressDialog) {
         APIService apiService = APIService.retrofit.create(APIService.class);
         Call<APIInfosTransformateur> call = apiService.getInfosTansformateur(idTransformateur);
         call.enqueue(new Callback<APIInfosTransformateur>() {
@@ -80,7 +80,9 @@ public class APICalls {
                     Intent intent = new Intent(activity.getApplicationContext(), KnowMoreActivity.class);
                     intent.putExtra(Constants.KEY_INTENT_MORE_INFOS_TRANSFORMATEUR, infosTransformateur);
                     activity.startActivity(intent);}
-
+                if(progressDialog != null){
+                    progressDialog.hide();
+                }
             }
 
             @Override
@@ -88,6 +90,9 @@ public class APICalls {
                 Log.wtf(TAG, "onResponseFailed : " + call.request().url());
                 t.printStackTrace();
                 Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.api_problem), Toast.LENGTH_SHORT).show();
+                if(progressDialog != null){
+                    progressDialog.hide();
+                }
             }
         });
     }
