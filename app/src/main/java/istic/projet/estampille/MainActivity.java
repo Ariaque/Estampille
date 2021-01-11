@@ -64,11 +64,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         context = MainActivity.this;
         this.containerView = findViewById(R.id.main_container);
 
-        //Checks permission
-        if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PermissionsUtils.permission_storage_explain, PermissionsUtils.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE);
-        }
-
         //Configures design elements
         mToolBar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolBar);
@@ -88,11 +83,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         StrictMode.setVmPolicy(builder);
     }
 
-    private boolean checkInternetConnexion(){
+    private boolean checkInternetConnexion() {
         boolean result = true;
 
-        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)) {
             Intent intent = new Intent(this, NoInternetActivity.class);
             startActivity(intent);
@@ -140,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 }
                 return true;
             case R.id.action_write_code:
-                if(checkInternetConnexion()){
+                if (checkInternetConnexion()) {
                     setFocusOnSearchItem();
                     viewPager.setCurrentItem(1);
                 }
@@ -154,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 }
                 return true;
             case R.id.action_look_around:
-                if(checkInternetConnexion()){
+                if (checkInternetConnexion()) {
                     setFocusOnLookAroundItem();
                     viewPager.setCurrentItem(3);
                 }
@@ -178,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 e.printStackTrace();
             }
         } else if (position == 1) {
-            if(checkInternetConnexion()) {
+            if (checkInternetConnexion()) {
                 setFocusOnSearchItem();
             }
         } else if (position == 2) {
@@ -188,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 e.printStackTrace();
             }
         } else if (position == 3) {
-            if(checkInternetConnexion()) {
+            if (checkInternetConnexion()) {
                 setFocusOnLookAroundItem();
             }
         }
@@ -330,13 +325,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == PermissionsUtils.REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE) {
-            if (!shouldShowRequestPermissionRationale(permissions[0])) {
-                PermissionsUtils.displayOptions(this, containerView, PermissionsUtils.permission_storage_params);
-            } else {
-                PermissionsUtils.explain(this, containerView, permissions[0], requestCode, PermissionsUtils.permission_storage_explain);
-            }
-        } else if (requestCode == PermissionsUtils.REQUEST_CODE_LOCATION) {
+        if (requestCode == PermissionsUtils.REQUEST_CODE_LOCATION) {
             if (grantResults.length > 0 && permissions.length > 0) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Fragment lookAroundFragment = (LookAroundFragment) fragmentPagerAdapter.instantiateItem(viewPager, 3);

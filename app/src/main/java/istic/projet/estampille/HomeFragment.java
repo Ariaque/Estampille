@@ -87,11 +87,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
-    private boolean checkInternetConnexion(){
+    private boolean checkInternetConnexion() {
         boolean result = true;
 
-        ConnectivityManager connectivityManager = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)) {
             Intent intent = new Intent(getActivity(), NoInternetActivity.class);
             startActivity(intent);
@@ -103,7 +103,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.tile_scan) {
-            if(checkInternetConnexion()){
+            if (checkInternetConnexion()) {
                 if (Objects.requireNonNull(this.getActivity()).checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.CAMERA}, "La caméra est nécessaire pour scanner les estampilles", PermissionsUtils.REQUEST_CODE_PERMISSION_CAMERA);
                 } else {
@@ -292,6 +292,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Launch the search of the stamp in the remote database.
+     *
      * @param estampilleSearched
      */
     private void searchStampInDB(String estampilleSearched) {
@@ -302,12 +303,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PermissionsUtils.REQUEST_CODE_PERMISSION_CAMERA) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openCamera();
-            } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
-                PermissionsUtils.displayOptions(this.getActivity(), containerView, PermissionsUtils.permission_camera_params);
-            } else {
-                PermissionsUtils.explain(this.getActivity(), containerView, permissions[0], requestCode, PermissionsUtils.permission_camera_explain);
+            if (grantResults.length > 0 && permissions.length > 0) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openCamera();
+                } else if (!shouldShowRequestPermissionRationale(permissions[0])) {
+                    PermissionsUtils.displayOptions(this.getActivity(), containerView, PermissionsUtils.permission_camera_params);
+                } else {
+                    PermissionsUtils.explain(this.getActivity(), containerView, permissions[0], requestCode, PermissionsUtils.permission_camera_explain);
+                }
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);

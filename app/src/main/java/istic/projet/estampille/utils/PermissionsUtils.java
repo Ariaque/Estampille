@@ -18,15 +18,12 @@ import java.util.Objects;
  */
 public class PermissionsUtils {
 
-    public static final int REQUEST_CODE_PERMISSION_EXTERNAL_STORAGE = 2;
     public static final int REQUEST_CODE_PERMISSION_CAMERA = 1;
-    public static final int REQUEST_CODE_LOCATION = 3;
-    public static final String permission_geoloc_explain = "La permission de géolocalisation est désactivée";
-    public static final String permission_geoloc_params = "La permission de géolocalisation est nécessaire pour vous situer sur la carte";
-    public static final String permission_storage_explain = "La permission d'accès au stockage est désactivée";
-    public static final String permission_storage_params = "La permission d'accès au stockage est nécessaire pour charger les données";
-    public static final String permission_camera_explain = "La permission d'accès à la caméra est désactivée";
-    public static final String permission_camera_params = "La permission d'accès à la caméra est nécessaire pour scanner les estampilles";
+    public static final int REQUEST_CODE_LOCATION = 2;
+    public static final String permission_geoloc_params = "La permission de géolocalisation est désactivée";
+    public static final String permission_geoloc_explain = "La permission de géolocalisation est nécessaire pour vous situer sur la carte";
+    public static final String permission_camera_params = "La permission d'accès à la caméra est désactivée";
+    public static final String permission_camera_explain = "La permission d'accès à la caméra est nécessaire pour scanner les estampilles";
 
     /**
      * Check if the permissions or granted and ask them if it is not.
