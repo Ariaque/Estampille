@@ -295,9 +295,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
      * @param estampilleSearched
      */
     private void searchStampInDB(String estampilleSearched) {
-        mProgressDialog = new ProgressDialog(getActivity(), R.style.FoodOriginAlertDialog);
-        mProgressDialog.setMessage(getString(R.string.loading_dialog_message));
-        mProgressDialog.setIndeterminate(true);
         mProgressDialog.show();
         APICalls.searchStampInRemoteAPI(this.getActivity(), estampilleSearched, mProgressDialog);
     }

@@ -1,6 +1,7 @@
 package istic.projet.estampille;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
@@ -26,6 +27,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
     private TextInputEditText textFieldEstampille2;
     private TextInputEditText textFieldEstampille3;
     private Context context;
+    private ProgressDialog mProgressDialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,11 +66,15 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
 
     @Override
     public void onClick(View view) {
+        mProgressDialog = new ProgressDialog(getActivity(), R.style.FoodOriginAlertDialog);
+        mProgressDialog.setMessage(getString(R.string.loading_dialog_message));
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.show();
         String txt = "";
         //Recover the stamp in the text field
         txt = Objects.requireNonNull(this.textFieldEstampille1.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille2.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille3.getText()).toString();
         // calling the remote API
-        APICalls.searchStampInRemoteAPI(this.getActivity(), txt, null);
+        APICalls.searchStampInRemoteAPI(this.getActivity(), txt, mProgressDialog);
     }
 
     /**
