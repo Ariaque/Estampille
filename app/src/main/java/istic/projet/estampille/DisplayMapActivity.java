@@ -51,7 +51,7 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
         setContentView(R.layout.activity_display_map);
         Intent intent = getIntent();
         fm = this.getSupportFragmentManager();
-        APITransformateur transformateur = (APITransformateur) intent.getSerializableExtra("searchedTransformateur");
+        //APITransformateur transformateur = (APITransformateur) intent.getSerializableExtra("searchedTransformateur");
         transformateur = (APITransformateur) intent.getSerializableExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR);
         if (transformateur != null) {
             siret = transformateur.getSiret();

@@ -10,7 +10,16 @@
     <color name="FoodOriginWhite">#FFFFFF</color>
     <color name="FoodOriginLightGrey">#FAFAFA</color>
     <color name="FoodOriginGrey">#EAEDED</color>
-    <color name="colorGrey">#9b9b9b</color>
+    <color name="FoodOriginGrey2">#9b9b9b</color>
     <color name="FoodOriginBlack"> #000000</color>
     <color name="transparent">#00000000</color>
+    <color name="FacebookBlue">#3b5998</color>
+    <color name="TwitterBlue">#1DA1F2</color>
+    <color name="InstagramYellow">#feda75</color>
+    <color name="InstagramOrange">#fa7e1e</color>
+    <color name="InstagramPink">#d62976</color>
+    <color name="InstagramPurple">#962fbf</color>
+    <color name="InstagramBlue">#4f5bd5</color>
+    <color name="FoodOriginDarkGrey">#545454</color>
+    <color name="FoodOriginTransparent">#00FFFFFF</color>
 </resources>

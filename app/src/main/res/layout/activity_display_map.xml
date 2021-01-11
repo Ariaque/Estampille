@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:background="@color/FoodOriginOrange"
         android:minHeight="?attr/actionBarSize"
+        android:elevation="16dp"
         app:titleTextColor="@android:color/white"
         app:contentInsetStartWithNavigation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -148,6 +149,7 @@
         android:backgroundTint="@color/FoodOriginOrange"
         android:focusable="true"
         android:tint="#FFFFFF"
+        android:elevation="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/abc_vector_test" />
