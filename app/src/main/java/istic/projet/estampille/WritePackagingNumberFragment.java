@@ -2,18 +2,15 @@ package istic.projet.estampille;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -21,12 +18,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Objects;
 
-import istic.projet.estampille.models.APITransformateur;
 import istic.projet.estampille.utils.APICalls;
-import istic.projet.estampille.utils.APIService;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class WritePackagingNumberFragment extends Fragment implements View.OnTouchListener, View.OnClickListener, View.OnFocusChangeListener, TextWatcher {
 
@@ -76,7 +68,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
         //Recover the stamp in the text field
         txt = Objects.requireNonNull(this.textFieldEstampille1.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille2.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille3.getText()).toString();
         // calling the remote API
-        APICalls.searchStampInRemoteAPI(this.getActivity(), txt);
+        APICalls.searchStampInRemoteAPI(this.getActivity(), txt, null);
     }
 
     /**

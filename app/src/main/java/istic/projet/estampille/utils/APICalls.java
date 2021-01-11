@@ -1,6 +1,7 @@
 package istic.projet.estampille.utils;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
@@ -24,7 +25,7 @@ public class APICalls {
 
     private static final String TAG = APICalls.class.getName();
 
-    public static void searchStampInRemoteAPI(Activity activity, String estampille) {
+    public static void searchStampInRemoteAPI(Activity activity, String estampille, ProgressDialog progressDialog) {
         APIService apiService = APIService.retrofit.create(APIService.class);
         Call<APITransformateur> call = apiService.getTansformateur(estampille);
         call.enqueue(new Callback<APITransformateur>() {
@@ -45,6 +46,9 @@ public class APICalls {
                 } else {
                     Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
                 }
+                if(progressDialog != null){
+                    progressDialog.hide();
+                }
             }
 
             @Override
@@ -52,6 +56,9 @@ public class APICalls {
                 Log.wtf(TAG, "onResponseFailed : " + call.request().url());
                 t.printStackTrace();
                 Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.api_problem), Toast.LENGTH_SHORT).show();
+                if(progressDialog != null){
+                    progressDialog.hide();
+                }
             }
         });
     }
