@@ -1,19 +1,17 @@
 package istic.projet.estampille;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -21,12 +19,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Objects;
 
-import istic.projet.estampille.models.APITransformateur;
 import istic.projet.estampille.utils.APICalls;
-import istic.projet.estampille.utils.APIService;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class WritePackagingNumberFragment extends Fragment implements View.OnTouchListener, View.OnClickListener, View.OnFocusChangeListener, TextWatcher {
 
@@ -34,6 +27,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
     private TextInputEditText textFieldEstampille2;
     private TextInputEditText textFieldEstampille3;
     private Context context;
+    private ProgressDialog mProgressDialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,11 +66,15 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
 
     @Override
     public void onClick(View view) {
+        mProgressDialog = new ProgressDialog(getActivity(), R.style.FoodOriginAlertDialog);
+        mProgressDialog.setMessage(getString(R.string.loading_dialog_message));
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.show();
         String txt = "";
         //Recover the stamp in the text field
         txt = Objects.requireNonNull(this.textFieldEstampille1.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille2.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille3.getText()).toString();
         // calling the remote API
-        APICalls.searchStampInRemoteAPI(this.getActivity(), txt);
+        APICalls.searchStampInRemoteAPI(this.getActivity(), txt, mProgressDialog);
     }
 
     /**

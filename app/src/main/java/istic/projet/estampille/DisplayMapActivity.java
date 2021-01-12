@@ -1,5 +1,6 @@
 package istic.projet.estampille;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
@@ -11,7 +12,6 @@ import android.text.Html;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import istic.projet.estampille.models.APIInfosTransformateur;
 import istic.projet.estampille.models.APITransformateur;
 import istic.projet.estampille.utils.APICalls;
 import istic.projet.estampille.utils.Constants;
@@ -44,6 +43,7 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
     private String street = "";
     private FragmentManager fm;
     private APITransformateur transformateur;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +124,11 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
         }
         if (view.getId() == R.id.button_know_more) {
             if(checkInternetConnexion()){
-                APICalls.searchMoreInRemoteAPI(this, String.valueOf(transformateur.getId()));
+                mProgressDialog = new ProgressDialog(this, R.style.FoodOriginAlertDialog);
+                mProgressDialog.setMessage(getString(R.string.loading_dialog_message));
+                mProgressDialog.setIndeterminate(true);
+                mProgressDialog.show();
+                APICalls.searchMoreInRemoteAPI(this, String.valueOf(transformateur.getId()), mProgressDialog);
             }
         }
     }

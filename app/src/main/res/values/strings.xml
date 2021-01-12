@@ -23,7 +23,7 @@
     <string name="name"><![CDATA[<b>Industriel :</b>]]> %1$s</string>
     <string name="wip">WORK IN PROGRESS</string>
     <string name="know_more">En savoir plus</string>
-    <string name="ocr_dialog_message">Reconnaissance en cours…</string>
+    <string name="loading_dialog_message">Chargement en cours…</string>
     <string name="txt_scan_tile">Scanner une estampille</string>
     <string name="txt_search_tile">Saisir une estampille</string>
     <string name="txt_hisotry_tile">Historique</string>
