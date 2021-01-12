@@ -22,4 +22,5 @@
     <color name="InstagramBlue">#4f5bd5</color>
     <color name="FoodOriginDarkGrey">#545454</color>
     <color name="FoodOriginTransparent">#00FFFFFF</color>
+    <color name="YoutubeRed">#C4302B</color>
 </resources>

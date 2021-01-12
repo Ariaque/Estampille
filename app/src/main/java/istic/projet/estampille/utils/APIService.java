@@ -1,9 +1,12 @@
 package istic.projet.estampille.utils;
 
+import android.content.res.Resources;
+import android.net.TrafficStats;
 import android.util.Log;
 
 import java.io.IOException;
 
+import istic.projet.estampille.R;
 import istic.projet.estampille.models.APIInfosTransformateur;
 import istic.projet.estampille.models.APITransformateur;
 import okhttp3.Interceptor;
@@ -49,6 +52,7 @@ public interface APIService {
     class LoggingInterceptor implements Interceptor {
         @Override
         public Response intercept(Chain chain) throws IOException {
+            TrafficStats.setThreadStatsTag(1234);
             Request request = chain.request();
             long t1 = System.nanoTime();
             Log.wtf(TAG, String.format("--> Sending request %s on %s%n%s", request.url(), chain.connection(), request.headers()));

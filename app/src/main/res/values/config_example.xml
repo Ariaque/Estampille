@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ftp_address_example">example@template.fr</string>
+    <string name="username_example">username</string>
+    <string name="password_example">password</string>
+</resources>

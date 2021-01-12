@@ -33,7 +33,7 @@ public class APIInfosTransformateur implements Serializable {
     private String urlTwitter;
     @SerializedName("url_instagram")
     @Expose
-    private Object urlInstagram;
+    private String urlInstagram;
     @SerializedName("appartient_groupe")
     @Expose
     private Boolean appartientGroupe;
@@ -42,10 +42,10 @@ public class APIInfosTransformateur implements Serializable {
     private Object groupe;
     @SerializedName("labels")
     @Expose
-    private List<Object> labels = null;
+    private List<APILabel> labels = null;
     @SerializedName("certifications")
     @Expose
-    private List<Object> certifications = null;
+    private List<APICertification> certifications = null;
     @SerializedName("urls")
     @Expose
     private List<Object> urls = null;
@@ -70,7 +70,7 @@ public class APIInfosTransformateur implements Serializable {
      * @param id
      * @param groupe
      */
-    public APIInfosTransformateur(Integer id, APITransformateur transformateur, String description, String nombreEmployes, String urlSite, String urlFacebook, String urlTwitter, Object urlInstagram, Boolean appartientGroupe, Object groupe, List<Object> labels, List<Object> certifications, List<Object> urls) {
+    public APIInfosTransformateur(Integer id, APITransformateur transformateur, String description, String nombreEmployes, String urlSite, String urlFacebook, String urlTwitter, String urlInstagram, Boolean appartientGroupe, Object groupe, List<APILabel> labels, List<APICertification> certifications, List<Object> urls) {
         super();
         this.id = id;
         this.transformateur = transformateur;
@@ -143,11 +143,11 @@ public class APIInfosTransformateur implements Serializable {
         this.urlTwitter = urlTwitter;
     }
 
-    public Object getUrlInstagram() {
+    public String getUrlInstagram() {
         return urlInstagram;
     }
 
-    public void setUrlInstagram(Object urlInstagram) {
+    public void setUrlInstagram(String urlInstagram) {
         this.urlInstagram = urlInstagram;
     }
 
@@ -167,19 +167,19 @@ public class APIInfosTransformateur implements Serializable {
         this.groupe = groupe;
     }
 
-    public List<Object> getLabels() {
+    public List<APILabel> getLabels() {
         return labels;
     }
 
-    public void setLabels(List<Object> labels) {
+    public void setLabels(List<APILabel> labels) {
         this.labels = labels;
     }
 
-    public List<Object> getCertifications() {
+    public List<APICertification> getCertifications() {
         return certifications;
     }
 
-    public void setCertifications(List<Object> certifications) {
+    public void setCertifications(List<APICertification> certifications) {
         this.certifications = certifications;
     }
 
