@@ -44,6 +44,7 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
     private FragmentManager fm;
     private APITransformateur transformateur;
     private ProgressDialog mProgressDialog;
+    private boolean isActive = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,7 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
         fm = this.getSupportFragmentManager();
         //APITransformateur transformateur = (APITransformateur) intent.getSerializableExtra("searchedTransformateur");
         transformateur = (APITransformateur) intent.getSerializableExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR);
+        isActive = (Boolean) intent.getSerializableExtra(Constants.KEY_INTENT_USER_STATE);
         if (transformateur != null) {
             siret = transformateur.getSiret();
             name = transformateur.getRaisonSociale();
@@ -65,6 +67,12 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
             TextView textViewName = findViewById(R.id.textViewName);
             textViewAdress.setText(Html.fromHtml(getResources().getString(R.string.adress, address)));
             textViewName.setText(Html.fromHtml(getResources().getString(R.string.name, name)));
+
+
+            if(!isActive){
+                View button = findViewById(R.id.button_know_more);
+                button.setVisibility(View.GONE);
+            }
         }
 
         ImageButton backButton = findViewById(R.id.backButton);
