@@ -34,5 +34,6 @@
     <string name="txt_stamp_fr">FR</string>
     <string name="txt_contenu_video">Découvrez-nous en vidéo !</string>
     <string name="txt_see_more">Suite ></string>
+    <string name="txt_no_internet">Aucune connexion internet, veuillez verifier que vous êtes bien connecté au réseau</string>
 
 </resources>
