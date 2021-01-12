@@ -32,8 +32,11 @@
     <string name="txt_delete_history">Supprimer l\'historique</string>
     <string name="txt_stamp_input_help">Complétez l\'estampille virtuelle pour effectuer une recherche</string>
     <string name="txt_stamp_fr">FR</string>
+    <string name="txt_website">Accédez à notre Site Web !</string>
+    <string name="txt_see_more">LIRE PLUS ></string>
+    <string name="txt_company_name_placeholder">Informations complémentaires</string>
+    <string name="txt_company_description_placeholder">Pas de description…</string>
     <string name="txt_contenu_video">Découvrez-nous en vidéo !</string>
-    <string name="txt_see_more">Suite ></string>
     <string name="txt_no_internet">Aucune connexion internet, veuillez verifier que vous êtes bien connecté au réseau</string>
 
 </resources>

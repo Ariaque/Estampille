@@ -38,17 +38,17 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
     <ImageButton
         android:id="@+id/reloadButton"
-        android:layout_width="55dp"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
+        android:layout_width="60dp"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/selectableItemBackground"
         android:backgroundTint="@color/FoodOriginOrange"
         android:focusable="true"
+        android:tint="#FFFFFF"
+        android:elevation="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/reload" />
+        app:srcCompat="@drawable/ic_baseline_refresh_24" />
+    
 </androidx.constraintlayout.widget.ConstraintLayout>
