@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:id="@+id/main_container"
+    android:background="@color/FoodOriginWhite"
     >
 
     <androidx.appcompat.widget.Toolbar

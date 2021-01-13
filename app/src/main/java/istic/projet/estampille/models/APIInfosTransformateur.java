@@ -49,6 +49,12 @@ public class APIInfosTransformateur implements Serializable {
     @SerializedName("urls")
     @Expose
     private List<Object> urls = null;
+    @SerializedName("fermesP")
+    @Expose
+    private List<APIFermePartenaire> fermesP = null;
+    @SerializedName("denreesA")
+    @Expose
+    private List<APIDenreeAnimale> denreesA = null;
 
     /**
      * No args constructor for use in serialization
@@ -70,7 +76,7 @@ public class APIInfosTransformateur implements Serializable {
      * @param id
      * @param groupe
      */
-    public APIInfosTransformateur(Integer id, APITransformateur transformateur, String description, String nombreEmployes, String urlSite, String urlFacebook, String urlTwitter, String urlInstagram, Boolean appartientGroupe, Object groupe, List<APILabel> labels, List<APICertification> certifications, List<Object> urls) {
+    public APIInfosTransformateur(Integer id, APITransformateur transformateur, String description, String nombreEmployes, String urlSite, String urlFacebook, String urlTwitter, String urlInstagram, Boolean appartientGroupe, Object groupe, List<APILabel> labels, List<APICertification> certifications, List<Object> urls, List<APIFermePartenaire> fermesP, List<APIDenreeAnimale> denreesA) {
         super();
         this.id = id;
         this.transformateur = transformateur;
@@ -85,6 +91,8 @@ public class APIInfosTransformateur implements Serializable {
         this.labels = labels;
         this.certifications = certifications;
         this.urls = urls;
+        this.fermesP = fermesP;
+        this.denreesA = denreesA;
     }
 
     public Integer getId() {
@@ -189,6 +197,22 @@ public class APIInfosTransformateur implements Serializable {
 
     public void setUrls(List<Object> urls) {
         this.urls = urls;
+    }
+
+    public List<APIFermePartenaire> getFermesP() {
+        return fermesP;
+    }
+
+    public void setFermesP(List<APIFermePartenaire> fermesP) {
+        this.fermesP = fermesP;
+    }
+
+    public List<APIDenreeAnimale> getDenreesA() {
+        return denreesA;
+    }
+
+    public void setDenreesA(List<APIDenreeAnimale> denreesA) {
+        this.denreesA = denreesA;
     }
 
     @Override

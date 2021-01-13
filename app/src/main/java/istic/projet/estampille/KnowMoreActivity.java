@@ -3,12 +3,15 @@ package istic.projet.estampille;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SyncRequest;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.TrafficStats;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.MotionEvent;
@@ -16,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,6 +40,8 @@ import java.util.Collections;
 import java.util.List;
 
 import istic.projet.estampille.models.APICertification;
+import istic.projet.estampille.models.APIDenreeAnimale;
+import istic.projet.estampille.models.APIFermePartenaire;
 import istic.projet.estampille.models.APIInfosTransformateur;
 import istic.projet.estampille.models.APILabel;
 import istic.projet.estampille.utils.Constants;
@@ -49,14 +55,19 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
     private String description;
     private String companyName;
     private List<Object> videoUrls;
+    private String websiteUrl;
     private String facebookUrl;
     private String instagramUrl;
     private String twitterUrl;
-    private String websiteUrl;
     private List<APICertification> certifications;
     private List<APILabel> labels;
+    private List<APIFermePartenaire> fermePartenaires;
+    private List<APIDenreeAnimale> denreeAnimales;
     private TextView textViewTitle;
+    private TextView textViewTitleDescription;
     private TextView textViewDescription;
+    private TextView texViewTitleLabels;
+    private TextView textViewTitleAnimalProducts;
     private ImageSlider imageSliderPictures;
     private GradientDrawable insGradientColor;
     private GradientDrawable greyHover;
@@ -66,9 +77,12 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
     private ImageButton insImageButton;
     private ImageButton twImageButton;
     private Button showMoreButton;
+    private Button partnersButton;
+    private Button rawMaterialsButton;
     private WrappingGridView labelsGridView;
     private FragmentManager fm;
     private ImageButton backButton;
+    private ListView denreesAnimalesListView;
     private List<String> uris;
     private String FTP_ADDRESS;
     private String FTP_USERNAME;
@@ -99,14 +113,16 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         FTP_USERNAME = getString(R.string.ftp_username);
         FTP_PASSWORD = getString(R.string.ftp_password);
         companyName = apiInfosTransformateur.getTransformateur().getRaisonSociale();
+        websiteUrl = apiInfosTransformateur.getUrlSite();
         videoUrls = apiInfosTransformateur.getUrls();
         facebookUrl = apiInfosTransformateur.getUrlFacebook();
         instagramUrl = apiInfosTransformateur.getUrlInstagram();
         twitterUrl = apiInfosTransformateur.getUrlTwitter();
         description = apiInfosTransformateur.getDescription();
-        websiteUrl = apiInfosTransformateur.getUrlSite();
         certifications = apiInfosTransformateur.getCertifications();
         labels = apiInfosTransformateur.getLabels();
+        fermePartenaires = apiInfosTransformateur.getFermesP();
+        denreeAnimales = apiInfosTransformateur.getDenreesA();
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -122,14 +138,25 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         textViewDescription = findViewById(R.id.textViewDescription);
         showMoreButton = findViewById(R.id.buttonSeeMore);
         labelsGridView = findViewById(R.id.gridViewLabels);
+        partnersButton = findViewById(R.id.buttonPartners);
+        rawMaterialsButton = findViewById(R.id.buttonOrigins);
+        textViewTitleDescription = findViewById(R.id.textViewTitleDescription);
+        texViewTitleLabels = findViewById(R.id.textViewTitleLabels);
 
         backButton.setOnClickListener(this);
         showMoreButton.setOnClickListener(this);
         websiteImageButton.setOnTouchListener(this);
+        websiteImageButton.setOnClickListener(this);
         videoImageButton.setOnTouchListener(this);
+        videoImageButton.setOnClickListener(this);
         fbImageButton.setOnTouchListener(this);
+        fbImageButton.setOnClickListener(this);
         insImageButton.setOnTouchListener(this);
+        insImageButton.setOnClickListener(this);
         twImageButton.setOnTouchListener(this);
+        twImageButton.setOnClickListener(this);
+        partnersButton.setOnClickListener(this);
+        rawMaterialsButton.setOnClickListener(this);
         websiteImageButton.setBackgroundResource(R.color.FoodOriginOrangeYellow);
         videoImageButton.setBackgroundResource(R.color.YoutubeRed);
         fbImageButton.setBackgroundResource(R.color.FacebookBlue);
@@ -170,12 +197,31 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
             twImageButton.setVisibility(View.GONE);
         }
         if (description == null || description.isEmpty()) {
-            description = getResources().getString(R.string.txt_company_name_placeholder);
-            showMoreButton.setVisibility(View.INVISIBLE);
+            textViewTitleDescription.setVisibility(View.GONE);
+            textViewDescription.setVisibility(View.GONE);
+            showMoreButton.setVisibility(View.GONE);
         } else {
             textViewDescription.setText(description);
+            textViewDescription.post(new Runnable() {
+                @Override
+                public void run() {
+                    int lineCount = textViewDescription.getLineCount();
+                    System.out.println(lineCount);
+                    if (lineCount < 5) {
+                        showMoreButton.setVisibility(View.GONE);
+                    }
+                }
+            });
+
+        }
+        if(fermePartenaires == null || fermePartenaires.isEmpty()) {
+            partnersButton.setVisibility(View.GONE);
+        }
+        if(denreeAnimales == null || denreeAnimales.isEmpty()) {
+            rawMaterialsButton.setVisibility(View.GONE);
         }
         if ((certifications == null && labels == null) || certifications.isEmpty() && labels.isEmpty()) {
+            texViewTitleLabels.setVisibility(View.GONE);
             labelsGridView.setVisibility(View.GONE);
         } else {
             loadLabelsCerificationsLogos();
@@ -233,10 +279,11 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                                     uris.add("http://" + FTP_ADDRESS + "/images/labels_certifs/" + file.getName());
                                     System.out.println(uris.get(uris.size() - 1));
                                 }
-                                /*for(APICertification certification : certifications) {
-                                    if(file.getName().contains(certification.getId().toString())) {
-                                        uris.add("http://" + FTP_ADDRESS + "/images/labels_certifs/" + file.getName());                                        }
-                                }*/
+                            }
+                            for(APICertification certification : certifications) {
+                                if(file.getName().contains(certification.getLibelle())) {
+                                    uris.add("http://" + FTP_ADDRESS + "/images/labels_certifs/" + file.getName());
+                                    System.out.println(uris.get(uris.size() -1)); }
                             }
                         }
                     }
@@ -293,6 +340,44 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                 this.showMoreButton.setText(R.string.txt_see_more);
             }
         }
+        else if (view.getId() == R.id.imageButtonWebSite) {
+            openBrowserPage(websiteUrl);
+        }
+        else if (view.getId() == R.id.imageButtonVideo) {
+            //openVideosDialog();
+        }
+        else if (view.getId() == R.id.imageButtonFb) {
+            openBrowserPage(facebookUrl);
+        }
+        else if(view.getId() == R.id.imageButtonIns) {
+            openBrowserPage(instagramUrl);
+        }
+        else if (view.getId() == R.id.imageButtonTw) {
+            openBrowserPage(twitterUrl);
+        }
+        else if (view.getId() == R.id.buttonPartners) {
+            //openPartnersDialog();
+        }
+        else if (view.getId() == R.id.buttonOrigins) {
+            System.out.println(("ORIGINS"));
+            openOriginsDialog();
+        }
+    }
+
+    private void openBrowserPage(String url) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(browserIntent);
+    }
+
+    private void openOriginsDialog() {
+        final Dialog dialog = new Dialog(KnowMoreActivity.this);
+        dialog.setContentView(R.layout.listview_dialog);
+        dialog.setTitle(getString(R.string.txt_origins));
+        dialog.show();
+        textViewTitleAnimalProducts = dialog.findViewById(R.id.title_animal_products);
+        denreesAnimalesListView = dialog.findViewById(R.id.listAnimalProducts);
+        textViewTitleAnimalProducts.setText(getString(R.string.title_animal_products));
+        denreesAnimalesListView.setAdapter(new ListViewAnimalProductAdapter(KnowMoreActivity.this, denreeAnimales));
     }
 
     /**
@@ -336,12 +421,12 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                     ColorDrawable[] colorDrawables = {new ColorDrawable(ContextCompat.getColor(this, R.color.FoodOriginGrey2)), new ColorDrawable(ContextCompat.getColor(this, R.color.FoodOriginDarkOrangeYellow))};
                     TransitionDrawable transitionDrawable = new TransitionDrawable(colorDrawables);
                     websiteImageButton.setBackground(transitionDrawable);
-                    transitionDrawable.startTransition(500);
+                    transitionDrawable.startTransition(100);
                 } else if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     ColorDrawable[] colorDrawables = {new ColorDrawable(ContextCompat.getColor(this, R.color.FoodOriginDarkOrangeYellow)), new ColorDrawable(ContextCompat.getColor(this, R.color.FoodOriginGrey2))};
                     TransitionDrawable transitionDrawable = new TransitionDrawable(colorDrawables);
                     websiteImageButton.setBackground(transitionDrawable);
-                    transitionDrawable.startTransition(500);
+                    transitionDrawable.startTransition(100);
                 }
                 break;
             case R.id.imageButtonVideo:
@@ -349,12 +434,12 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                     ColorDrawable[] colorDrawables = {new ColorDrawable(ContextCompat.getColor(this, R.color.FoodOriginGrey2)), new ColorDrawable(ContextCompat.getColor(this, R.color.YoutubeRed))};
                     TransitionDrawable transitionDrawable = new TransitionDrawable(colorDrawables);
                     videoImageButton.setBackground(transitionDrawable);
-                    transitionDrawable.startTransition(500);
+                    transitionDrawable.startTransition(100);
                 } else if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     ColorDrawable[] colorDrawables = {new ColorDrawable(ContextCompat.getColor(this, R.color.YoutubeRed)), new ColorDrawable(ContextCompat.getColor(this, R.color.FoodOriginGrey2))};
                     TransitionDrawable transitionDrawable = new TransitionDrawable(colorDrawables);
                     videoImageButton.setBackground(transitionDrawable);
-                    transitionDrawable.startTransition(500);
+                    transitionDrawable.startTransition(100);
                 }
                 break;
             case R.id.imageButtonFb:
@@ -362,12 +447,12 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                     ColorDrawable[] colorDrawables = {new ColorDrawable(ContextCompat.getColor(this, R.color.FoodOriginGrey2)), new ColorDrawable(ContextCompat.getColor(this, R.color.FacebookBlue))};
                     TransitionDrawable transitionDrawable = new TransitionDrawable(colorDrawables);
                     fbImageButton.setBackground(transitionDrawable);
-                    transitionDrawable.startTransition(500);
+                    transitionDrawable.startTransition(100);
                 } else if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     ColorDrawable[] colorDrawables = {new ColorDrawable(ContextCompat.getColor(this, R.color.FacebookBlue)), new ColorDrawable(ContextCompat.getColor(this, R.color.FoodOriginGrey2))};
                     TransitionDrawable transitionDrawable = new TransitionDrawable(colorDrawables);
                     fbImageButton.setBackground(transitionDrawable);
-                    transitionDrawable.startTransition(500);
+                    transitionDrawable.startTransition(100);
                 }
                 break;
             case R.id.imageButtonIns:
@@ -375,12 +460,12 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                     GradientDrawable[] gradientDrawables = {greyHover, insGradientColor};
                     TransitionDrawable transitionDrawable = new TransitionDrawable(gradientDrawables);
                     insImageButton.setBackground(transitionDrawable);
-                    transitionDrawable.startTransition(500);
+                    transitionDrawable.startTransition(100);
                 } else if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     GradientDrawable[] gradientDrawables = {insGradientColor, greyHover};
                     TransitionDrawable transitionDrawable = new TransitionDrawable(gradientDrawables);
                     insImageButton.setBackground(transitionDrawable);
-                    transitionDrawable.startTransition(500);
+                    transitionDrawable.startTransition(100);
                 }
                 break;
             case R.id.imageButtonTw:

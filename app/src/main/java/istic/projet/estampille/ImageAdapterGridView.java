@@ -46,7 +46,7 @@ public class ImageAdapterGridView extends BaseAdapter {
         if (convertView == null) {
             imageView = new ImageView(context);
             imageView.setLayoutParams(new WrappingGridView.LayoutParams(400, 400));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             imageView.setPadding(16, 16, 16, 16);
         } else {
             imageView = (ImageView) convertView;
@@ -55,7 +55,7 @@ public class ImageAdapterGridView extends BaseAdapter {
         Glide
                 .with(context)
                 .load(url)
-                .centerCrop()
+                .centerInside()
                 .into(imageView);
         return imageView;
     }
