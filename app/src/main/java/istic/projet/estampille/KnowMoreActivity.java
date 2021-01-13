@@ -11,6 +11,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.TrafficStats;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.MotionEvent;
