@@ -36,5 +36,11 @@
     <string name="txt_see_more">LIRE PLUS ></string>
     <string name="txt_company_name_placeholder">Informations complémentaires</string>
     <string name="txt_company_description_placeholder">Pas de description…</string>
+    <string name="txt_partners">Nos partenaires</string>
+    <string name="txt_origins">Denrées animales</string>
+    <string name="txt_videos">Vidéos</string>
+    <string name="title_description">Description</string>
+    <string name="title_labels">Labels &amp; Certifications</string>
+    <string name="title_animal_products">Denrées animales</string>
 
 </resources>

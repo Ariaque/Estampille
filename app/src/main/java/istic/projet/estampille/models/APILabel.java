@@ -9,7 +9,7 @@ public class APILabel implements Serializable {
 
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private Long id;
 
     @SerializedName("libelle")
     @Expose
@@ -19,17 +19,17 @@ public class APILabel implements Serializable {
 
     }
 
-    public APILabel(Integer id, String libelle) {
+    public APILabel(Long id, String libelle) {
         super();
         this.id = id;
         this.libelle = libelle;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

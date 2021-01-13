@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/FoodOriginWhite"
     tools:context=".KnowMoreActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -36,6 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="55dp"
+        android:scrollbars="none"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -55,6 +57,8 @@
                 android:layout_marginBottom="10dp"
                 android:textColor="@color/FoodOriginBlack"
                 android:textSize="30sp"
+                android:maxLines="2"
+                android:ellipsize="end"
                 android:textStyle="bold" />
 
             <com.denzcoskun.imageslider.ImageSlider
@@ -125,6 +129,21 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/textViewTitleDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:ellipsize="end"
+                    android:maxLines="5"
+                    android:textAlignment="center"
+                    android:text="@string/title_description"
+                    android:textColor="@color/FoodOriginBlack" />
+                <TextView
                     android:id="@+id/textViewDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -139,7 +158,9 @@
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingBottom="15dp">
 
                     <Button
                         android:id="@+id/buttonSeeMore"
@@ -161,12 +182,65 @@
                         app:layout_constraintVertical_bias="0.0" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
+                <LinearLayout
+                    android:id="@+id/linearLayout3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="15dp"
+                    android:clipToPadding="false"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/buttonPartners"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@color/FoodOriginOrange"
+                        android:backgroundTint="@color/FoodOriginOrange"
+                        android:textColor="@color/FoodOriginWhite"
+                        android:text="@string/txt_partners"
+                        app:srcCompat="@drawable/ic_baseline_computer_24" />
+
+                    <Button
+                        android:id="@+id/buttonOrigins"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:background="@color/FoodOriginOrange"
+                        android:backgroundTint="@color/FoodOriginOrange"
+                        android:textColor="@color/FoodOriginWhite"
+                        android:text="@string/txt_origins"
+                        app:srcCompat="@drawable/ic_baseline_play_circle_filled_24" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textViewTitleLabels"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    android:ellipsize="end"
+                    android:maxLines="5"
+                    android:textAlignment="center"
+                    android:text="@string/title_labels"
+                    android:textColor="@color/FoodOriginBlack" />
+
                 <istic.projet.estampille.WrappingGridView
                     android:id="@+id/gridViewLabels"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"
+                    android:listSelector="@color/FoodOriginTransparent"
                     android:gravity="center"
                     android:numColumns="auto_fit"
                     android:stretchMode="columnWidth" />
