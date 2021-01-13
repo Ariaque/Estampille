@@ -38,7 +38,6 @@ public class APICalls {
             public void onResponse(Call<APITransformateur> call, Response<APITransformateur> response) {
                 APITransformateur searchedTransformateur = response.body();
                 if (searchedTransformateur != null) {
-                    HistoryFragment.writeSearchInHistory(activity, searchedTransformateur);
                     // showing the searchedTransformateur details
                     APICalls.searchUserStateAPI(activity, searchedTransformateur, progressDialog);
                 } else {
@@ -107,6 +106,8 @@ public class APICalls {
             public void onResponse(Call<Boolean> call, Response<Boolean> response) {
                 Boolean userState = response.body();
                 if (userState != null) {
+                    searchedTransformateur.setIsKnowMoreActive(userState);
+                    HistoryFragment.writeSearchInHistory(activity, searchedTransformateur);
                     Intent intent = new Intent(activity.getApplicationContext(), DisplayMapActivity.class);
                     intent.putExtra(Constants.KEY_INTENT_USER_STATE, userState);
                     intent.putExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR, searchedTransformateur);
