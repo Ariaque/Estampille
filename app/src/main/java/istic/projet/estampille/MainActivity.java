@@ -12,6 +12,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,6 +43,7 @@ import istic.projet.estampille.utils.PermissionsUtils;
 
 public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener {
 
+    private static final String TAG = MainActivity.class.getName();
     private Context context;
     private Toolbar mToolBar;
     private FragmentPagerAdapter fragmentPagerAdapter;
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -81,11 +84,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 .penaltyLog()
                 .build();
         StrictMode.setVmPolicy(builder);
+
     }
 
     private boolean checkInternetConnexion() {
         boolean result = true;
-
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)) {
@@ -284,9 +287,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         Object objectRead = null;
         File file = new File(this.context.getFilesDir(), "" + File.separator + fileName);
         if (file.exists()) {
-            try {
-                FileInputStream fileInputStream = context.openFileInput(fileName);
-                ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            try (FileInputStream fileInputStream = context.openFileInput(fileName); ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
                 while ((objectRead = objectInputStream.readObject()) != null) {
                     if (objectRead instanceof APITransformateur) {
                         boolean alreadyPresent = false;
@@ -295,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                             APITransformateur finalObjectRead = (APITransformateur) objectRead;
                             alreadyPresent = listHistoryItems.stream().anyMatch(o -> o.getNumAgrement().equals((finalObjectRead).getNumAgrement()));
                         } else {
-                            Iterator it = listHistoryItems.iterator();
+                            Iterator<APITransformateur> it = listHistoryItems.iterator();
                             while (!alreadyPresent && it.hasNext()) {
                                 Object finalObjectRead = it.next();
                                 if (finalObjectRead != null && finalObjectRead.equals(objectRead)) {
@@ -308,9 +309,9 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                         }
                     }
                 }
-                objectInputStream.close();
-                fileInputStream.close();
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (IOException e) {
+                Log.wtf(TAG, "fin du fichier d'historique");
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
 

@@ -13,6 +13,8 @@ import java.util.Objects;
  */
 public class APITransformateur implements Serializable {
 
+    private Boolean isKnowMoreActive;
+
     private static final long serialVersionUID = 1L;
 
     @SerializedName("id")
@@ -88,6 +90,9 @@ public class APITransformateur implements Serializable {
         this.longitude = longitude;
     }
 
+    public Boolean getIsKnowMoreActive(){return isKnowMoreActive;}
+
+    public void setIsKnowMoreActive(Boolean isKnowMoreActive){this.isKnowMoreActive = isKnowMoreActive;}
 
     public Integer getId() {
         return id;
