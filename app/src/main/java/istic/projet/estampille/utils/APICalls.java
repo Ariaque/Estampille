@@ -40,14 +40,9 @@ public class APICalls {
                 if (searchedTransformateur != null) {
                     HistoryFragment.writeSearchInHistory(activity, searchedTransformateur);
                     // showing the searchedTransformateur details
-                    Intent intent = new Intent(activity.getApplicationContext(), DisplayMapActivity.class);
-                    intent.putExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR, searchedTransformateur);
-                    activity.startActivity(intent);
+                    APICalls.searchUserStateAPI(activity, searchedTransformateur, progressDialog);
                 } else {
                     Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.no_match_toast), Toast.LENGTH_SHORT).show();
-                }
-                if(progressDialog != null){
-                    progressDialog.hide();
                 }
             }
 
@@ -80,13 +75,52 @@ public class APICalls {
                     Intent intent = new Intent(activity.getApplicationContext(), KnowMoreActivity.class);
                     intent.putExtra(Constants.KEY_INTENT_MORE_INFOS_TRANSFORMATEUR, infosTransformateur);
                     activity.startActivity(intent);}
+                else {
+                    Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.api_problem), Toast.LENGTH_SHORT).show();
+                }
+                if(progressDialog != null){
+                    progressDialog.hide();
+                }
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<APIInfosTransformateur> call, @NonNull Throwable t) {
+                Log.wtf(TAG, "onResponseFailed : " + call.request().url());
+                t.printStackTrace();
+                Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.api_problem), Toast.LENGTH_SHORT).show();
+                if(progressDialog != null){
+                    progressDialog.hide();
+                }
+            }
+        });
+    }
+
+
+
+
+    public static void searchUserStateAPI(Activity activity, APITransformateur searchedTransformateur, ProgressDialog progressDialog){
+        APIService apiService = APIService.retrofit.create(APIService.class);
+        Call<Boolean> call = apiService.getUserState(searchedTransformateur.getSiret());
+        call.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                Boolean userState = response.body();
+                if (userState != null) {
+                    Intent intent = new Intent(activity.getApplicationContext(), DisplayMapActivity.class);
+                    intent.putExtra(Constants.KEY_INTENT_USER_STATE, userState);
+                    intent.putExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR, searchedTransformateur);
+                    activity.startActivity(intent);
+                } else {
+                    Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.api_problem), Toast.LENGTH_SHORT).show();
+                }
                 if(progressDialog != null){
                     progressDialog.hide();
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<APIInfosTransformateur> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
                 Log.wtf(TAG, "onResponseFailed : " + call.request().url());
                 t.printStackTrace();
                 Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.api_problem), Toast.LENGTH_SHORT).show();

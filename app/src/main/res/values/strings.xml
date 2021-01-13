@@ -37,5 +37,7 @@
     <string name="txt_see_less">Lire moins ></string>
     <string name="txt_company_name_placeholder">Informations complémentaires</string>
     <string name="txt_company_description_placeholder">Pas de description…</string>
+    <string name="txt_contenu_video">Découvrez-nous en vidéo !</string>
+    <string name="txt_no_internet">Aucune connexion internet, veuillez verifier que vous êtes bien connecté au réseau</string>
 
 </resources>

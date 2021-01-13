@@ -46,6 +46,9 @@ public interface APIService {
     @GET("/infoTransformateur/transformateur/{id}")
     Call<APIInfosTransformateur> getInfosTansformateur(@Path("id") String estampille);
 
+    @GET("/user/isActive/{siret}")
+    Call<Boolean> getUserState(@Path("siret")String siret);
+
     /**
      * Custom Interceptor.
      */
