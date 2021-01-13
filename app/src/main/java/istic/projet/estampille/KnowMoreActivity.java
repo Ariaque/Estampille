@@ -1,5 +1,7 @@
 package istic.projet.estampille;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -7,13 +9,12 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.TrafficStats;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -30,9 +31,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,6 +43,7 @@ import istic.projet.estampille.utils.Constants;
 public class KnowMoreActivity extends AppCompatActivity implements View.OnClickListener, View.OnTouchListener {
 
 
+    private final int COLLAPSED_MAX_LINES = 5;
     private Context context;
     private APIInfosTransformateur apiInfosTransformateur;
     private String description;
@@ -73,6 +73,8 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
     private String FTP_ADDRESS;
     private String FTP_USERNAME;
     private String FTP_PASSWORD;
+    private int collapsedHeight;
+    private int expandedHeight;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -122,6 +124,7 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         labelsGridView = findViewById(R.id.gridViewLabels);
 
         backButton.setOnClickListener(this);
+        showMoreButton.setOnClickListener(this);
         websiteImageButton.setOnTouchListener(this);
         videoImageButton.setOnTouchListener(this);
         fbImageButton.setOnTouchListener(this);
@@ -171,14 +174,10 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
             showMoreButton.setVisibility(View.INVISIBLE);
         } else {
             textViewDescription.setText(description);
-            if (textViewDescription.getLineCount() > 5) {
-                showMoreButton.setVisibility(View.GONE);
-            }
         }
         if ((certifications == null && labels == null) || certifications.isEmpty() && labels.isEmpty()) {
             labelsGridView.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             loadLabelsCerificationsLogos();
             labelsGridView.setAdapter(new ImageAdapterGridView(this, uris));
         }
@@ -230,9 +229,9 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                     for (FTPFile file : files) {
                         if (!file.getName().equals(".") && !file.getName().equals("..")) {
                             for (APILabel label : labels) {
-                                if(file.getName().contains(label.getLibelle())) {
+                                if (file.getName().contains(label.getLibelle())) {
                                     uris.add("http://" + FTP_ADDRESS + "/images/labels_certifs/" + file.getName());
-                                    System.out.println(uris.get(uris.size() -1));
+                                    System.out.println(uris.get(uris.size() - 1));
                                 }
                                 /*for(APICertification certification : certifications) {
                                     if(file.getName().contains(certification.getId().toString())) {
@@ -285,11 +284,52 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
             startActivity(otherActivity);*/
             fm.popBackStack();
             finish();
+        } else if (view.getId() == R.id.buttonSeeMore) {
+            if (this.textViewDescription.getMaxLines() == COLLAPSED_MAX_LINES) {
+                this.expandTextView();
+                this.showMoreButton.setText(R.string.txt_see_less);
+            } else {
+                this.collapseTextView();
+                this.showMoreButton.setText(R.string.txt_see_more);
+            }
         }
+    }
+
+    /**
+     * Expand the textView which contains the description.
+     */
+    private void expandTextView() {
+        collapsedHeight = textViewDescription.getMeasuredHeight();
+        textViewDescription.setMaxLines(Integer.MAX_VALUE);
+        textViewDescription.measure(View.MeasureSpec.makeMeasureSpec(textViewDescription.getMeasuredWidth(), View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED));
+        expandedHeight = textViewDescription.getMeasuredHeight();
+        ObjectAnimator animation = ObjectAnimator.ofInt(textViewDescription, "height", collapsedHeight, expandedHeight);
+        animation.setDuration(200).start();
+    }
+
+    /**
+     * Collapse the textView which contains the description.
+     */
+    private void collapseTextView() {
+        ObjectAnimator animation = ObjectAnimator.ofInt(this.textViewDescription, "height", expandedHeight, collapsedHeight);
+        animation.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {}
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                textViewDescription.setMaxLines(COLLAPSED_MAX_LINES);
+            }
+            @Override
+            public void onAnimationCancel(Animator animator) {}
+            @Override
+            public void onAnimationRepeat(Animator animator) {}
+        });
+        animation.setDuration(200).start();
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        v.performClick();
         switch (v.getId()) {
             case R.id.imageButtonWebSite:
                 if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
