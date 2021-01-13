@@ -109,7 +109,6 @@ public class APICalls {
                     searchedTransformateur.setIsKnowMoreActive(userState);
                     HistoryFragment.writeSearchInHistory(activity, searchedTransformateur);
                     Intent intent = new Intent(activity.getApplicationContext(), DisplayMapActivity.class);
-                    intent.putExtra(Constants.KEY_INTENT_USER_STATE, userState);
                     intent.putExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR, searchedTransformateur);
                     activity.startActivity(intent);
                 } else {

@@ -54,7 +54,7 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
         fm = this.getSupportFragmentManager();
         //APITransformateur transformateur = (APITransformateur) intent.getSerializableExtra("searchedTransformateur");
         transformateur = (APITransformateur) intent.getSerializableExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR);
-        isActive = (Boolean) intent.getSerializableExtra(Constants.KEY_INTENT_USER_STATE);
+        isActive = transformateur.getIsKnowMoreActive();
         if (transformateur != null) {
             siret = transformateur.getSiret();
             name = transformateur.getRaisonSociale();

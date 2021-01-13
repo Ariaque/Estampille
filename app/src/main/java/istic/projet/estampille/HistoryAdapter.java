@@ -47,7 +47,6 @@ public class HistoryAdapter extends ArrayAdapter<APITransformateur> {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, DisplayMapActivity.class);
-                intent.putExtra(Constants.KEY_INTENT_USER_STATE, transformateur.getIsKnowMoreActive());
                 intent.putExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR, transformateurs.get(position));
                 context.startActivity(intent);
             }
