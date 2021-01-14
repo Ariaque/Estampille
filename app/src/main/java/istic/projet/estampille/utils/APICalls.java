@@ -25,6 +25,12 @@ public class APICalls {
 
     private static final String TAG = APICalls.class.getName();
 
+    /**
+     * Call the API to know if a given estampille match with any transformator in the database
+     * @param activity
+     * @param estampille the estampille we are searching a match for
+     * @param progressDialog ProgressDialog that mus be hidden when treatment is over
+     */
     public static void searchStampInRemoteAPI(Activity activity, String estampille, ProgressDialog progressDialog) {
         APIService apiService = APIService.retrofit.create(APIService.class);
         Call<APITransformateur> call = apiService.getTansformateur(estampille);
@@ -96,8 +102,12 @@ public class APICalls {
     }
 
 
-
-
+    /**
+     * Call the API to know if a given user account is active or not to know if we have to display the know more button or not.
+     * @param activity
+     * @param searchedTransformateur Transformator that have the SIRET number of the user we are looking for
+     * @param progressDialog ProgressDialog that mus be hidden when treatment is over
+     */
     public static void searchUserStateAPI(Activity activity, APITransformateur searchedTransformateur, ProgressDialog progressDialog){
         APIService apiService = APIService.retrofit.create(APIService.class);
         Call<Boolean> call = apiService.getUserState(searchedTransformateur.getSiret());

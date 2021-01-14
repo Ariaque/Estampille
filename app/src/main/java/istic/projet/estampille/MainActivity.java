@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -88,6 +87,11 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     }
 
+    /**
+     * Check is the phone is connected to internet, if it is, the application proceed as usual,
+     * if not, a new page is loaded, telling the user that the phone can't access internet
+     * @return true if the phone can access internet, false otherwise
+     */
     private boolean checkInternetConnexion() {
         boolean result = true;
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -325,6 +329,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PermissionsUtils.REQUEST_CODE_LOCATION) {
@@ -343,6 +348,10 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         }
     }
 
+    /**
+     * prevent the application to going back to the phone's main menu screen if
+     * the back button is pressed when in another fragment than the home page
+     */
     @Override
     public void onBackPressed() {
         if(viewPager.getCurrentItem() != 0) {

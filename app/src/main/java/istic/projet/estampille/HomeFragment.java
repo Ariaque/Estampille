@@ -87,6 +87,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
+    /**
+     * Check is the phone is connected to internet, if it is, the application proceed as usual,
+     * if not, a new page is loaded, telling the user that the phone can't access internet
+     * @return true if the phone can access internet, false otherwise
+     */
     private boolean checkInternetConnexion() {
         boolean result = true;
 
