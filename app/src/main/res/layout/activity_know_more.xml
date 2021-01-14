@@ -149,9 +149,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
                     android:textSize="20sp"
+                    android:layout_gravity="center_vertical|end"
+                    android:justificationMode="inter_word"
                     android:ellipsize="end"
                     android:maxLines="5"
                     android:textColor="@color/FoodOriginBlack" />

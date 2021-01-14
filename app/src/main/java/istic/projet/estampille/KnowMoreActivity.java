@@ -6,7 +6,6 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SyncRequest;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
@@ -14,13 +13,17 @@ import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -36,7 +39,9 @@ import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import istic.projet.estampille.models.APICertification;
@@ -44,9 +49,10 @@ import istic.projet.estampille.models.APIDenreeAnimale;
 import istic.projet.estampille.models.APIFermePartenaire;
 import istic.projet.estampille.models.APIInfosTransformateur;
 import istic.projet.estampille.models.APILabel;
+import istic.projet.estampille.models.APIVideo;
 import istic.projet.estampille.utils.Constants;
 
-public class KnowMoreActivity extends AppCompatActivity implements View.OnClickListener, View.OnTouchListener {
+public class KnowMoreActivity extends AppCompatActivity implements View.OnClickListener, View.OnTouchListener, AdapterView.OnItemClickListener {
 
 
     private final int COLLAPSED_MAX_LINES = 5;
@@ -54,7 +60,7 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
     private APIInfosTransformateur apiInfosTransformateur;
     private String description;
     private String companyName;
-    private List<Object> videoUrls;
+    private List<APIVideo> videoUrls;
     private String websiteUrl;
     private String facebookUrl;
     private String instagramUrl;
@@ -63,11 +69,13 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
     private List<APILabel> labels;
     private List<APIFermePartenaire> fermePartenaires;
     private List<APIDenreeAnimale> denreeAnimales;
+    private APIFermePartenaire partnerItem;
+    private APIVideo videoItem;
     private TextView textViewTitle;
     private TextView textViewTitleDescription;
     private TextView textViewDescription;
     private TextView texViewTitleLabels;
-    private TextView textViewTitleAnimalProducts;
+    private TextView textViewDialogTitle;
     private ImageSlider imageSliderPictures;
     private GradientDrawable insGradientColor;
     private GradientDrawable greyHover;
@@ -79,10 +87,12 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
     private Button showMoreButton;
     private Button partnersButton;
     private Button rawMaterialsButton;
+    private Button partnerWebsiteButton;
     private WrappingGridView labelsGridView;
     private FragmentManager fm;
     private ImageButton backButton;
-    private ListView denreesAnimalesListView;
+    private ListView dialogListView;
+    private Dialog dialog;
     private List<String> uris;
     private String FTP_ADDRESS;
     private String FTP_USERNAME;
@@ -206,7 +216,6 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                 @Override
                 public void run() {
                     int lineCount = textViewDescription.getLineCount();
-                    System.out.println(lineCount);
                     if (lineCount < 5) {
                         showMoreButton.setVisibility(View.GONE);
                     }
@@ -214,10 +223,10 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
             });
 
         }
-        if(fermePartenaires == null || fermePartenaires.isEmpty()) {
+        if (fermePartenaires == null || fermePartenaires.isEmpty()) {
             partnersButton.setVisibility(View.GONE);
         }
-        if(denreeAnimales == null || denreeAnimales.isEmpty()) {
+        if (denreeAnimales == null || denreeAnimales.isEmpty()) {
             rawMaterialsButton.setVisibility(View.GONE);
         }
         if ((certifications == null && labels == null) || certifications.isEmpty() && labels.isEmpty()) {
@@ -243,16 +252,25 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                 conn.changeWorkingDirectory("/images/" + idTransformateur);
                 FTPFile[] files = conn.listFiles();
                 ftpLogout(conn);
-                if (files != null) {
+                List<FTPFile> filesList = null;
+                if (files != null && files.length != 0) {
+                    filesList = new LinkedList<>(Arrays.asList(files));
                     for (FTPFile file : files) {
-                        if (!file.getName().equals(".") && !file.getName().equals("..")) {
-                            imageList.add(new SlideModel("http://" + FTP_ADDRESS + "/images/" + idTransformateur + "/" + file.getName(), ScaleTypes.CENTER_INSIDE));
+                        if (file.getName().equals(".") || file.getName().equals("..")) {
+                            filesList.remove(file);
                         }
                     }
+                }
+                if (filesList != null && !filesList.isEmpty()) {
+                    for (FTPFile file : filesList) {
+                        imageList.add(new SlideModel("http://" + FTP_ADDRESS + "/images/" + idTransformateur + "/" + file.getName(), ScaleTypes.CENTER_INSIDE));
+
+                    }
+                    imageSliderPictures.setBackgroundResource(R.color.FoodOriginBlack);
                 } else {
                     imageList.add(new SlideModel("http://" + FTP_ADDRESS + "/images/placeholder/foodorigintransp.png", ScaleTypes.CENTER_INSIDE));
+                    imageSliderPictures.setBackgroundResource(R.color.FoodOriginGrey2);
                 }
-                imageSliderPictures.setBackgroundResource(R.color.FoodOriginBlack);
                 imageSliderPictures.setImageList(imageList);
             }
         } catch (IOException e) {
@@ -277,17 +295,15 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                             for (APILabel label : labels) {
                                 if (file.getName().contains(label.getLibelle())) {
                                     uris.add("http://" + FTP_ADDRESS + "/images/labels_certifs/" + file.getName());
-                                    System.out.println(uris.get(uris.size() - 1));
                                 }
                             }
-                            for(APICertification certification : certifications) {
-                                if(file.getName().contains(certification.getLibelle())) {
+                            for (APICertification certification : certifications) {
+                                if (file.getName().contains(certification.getLibelle())) {
                                     uris.add("http://" + FTP_ADDRESS + "/images/labels_certifs/" + file.getName());
-                                    System.out.println(uris.get(uris.size() -1)); }
+                                }
                             }
                         }
                     }
-                    System.out.println(uris.size());
                     Collections.sort(uris);
                 }
             }
@@ -327,8 +343,6 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.backButton) {
-            /*Intent otherActivity = new Intent(getApplicationContext(), DisplayMapActivity.class);
-            startActivity(otherActivity);*/
             fm.popBackStack();
             finish();
         } else if (view.getId() == R.id.buttonSeeMore) {
@@ -339,28 +353,12 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                 this.collapseTextView();
                 this.showMoreButton.setText(R.string.txt_see_more);
             }
-        }
-        else if (view.getId() == R.id.imageButtonWebSite) {
-            openBrowserPage(websiteUrl);
-        }
-        else if (view.getId() == R.id.imageButtonVideo) {
-            //openVideosDialog();
-        }
-        else if (view.getId() == R.id.imageButtonFb) {
-            openBrowserPage(facebookUrl);
-        }
-        else if(view.getId() == R.id.imageButtonIns) {
-            openBrowserPage(instagramUrl);
-        }
-        else if (view.getId() == R.id.imageButtonTw) {
-            openBrowserPage(twitterUrl);
-        }
-        else if (view.getId() == R.id.buttonPartners) {
-            //openPartnersDialog();
-        }
-        else if (view.getId() == R.id.buttonOrigins) {
-            System.out.println(("ORIGINS"));
-            openOriginsDialog();
+        } else if (view.getId() == R.id.buttonPartners) {
+            openPartnersDialog();
+        } else if (view.getId() == R.id.buttonOrigins) {
+            openAnimalProductsDialog();
+        } else if (view.getId() == R.id.buttonPartnerWebsite) {
+            openBrowserPage(partnerItem.getUrl());
         }
     }
 
@@ -369,15 +367,86 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         startActivity(browserIntent);
     }
 
-    private void openOriginsDialog() {
-        final Dialog dialog = new Dialog(KnowMoreActivity.this);
+    private void openVideosDialog() {
+        dialog = new Dialog(KnowMoreActivity.this);
+        dialog.setContentView(R.layout.listview_dialog);
+        dialog.setTitle(getString(R.string.txt_videos));
+        Window window = dialog.getWindow();
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setGravity(Gravity.CENTER);
+        dialog.show();
+        textViewDialogTitle = dialog.findViewById(R.id.listViewTitle);
+        dialogListView = dialog.findViewById(R.id.listView);
+        dialogListView.setId(R.id.listViewVideos);
+        dialogListView.setOnItemClickListener(this);
+        textViewDialogTitle.setText(getString(R.string.txt_videos));
+        dialogListView.setAdapter(new ListViewVideoUrlsAdapter(KnowMoreActivity.this, videoUrls));
+    }
+
+    private void openPartnersDialog() {
+        dialog = new Dialog(KnowMoreActivity.this);
+        dialog.setContentView(R.layout.listview_dialog);
+        dialog.setTitle(getString(R.string.txt_partners));
+        Window window = dialog.getWindow();
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setGravity(Gravity.CENTER);
+        dialog.show();
+        textViewDialogTitle = dialog.findViewById(R.id.listViewTitle);
+        dialogListView = dialog.findViewById(R.id.listView);
+        dialogListView.setId(R.id.listViewPartners);
+        dialogListView.setOnItemClickListener(this);
+        textViewDialogTitle.setText(getString(R.string.txt_partners));
+        dialogListView.setAdapter(new ListViewPartnersAdapter(KnowMoreActivity.this, fermePartenaires));
+
+    }
+
+    private void openAnimalProductsDialog() {
+        dialog = new Dialog(KnowMoreActivity.this);
         dialog.setContentView(R.layout.listview_dialog);
         dialog.setTitle(getString(R.string.txt_origins));
+        Window window = dialog.getWindow();
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setGravity(Gravity.CENTER);
         dialog.show();
-        textViewTitleAnimalProducts = dialog.findViewById(R.id.title_animal_products);
-        denreesAnimalesListView = dialog.findViewById(R.id.listAnimalProducts);
-        textViewTitleAnimalProducts.setText(getString(R.string.title_animal_products));
-        denreesAnimalesListView.setAdapter(new ListViewAnimalProductAdapter(KnowMoreActivity.this, denreeAnimales));
+        textViewDialogTitle = dialog.findViewById(R.id.listViewTitle);
+        dialogListView = dialog.findViewById(R.id.listView);
+        dialogListView.setSelector(R.color.FoodOriginTransparent);
+        textViewDialogTitle.setText(getString(R.string.txt_origins));
+        dialogListView.setAdapter(new ListViewAnimalProductAdapter(KnowMoreActivity.this, denreeAnimales));
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (parent.getId() == R.id.listViewPartners) {
+            partnerItem = (APIFermePartenaire) dialogListView.getItemAtPosition(position);
+
+
+            if ((partnerItem.getDescription() == null || partnerItem.getDescription().isEmpty()) && (partnerItem.getUrl() == null || partnerItem.getUrl().isEmpty())) {
+                Toast.makeText(this, R.string.txt_partner_no_info, Toast.LENGTH_SHORT).show();
+            } else {
+                dialog.setContentView(R.layout.partner_dialog_layout);
+                TextView partnerLayoutTitleTextView = dialog.findViewById(R.id.partnerLayoutTitle);
+                TextView partnerLayoutDescriptionTextView = dialog.findViewById(R.id.partnerLayoutDescription);
+                partnerWebsiteButton = dialog.findViewById(R.id.buttonPartnerWebsite);
+                partnerLayoutTitleTextView.setText(partnerItem.getNom());
+                if (partnerItem.getDescription() == null || partnerItem.getDescription().isEmpty()) {
+                    partnerLayoutDescriptionTextView.setVisibility(View.GONE);
+                } else {
+                    partnerLayoutDescriptionTextView.setText(partnerItem.getDescription());
+                }
+                if (partnerItem.getUrl() == null || partnerItem.getUrl().isEmpty()) {
+                    partnerWebsiteButton.setVisibility(View.GONE);
+                } else {
+                    partnerWebsiteButton.setOnClickListener(this);
+                }
+
+            }
+        } else if (parent.getId() == R.id.listViewVideos) {
+            videoItem = (APIVideo) dialogListView.getItemAtPosition(position);
+            if (videoItem.getLibelle() != null && !videoItem.getLibelle().isEmpty()) {
+                openBrowserPage(videoItem.getLibelle());
+            }
+        }
     }
 
     /**
@@ -399,15 +468,21 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         ObjectAnimator animation = ObjectAnimator.ofInt(this.textViewDescription, "height", expandedHeight, collapsedHeight);
         animation.addListener(new Animator.AnimatorListener() {
             @Override
-            public void onAnimationStart(Animator animator) {}
+            public void onAnimationStart(Animator animator) {
+            }
+
             @Override
             public void onAnimationEnd(Animator animator) {
                 textViewDescription.setMaxLines(COLLAPSED_MAX_LINES);
             }
+
             @Override
-            public void onAnimationCancel(Animator animator) {}
+            public void onAnimationCancel(Animator animator) {
+            }
+
             @Override
-            public void onAnimationRepeat(Animator animator) {}
+            public void onAnimationRepeat(Animator animator) {
+            }
         });
         animation.setDuration(200).start();
     }
@@ -427,6 +502,7 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                     TransitionDrawable transitionDrawable = new TransitionDrawable(colorDrawables);
                     websiteImageButton.setBackground(transitionDrawable);
                     transitionDrawable.startTransition(100);
+                    openBrowserPage(websiteUrl);
                 }
                 break;
             case R.id.imageButtonVideo:
@@ -440,6 +516,7 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                     TransitionDrawable transitionDrawable = new TransitionDrawable(colorDrawables);
                     videoImageButton.setBackground(transitionDrawable);
                     transitionDrawable.startTransition(100);
+                    openVideosDialog();
                 }
                 break;
             case R.id.imageButtonFb:
@@ -453,6 +530,7 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                     TransitionDrawable transitionDrawable = new TransitionDrawable(colorDrawables);
                     fbImageButton.setBackground(transitionDrawable);
                     transitionDrawable.startTransition(100);
+                    openBrowserPage(facebookUrl);
                 }
                 break;
             case R.id.imageButtonIns:
@@ -466,6 +544,7 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                     TransitionDrawable transitionDrawable = new TransitionDrawable(gradientDrawables);
                     insImageButton.setBackground(transitionDrawable);
                     transitionDrawable.startTransition(100);
+                    openBrowserPage(instagramUrl);
                 }
                 break;
             case R.id.imageButtonTw:
@@ -479,6 +558,7 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                     TransitionDrawable transitionDrawable = new TransitionDrawable(colorDrawables);
                     twImageButton.setBackground(transitionDrawable);
                     transitionDrawable.startTransition(500);
+                    openBrowserPage(twitterUrl);
                 }
                 break;
             default:

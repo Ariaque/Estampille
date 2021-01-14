@@ -12,28 +12,28 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.util.List;
 
-import istic.projet.estampille.models.APIDenreeAnimale;
+import istic.projet.estampille.models.APIFermePartenaire;
 
-public class ListViewAnimalProductAdapter extends BaseAdapter {
+public class ListViewPartnersAdapter extends BaseAdapter {
 
     private Context context;
-    private List<APIDenreeAnimale> denreeAnimales;
+    private List<APIFermePartenaire> partenaires;
     private LayoutInflater inflater;
 
-    public ListViewAnimalProductAdapter(Context context, List<APIDenreeAnimale> denreeAnimales) {
+    public ListViewPartnersAdapter(Context context, List<APIFermePartenaire> partenaires) {
         this.context = context;
-        this.denreeAnimales = denreeAnimales;
+        this.partenaires = partenaires;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount() {
-        return denreeAnimales.size();
+        return partenaires.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return denreeAnimales.get(position);
+        return partenaires.get(position);
     }
 
     @Override
@@ -45,13 +45,13 @@ public class ListViewAnimalProductAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         LinearLayout view;
-        APIDenreeAnimale result = this.denreeAnimales.get(position);
+        APIFermePartenaire result = this.partenaires.get(position);
         if(convertView == null) {
             view = (LinearLayout) inflater.inflate(R.layout.simple_dialog_listview_item, null, false);
-            TextView textViewProductName = view.findViewById(R.id.item_title);
-            textViewProductName.setText(result.getNom());
-            TextView textViewProductOrigin = view.findViewById(R.id.item_text);
-            textViewProductOrigin.setText(result.getOrigine());
+            TextView textViewItemTitle = view.findViewById(R.id.item_title);
+            textViewItemTitle.setText(result.getNom());
+            TextView textViewItemText = view.findViewById(R.id.item_text);
+            textViewItemText.setText(result.getDescription());
         }
         else {
             view = (LinearLayout) convertView;

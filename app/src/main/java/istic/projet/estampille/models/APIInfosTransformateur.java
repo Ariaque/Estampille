@@ -48,7 +48,7 @@ public class APIInfosTransformateur implements Serializable {
     private List<APICertification> certifications = null;
     @SerializedName("urls")
     @Expose
-    private List<Object> urls = null;
+    private List<APIVideo> urls = null;
     @SerializedName("fermesP")
     @Expose
     private List<APIFermePartenaire> fermesP = null;
@@ -76,7 +76,7 @@ public class APIInfosTransformateur implements Serializable {
      * @param id
      * @param groupe
      */
-    public APIInfosTransformateur(Integer id, APITransformateur transformateur, String description, String nombreEmployes, String urlSite, String urlFacebook, String urlTwitter, String urlInstagram, Boolean appartientGroupe, Object groupe, List<APILabel> labels, List<APICertification> certifications, List<Object> urls, List<APIFermePartenaire> fermesP, List<APIDenreeAnimale> denreesA) {
+    public APIInfosTransformateur(Integer id, APITransformateur transformateur, String description, String nombreEmployes, String urlSite, String urlFacebook, String urlTwitter, String urlInstagram, Boolean appartientGroupe, Object groupe, List<APILabel> labels, List<APICertification> certifications, List<APIVideo> urls, List<APIFermePartenaire> fermesP, List<APIDenreeAnimale> denreesA) {
         super();
         this.id = id;
         this.transformateur = transformateur;
@@ -191,11 +191,11 @@ public class APIInfosTransformateur implements Serializable {
         this.certifications = certifications;
     }
 
-    public List<Object> getUrls() {
+    public List<APIVideo> getUrls() {
         return urls;
     }
 
-    public void setUrls(List<Object> urls) {
+    public void setUrls(List<APIVideo> urls) {
         this.urls = urls;
     }
 
