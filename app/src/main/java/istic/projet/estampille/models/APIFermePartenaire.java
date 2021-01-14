@@ -16,15 +16,19 @@ public class APIFermePartenaire implements Serializable {
     @SerializedName("description")
     @Expose
     private String description;
+    @SerializedName("url")
+    @Expose
+    private String url;
 
     public APIFermePartenaire() {
 
     }
 
-    public APIFermePartenaire(Long id, String nom, String description) {
+    public APIFermePartenaire(Long id, String nom, String description, String url) {
         this.id = id;
         this.nom = nom;
         this.description = description;
+        this.url = url;
     }
 
     public Long getId() {
@@ -49,5 +53,13 @@ public class APIFermePartenaire implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

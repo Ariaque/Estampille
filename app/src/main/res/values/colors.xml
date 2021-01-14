@@ -23,4 +23,5 @@
     <color name="FoodOriginDarkGrey">#545454</color>
     <color name="FoodOriginTransparent">#00FFFFFF</color>
     <color name="YoutubeRed">#C4302B</color>
+    <color name="test">#99ff6550</color>
 </resources>

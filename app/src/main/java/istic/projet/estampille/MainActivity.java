@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -339,6 +340,21 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(viewPager.getCurrentItem() != 0) {
+            viewPager.setCurrentItem(0);
+            try {
+                setFocusOnHomeItem();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            super.onBackPressed();
         }
     }
 }
