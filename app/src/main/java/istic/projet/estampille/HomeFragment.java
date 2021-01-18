@@ -252,6 +252,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             if (OCRcounter == 4) {
                 viewPager.setCurrentItem(1);
                 Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
+                mProgressDialog.hide();
             }
         }
     }
