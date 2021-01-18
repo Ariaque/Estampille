@@ -4,7 +4,6 @@ import android.app.Instrumentation;
 import android.content.Intent;
 import android.net.Uri;
 
-import androidx.test.espresso.intent.Intents;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -36,6 +35,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasData;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
@@ -46,6 +46,9 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.not;
 
+/**
+ * Testing Know more page.
+ */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class KnowMoreActivityTest2 {
@@ -75,8 +78,8 @@ public class KnowMoreActivityTest2 {
         apiCertification = new APICertification(1, "une certification");
         List<APICertification> apiCertificationList = new ArrayList<APICertification>();
         apiCertificationList.add(apiCertification);
-        apiFermePartenaire = new APIFermePartenaire((long) 1, "ma ferme", "description de ma ferme", "ww.maferme.fr");
-        apiFermePartenaire2 = new APIFermePartenaire((long) 2, "ma ferme 2", "description de ma ferme 2", "ww.maferme2.fr");
+        apiFermePartenaire = new APIFermePartenaire((long) 1, "ma ferme", "description de ma ferme", "https://www.google.com/");
+        apiFermePartenaire2 = new APIFermePartenaire((long) 2, "ma ferme 2", "description de ma ferme 2", "https://ent.univ-rennes1.fr");
         List<APIFermePartenaire> apiFermePartenaireList = new ArrayList<>();
         apiFermePartenaireList.add(apiFermePartenaire);
         apiFermePartenaireList.add(apiFermePartenaire2);
@@ -88,7 +91,7 @@ public class KnowMoreActivityTest2 {
         apiVideoList.add(apiVideo);
         APITransformateur apiTransformateur = new APITransformateur(1, "01.006.009", "01236547896532", "Entreprise A", "7 rue des violettes", "75000", "Paris", "", "", "", "", "");
         apiInfosTransformateur = new APIInfosTransformateur(1, apiTransformateur, "7", "www",
-                "www.google.fr", "www", "www", "dd",
+                "https://www.google.com/", "https://www.facebook.com/pages/Centre-viande-Beauvallet/274439846047509", "https://twitter.com/univrennes1", "https://www.instagram.com/sau_siege/?hl=fr",
                 false, null, apiLabelList, apiCertificationList, apiVideoList,
                 apiFermePartenaireList, apiDenreeAnimaleList);
     }
@@ -98,6 +101,9 @@ public class KnowMoreActivityTest2 {
         intentsTestRule.finishActivity();
     }
 
+    /**
+     * Check if all the components are displayed according to the content of the intent received.
+     */
     @Test
     public void testDisplayed() {
         Intent i = new Intent();
@@ -120,6 +126,9 @@ public class KnowMoreActivityTest2 {
                 .inAdapterView(withId(R.id.gridViewLabels));
     }
 
+    /**
+     * Test of the click on video icon.
+     */
     @Test
     public void testPopUpVideo() {
         Intent i = new Intent();
@@ -129,15 +138,11 @@ public class KnowMoreActivityTest2 {
         onView(withId(R.id.imageButtonVideo)).perform(click());
         onView(withText(R.string.txt_videos)).inRoot(isDialog()).check(matches(isDisplayed()));
         onData(contains(apiVideo.getTitre()));
-        Instrumentation.ActivityMonitor am = new Instrumentation.ActivityMonitor(Intent.ACTION_VIEW, null, true);
-        InstrumentationRegistry.getInstrumentation().addMonitor(am);
-        onView(withText(apiVideo.getTitre())).inRoot(isDialog()).check(matches(isDisplayed())).perform(click());
-        Intents.intended(allOf(
-                hasAction(Matchers.equalTo(Intent.ACTION_VIEW)),
-                hasData(Matchers.equalTo(Uri.parse(apiVideo.getLibelle())))));
-        InstrumentationRegistry.getInstrumentation().removeMonitor(am);
     }
 
+    /**
+     * Test of the click on "Our partners" button.
+     */
     @Test
     public void testPartnerPopUp() {
         Intent i = new Intent();
@@ -151,14 +156,18 @@ public class KnowMoreActivityTest2 {
         onData(contains(apiFermePartenaire.getDescription()));
         onData(contains(apiFermePartenaire2.getDescription()));
         onView(withText(apiFermePartenaire.getDescription())).inRoot(isDialog()).perform(click());
-        onView(withText(R.string.txt_website)).inRoot(isDialog()).check(matches(isDisplayed()));
-        pressBack();
-        onView(withText(apiFermePartenaire2.getDescription())).inRoot(isDialog()).perform(click());
-        onView(withText(R.string.txt_website)).inRoot(isDialog()).check(matches(isDisplayed()));
-        pressBack();
-        onView(withText(R.string.txt_partners)).inRoot(not(isDialog()));
+        Instrumentation.ActivityMonitor am = new Instrumentation.ActivityMonitor(Intent.ACTION_VIEW, null, true);
+        InstrumentationRegistry.getInstrumentation().addMonitor(am);
+        onView(withText(R.string.txt_website)).inRoot(isDialog()).check(matches(isDisplayed())).perform(click());
+        intended(allOf(
+                hasAction(Matchers.equalTo(Intent.ACTION_VIEW)),
+                hasData(Matchers.equalTo(Uri.parse(apiFermePartenaire.getUrl())))));
+        InstrumentationRegistry.getInstrumentation().removeMonitor(am);
     }
 
+    /**
+     * Test of the click on "Animals products" button.
+     */
     @Test
     public void testProductsPopUp() {
         Intent i = new Intent();
@@ -170,5 +179,73 @@ public class KnowMoreActivityTest2 {
         onView(withText(R.string.txt_partners)).inRoot(not(isDialog()));
         pressBack();
         onView(withText(R.string.txt_origins)).inRoot(not(isDialog()));
+    }
+
+    /**
+     * Test of the click on website icon.
+     */
+    @Test
+    public void testOpenWebsite() {
+        Intent i = new Intent();
+        i.putExtra(Constants.KEY_INTENT_MORE_INFOS_TRANSFORMATEUR, apiInfosTransformateur);
+        intentsTestRule.launchActivity(i);
+        Instrumentation.ActivityMonitor am = new Instrumentation.ActivityMonitor(Intent.ACTION_VIEW, null, true);
+        InstrumentationRegistry.getInstrumentation().addMonitor(am);
+        onView(withId(R.id.imageButtonWebSite)).check(matches(isDisplayed())).perform(click());
+        intended(allOf(
+                hasAction(Matchers.equalTo(Intent.ACTION_VIEW)),
+                hasData(Matchers.equalTo(Uri.parse(apiInfosTransformateur.getUrlSite())))));
+        InstrumentationRegistry.getInstrumentation().removeMonitor(am);
+    }
+
+    /**
+     * Test of the click on facebook icon.
+     */
+    @Test
+    public void testOpenFacebook() {
+        Intent i = new Intent();
+        i.putExtra(Constants.KEY_INTENT_MORE_INFOS_TRANSFORMATEUR, apiInfosTransformateur);
+        intentsTestRule.launchActivity(i);
+        Instrumentation.ActivityMonitor am = new Instrumentation.ActivityMonitor(Intent.ACTION_VIEW, null, true);
+        InstrumentationRegistry.getInstrumentation().addMonitor(am);
+        onView(withId(R.id.imageButtonFb)).check(matches(isDisplayed())).perform(click());
+        intended(allOf(
+                hasAction(Matchers.equalTo(Intent.ACTION_VIEW)),
+                hasData(Matchers.equalTo(Uri.parse(apiInfosTransformateur.getUrlFacebook())))));
+        InstrumentationRegistry.getInstrumentation().removeMonitor(am);
+    }
+
+    /**
+     * Test of the click on Insta icon.
+     */
+    @Test
+    public void testOpenInstagram() {
+        Intent i = new Intent();
+        i.putExtra(Constants.KEY_INTENT_MORE_INFOS_TRANSFORMATEUR, apiInfosTransformateur);
+        intentsTestRule.launchActivity(i);
+        Instrumentation.ActivityMonitor am = new Instrumentation.ActivityMonitor(Intent.ACTION_VIEW, null, true);
+        InstrumentationRegistry.getInstrumentation().addMonitor(am);
+        onView(withId(R.id.imageButtonIns)).check(matches(isDisplayed())).perform(click());
+        intended(allOf(
+                hasAction(Matchers.equalTo(Intent.ACTION_VIEW)),
+                hasData(Matchers.equalTo(Uri.parse(apiInfosTransformateur.getUrlInstagram())))));
+        InstrumentationRegistry.getInstrumentation().removeMonitor(am);
+    }
+
+    /**
+     * Test of the click on Twitter icon.
+     */
+    @Test
+    public void testOpenTwitter() {
+        Intent i = new Intent();
+        i.putExtra(Constants.KEY_INTENT_MORE_INFOS_TRANSFORMATEUR, apiInfosTransformateur);
+        intentsTestRule.launchActivity(i);
+        Instrumentation.ActivityMonitor am = new Instrumentation.ActivityMonitor(Intent.ACTION_VIEW, null, true);
+        InstrumentationRegistry.getInstrumentation().addMonitor(am);
+        onView(withId(R.id.imageButtonTw)).check(matches(isDisplayed())).perform(click());
+        intended(allOf(
+                hasAction(Matchers.equalTo(Intent.ACTION_VIEW)),
+                hasData(Matchers.equalTo(Uri.parse(apiInfosTransformateur.getUrlTwitter())))));
+        InstrumentationRegistry.getInstrumentation().removeMonitor(am);
     }
 }

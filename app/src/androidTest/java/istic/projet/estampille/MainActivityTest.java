@@ -2,7 +2,6 @@ package istic.projet.estampille;
 
 import android.app.Instrumentation;
 import android.content.Intent;
-import android.net.Uri;
 import android.provider.MediaStore;
 
 import androidx.test.espresso.intent.Intents;
@@ -14,7 +13,6 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.hamcrest.Matchers;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,14 +23,14 @@ import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.hasData;
-import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
 
+/**
+ * Testing main page.
+ */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class MainActivityTest {
@@ -43,11 +41,15 @@ public class MainActivityTest {
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule
             = new ActivityScenarioRule<>(MainActivity.class);
+
     @After
     public void after() {
         intentsTestRule.finishActivity();
     }
 
+    /**
+     * Testing display of all the components.
+     */
     @Test
     public void testBases() {
         onView(withId(R.id.tile_look_around)).check(matches(isDisplayed()));
@@ -60,31 +62,47 @@ public class MainActivityTest {
         onView(withId(R.id.textView8)).check(matches(withText(R.string.txt_scan_tile)));
     }
 
-
+    /**
+     * Go to look around page with button and go back to home page.
+     */
     @Test
     public void testGoToLookAround() {
         onView(withId(R.id.tile_look_around)).perform(click());
         onView(withId(R.id.tv_look_around)).check(matches(isDisplayed())).check(matches(isDisplayed()));
+        pressBack();
+        onView(withId(R.id.action_write_code)).check(matches(isDisplayed()));
     }
 
+    /**
+     * Go to history page with button and go back to home page.
+     */
     @Test
     public void testGoToHistory() {
         onView(withId(R.id.tile_history)).perform(click());
         onView(withId(R.id.tile_history)).check(matches(not(isDisplayed())));
         onView(withId(R.id.toolbar)).check(matches(isDisplayed()));
+        pressBack();
+        onView(withId(R.id.action_write_code)).check(matches(isDisplayed()));
     }
 
+    /**
+     * Go to manual search page with button and go back to home page.
+     */
     @Test
     public void testGoToWritingSearch() {
         onView(withId(R.id.tile_search)).perform(click());
         onView(withId(R.id.button_pckg_nb)).check(matches(isDisplayed())).check(matches(withText(R.string.button_search_estampille)));
         onView(withId(R.id.toolbar)).check(matches(isDisplayed()));
+        pressBack();
+        onView(withId(R.id.action_write_code)).check(matches(isDisplayed()));
     }
 
+    /**
+     * Go to scan page with button, check opening camera.
+     */
     @Test
     public void testGoToScanningSearch() {
         intentsTestRule.launchActivity(null);
-
         Instrumentation.ActivityMonitor am = new Instrumentation.ActivityMonitor(String.valueOf(new Intent(MediaStore.ACTION_IMAGE_CAPTURE)), null, true);
         InstrumentationRegistry.getInstrumentation().addMonitor(am);
         onView(withId(R.id.tile_scan)).perform(click());

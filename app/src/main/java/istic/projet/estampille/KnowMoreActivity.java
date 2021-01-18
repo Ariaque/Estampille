@@ -216,7 +216,7 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                 @Override
                 public void run() {
                     int lineCount = textViewDescription.getLineCount();
-                    if (lineCount < 5) {
+                    if (lineCount < COLLAPSED_MAX_LINES) {
                         showMoreButton.setVisibility(View.GONE);
                     }
                 }
