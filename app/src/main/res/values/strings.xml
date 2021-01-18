@@ -44,5 +44,6 @@
     <string name="title_labels">Labels &amp; Certifications</string>
     <string name="txt_no_internet">Aucune connexion internet, veuillez verifier que vous êtes bien connecté au réseau</string>
     <string name="txt_partner_no_info">Pas d\'informations disponibles</string>
+    <string name="txt_no_more_info">Nous ne disposons d\'aucune informations suplémentaire</string>
 
 </resources>

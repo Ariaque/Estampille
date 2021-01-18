@@ -1,12 +1,10 @@
 package istic.projet.estampille.utils;
 
-import android.content.res.Resources;
 import android.net.TrafficStats;
 import android.util.Log;
 
 import java.io.IOException;
 
-import istic.projet.estampille.R;
 import istic.projet.estampille.models.APIInfosTransformateur;
 import istic.projet.estampille.models.APITransformateur;
 import okhttp3.Interceptor;
@@ -34,7 +32,7 @@ public interface APIService {
             .build();
 
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://000.000.0.00:8080/") // TODO: If tests are done on a device and as long as the API run on a localhost:
+            .baseUrl("http://192.168.43.8:8080/") // TODO: If tests are done on a device and as long as the API run on a localhost:
             // TODO: put the IP of the machine on which the API is running. The device and the computer must be connected to the same network in order for the device to be able to call the API.
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)

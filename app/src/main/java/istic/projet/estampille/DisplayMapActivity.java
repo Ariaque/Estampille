@@ -72,6 +72,9 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
             if(!isActive){
                 View button = findViewById(R.id.button_know_more);
                 button.setVisibility(View.GONE);
+            }else{
+                View text = findViewById(R.id.textView_no_more_info);
+                text.setVisibility((View.GONE));
             }
         }
 
