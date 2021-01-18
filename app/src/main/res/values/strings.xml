@@ -45,5 +45,7 @@
     <string name="txt_no_internet">Aucune connexion internet, veuillez verifier que vous êtes bien connecté au réseau</string>
     <string name="txt_partner_no_info">Pas d\'informations disponibles</string>
     <string name="txt_no_more_info">Nous ne disposons d\'aucune informations suplémentaire</string>
+    <string name="bad_estampille_form">L\'estampille n\'est pas bonne</string>
+    <string name="estampille_not_complete">L\'estampille n\'est pas complète</string>
 
 </resources>
