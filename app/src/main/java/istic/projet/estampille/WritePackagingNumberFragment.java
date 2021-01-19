@@ -74,7 +74,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
     @Override
     public void onClick(View view) {
         if(!textFieldEstampille1.getText().toString().equals("") && !textFieldEstampille2.getText().toString().equals("") && !textFieldEstampille3.getText().toString().equals("")){
-            String tempText = textFieldEstampille1.getText().toString() + textFieldEstampille2.getText().toString() + textFieldEstampille3.getText().toString();
+            String tempText = textFieldEstampille1.getText().toString() + "." + textFieldEstampille2.getText().toString() + "." + textFieldEstampille3.getText().toString();
             Matcher normalMatcher = normalStamp.matcher(tempText);
             Matcher domTomMatcher = domTomStamp.matcher(tempText);
             Matcher corsicaMatcher = corsicaStamp.matcher(tempText);
