@@ -128,5 +128,13 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
     public void afterTextChanged(Editable editable) {
 
     }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        textFieldEstampille1.setText("");
+        textFieldEstampille2.setText("");
+        textFieldEstampille3.setText("");
+    }
 }
 
