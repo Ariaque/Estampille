@@ -8,17 +8,22 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import java.util.List;
 
 import istic.projet.estampille.models.APIDenreeAnimale;
 
 public class ListViewAnimalProductAdapter extends BaseAdapter {
 
-    private Context context;
-    private List<APIDenreeAnimale> denreeAnimales;
-    private LayoutInflater inflater;
+    private final Context context;
+    private final List<APIDenreeAnimale> denreeAnimales;
+    private final LayoutInflater inflater;
+    private APIDenreeAnimale currentDenreeAnimale;
+    private TextView textViewDenreeType;
+    private TextView textViewDenreeAnimal;
+    private TextView textViewDenreeTypeInfos;
+    private TextView textViewDenreeOrigin;
+    private TextView textViewDenreePays;
+    private TextView textViewDenreeOriginInfos;
 
     public ListViewAnimalProductAdapter(Context context, List<APIDenreeAnimale> denreeAnimales) {
         this.context = context;
@@ -45,27 +50,35 @@ public class ListViewAnimalProductAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         LinearLayout view;
-        APIDenreeAnimale result = this.denreeAnimales.get(position);
-        if(convertView == null) {
-            view = (LinearLayout) inflater.inflate(R.layout.simple_dialog_listview_item, null, false);
-            //TODO
-            System.out.println("DENREES");
-            System.out.println(result.getInfosOrigineDenree());
-            System.out.println(result.getInfosTypeDenree());
-            System.out.println(result.getTypeDenree().getAnimal());
-            System.out.println(result.getTypeDenree().getEspece());
-            System.out.println(result.getTypeDenree().getNom());
-            System.out.println(result.getOrigineDenree().getPays());
-            System.out.println(result.getOrigineDenree().getRegion());
-            TextView textViewProductName = view.findViewById(R.id.item_title);
-//            textViewProductName.setText(result.getNom());
-            TextView textViewProductOrigin = view.findViewById(R.id.item_text);
-//            textViewProductOrigin.setText(result.getOrigine());
-        }
-        else {
+        currentDenreeAnimale = this.denreeAnimales.get(position);
+        if (convertView == null) {
+            view = (LinearLayout) inflater.inflate(R.layout.animal_product_list_item, null, false);
+            textViewDenreeType = view.findViewById(R.id.denree_type_title);
+            textViewDenreeType.setText(R.string.type_denree_title);
+            textViewDenreeAnimal = view.findViewById(R.id.denree_type_details);
+            textViewDenreeAnimal.setText(currentDenreeAnimale.getTypeDenree().getAnimal() + ", " + currentDenreeAnimale.getTypeDenree().getEspece() + ", " + currentDenreeAnimale.getTypeDenree().getNom());
+            textViewDenreeTypeInfos = view.findViewById(R.id.denree_type_infos);
+            textViewDenreeTypeInfos.setText(currentDenreeAnimale.getInfosTypeDenree());
+            textViewDenreeOrigin = view.findViewById(R.id.denree_origin_title);
+            textViewDenreeOrigin.setText(R.string.origin_denree_title);
+            textViewDenreePays = view.findViewById(R.id.denree_origine_details);
+            textViewDenreePays.setText(currentDenreeAnimale.getOrigineDenree().getPays() + ", " + currentDenreeAnimale.getOrigineDenree().getRegion());
+            textViewDenreeOriginInfos = view.findViewById(R.id.denree_origine_infos);
+            textViewDenreeOriginInfos.setText(currentDenreeAnimale.getInfosOrigineDenree());
+            chooseComponentsToDisplay();
+        } else {
             view = (LinearLayout) convertView;
         }
 
         return view;
+    }
+
+    private void chooseComponentsToDisplay() {
+        if (currentDenreeAnimale.getInfosTypeDenree() == null || currentDenreeAnimale.getInfosTypeDenree().isEmpty()) {
+            textViewDenreeTypeInfos.setVisibility(View.GONE);
+        }
+        if (currentDenreeAnimale.getInfosOrigineDenree() == null || currentDenreeAnimale.getInfosOrigineDenree().isEmpty()) {
+            textViewDenreeOriginInfos.setVisibility(View.GONE);
+        }
     }
 }
