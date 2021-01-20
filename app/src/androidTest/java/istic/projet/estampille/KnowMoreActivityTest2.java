@@ -26,7 +26,9 @@ import istic.projet.estampille.models.APIDenreeAnimale;
 import istic.projet.estampille.models.APIFermePartenaire;
 import istic.projet.estampille.models.APIInfosTransformateur;
 import istic.projet.estampille.models.APILabel;
+import istic.projet.estampille.models.APIOrigineDenree;
 import istic.projet.estampille.models.APITransformateur;
+import istic.projet.estampille.models.APITypeDenree;
 import istic.projet.estampille.models.APIVideo;
 import istic.projet.estampille.utils.Constants;
 
@@ -83,7 +85,9 @@ public class KnowMoreActivityTest2 {
         List<APIFermePartenaire> apiFermePartenaireList = new ArrayList<>();
         apiFermePartenaireList.add(apiFermePartenaire);
         apiFermePartenaireList.add(apiFermePartenaire2);
-        apiDenreeAnimale = new APIDenreeAnimale((long) 1, "boeuf", "origine du bouef");
+        APITypeDenree apiTypeDenree = new APITypeDenree((long) 1,"Viande","Bovins","Genisse");
+        APIOrigineDenree apiOrigineDenree = new APIOrigineDenree((long) 1, "France", "Bretagne");
+        apiDenreeAnimale = new APIDenreeAnimale((long) 1, apiTypeDenree, apiOrigineDenree, "infos sur le type de la denrée", "infos sur l'origine de la denrée");
         List<APIDenreeAnimale> apiDenreeAnimaleList = new ArrayList<>();
         apiDenreeAnimaleList.add(apiDenreeAnimale);
         apiVideo = new APIVideo((long) 1, "https://www.youtube.com/watch?v=gt_a7OfxBLI", "titre de ma video");
