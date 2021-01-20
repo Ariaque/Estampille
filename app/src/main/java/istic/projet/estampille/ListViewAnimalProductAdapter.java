@@ -48,10 +48,19 @@ public class ListViewAnimalProductAdapter extends BaseAdapter {
         APIDenreeAnimale result = this.denreeAnimales.get(position);
         if(convertView == null) {
             view = (LinearLayout) inflater.inflate(R.layout.simple_dialog_listview_item, null, false);
+            //TODO
+            System.out.println("DENREES");
+            System.out.println(result.getInfosOrigineDenree());
+            System.out.println(result.getInfosTypeDenree());
+            System.out.println(result.getTypeDenree().getAnimal());
+            System.out.println(result.getTypeDenree().getEspece());
+            System.out.println(result.getTypeDenree().getNom());
+            System.out.println(result.getOrigineDenree().getPays());
+            System.out.println(result.getOrigineDenree().getRegion());
             TextView textViewProductName = view.findViewById(R.id.item_title);
-            textViewProductName.setText(result.getNom());
+//            textViewProductName.setText(result.getNom());
             TextView textViewProductOrigin = view.findViewById(R.id.item_text);
-            textViewProductOrigin.setText(result.getOrigine());
+//            textViewProductOrigin.setText(result.getOrigine());
         }
         else {
             view = (LinearLayout) convertView;

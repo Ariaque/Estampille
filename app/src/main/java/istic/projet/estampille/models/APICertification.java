@@ -5,6 +5,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
+/**
+ * Class to map Certification objects that come from remote API.
+ */
 public class APICertification implements Serializable {
     @SerializedName("id")
     @Expose
