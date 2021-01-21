@@ -429,7 +429,7 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                 TextView partnerLayoutDescriptionTextView = dialog.findViewById(R.id.partnerLayoutDescription);
                 partnerWebsiteButton = dialog.findViewById(R.id.buttonPartnerWebsite);
                 partnerLayoutTitleTextView.setText(partnerItem.getNom());
-                if (partnerItem.getDescription() == null || partnerItem.getDescription().isEmpty()) {
+                if (partnerItem.getDescription() == null || partnerItem.getDescription().trim().isEmpty()) {
                     partnerLayoutDescriptionTextView.setVisibility(View.GONE);
                 } else {
                     partnerLayoutDescriptionTextView.setText(partnerItem.getDescription());

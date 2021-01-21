@@ -17,6 +17,9 @@
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:divider="@drawable/listview_divider"
+        android:dividerHeight="2dp"
         android:layout_marginBottom="10dp">
     </ListView>
 

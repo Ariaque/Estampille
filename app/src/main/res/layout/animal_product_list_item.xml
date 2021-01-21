@@ -3,7 +3,7 @@
     android:id="@+id/animal_product_list_item"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/tile_grey_selector"
+    android:listSelector="@android:color/transparent"
     android:elevation="5dp"
     android:orientation="vertical">
 
@@ -15,8 +15,6 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="5dp"
-        android:textColor="@color/FoodOriginBlack"
-        android:textSize="18sp"
         android:textStyle="bold"/>
 
     <TextView
@@ -26,9 +24,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="5dp"
         android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
-        android:textColor="@color/FoodOriginGrey2"
-        android:textSize="14sp" />
+        android:layout_marginBottom="10dp"/>
 
 
     <TextView
@@ -38,9 +34,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="5dp"
         android:layout_marginRight="10dp"
-        android:layout_marginBottom="5dp"
-        android:textColor="@color/FoodOriginGrey2"
-        android:textSize="14sp" />
+        android:layout_marginBottom="5dp"/>
 
     <TextView
         android:id="@+id/denree_origin_title"
@@ -50,8 +44,6 @@
         android:layout_marginTop="5dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="5dp"
-        android:textColor="@color/FoodOriginBlack"
-        android:textSize="18sp"
         android:textStyle="bold"/>
 
     <TextView
@@ -61,9 +53,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="5dp"
         android:layout_marginRight="10dp"
-        android:layout_marginBottom="5dp"
-        android:textColor="@color/FoodOriginGrey2"
-        android:textSize="14sp" />
+        android:layout_marginBottom="5dp"/>
 
     <TextView
         android:id="@+id/denree_origine_infos"
@@ -72,9 +62,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="5dp"
         android:layout_marginRight="10dp"
-        android:layout_marginBottom="5dp"
-        android:textColor="@color/FoodOriginGrey2"
-        android:textSize="14sp" />
+        android:layout_marginBottom="5dp"/>
 
 
 </LinearLayout>

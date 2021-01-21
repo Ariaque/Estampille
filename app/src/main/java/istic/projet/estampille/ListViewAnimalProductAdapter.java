@@ -8,6 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import java.util.List;
 
 import istic.projet.estampille.models.APIDenreeAnimale;
@@ -53,6 +55,7 @@ public class ListViewAnimalProductAdapter extends BaseAdapter {
         currentDenreeAnimale = this.denreeAnimales.get(position);
         if (convertView == null) {
             view = (LinearLayout) inflater.inflate(R.layout.animal_product_list_item, null, false);
+
             textViewDenreeType = view.findViewById(R.id.denree_type_title);
             textViewDenreeType.setText(R.string.type_denree_title);
             textViewDenreeAnimal = view.findViewById(R.id.denree_type_details);
