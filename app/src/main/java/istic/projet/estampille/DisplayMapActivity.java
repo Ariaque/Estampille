@@ -54,8 +54,8 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
         fm = this.getSupportFragmentManager();
         //APITransformateur transformateur = (APITransformateur) intent.getSerializableExtra("searchedTransformateur");
         transformateur = (APITransformateur) intent.getSerializableExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR);
-        isActive = transformateur.getIsKnowMoreActive();
         if (transformateur != null) {
+            isActive = transformateur.getIsKnowMoreActive();
             siret = transformateur.getSiret();
             name = transformateur.getRaisonSociale();
             street = transformateur.getAdresse().trim().isEmpty() ? transformateur.getAdresse() : transformateur.getAdresse() + ", ";
@@ -72,6 +72,9 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
             if(!isActive){
                 View button = findViewById(R.id.button_know_more);
                 button.setVisibility(View.GONE);
+            }else{
+                View text = findViewById(R.id.textView_no_more_info);
+                text.setVisibility((View.GONE));
             }
         }
 
@@ -82,6 +85,11 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
         Objects.requireNonNull(mapFragment).getMapAsync(this);
     }
 
+    /**
+     * Check is the phone is connected to internet, if it is, the application proceed as usual,
+     * if not, a new page is loaded, telling the user that the phone can't access internet
+     * @return true if the phone can access internet, false otherwise
+     */
     private boolean checkInternetConnexion(){
         boolean result = true;
 
@@ -95,6 +103,10 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
         return result;
     }
 
+    /**
+     * Called when the google map is ready to be displayed on screen
+     * @param googleMap
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng coords = new LatLng(lat, lon);
@@ -105,6 +117,11 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
     }
 
+    /**
+     * Given an address, return the latitude and longitude of the address
+     * @param address the address we want toknow the coordinate of
+     * @return a LatLng object containing the coordinate of the given address
+     */
     private LatLng getCoords(String address) {
         Geocoder geocoder = new Geocoder(this.getApplicationContext());
         List<Address> addresses = new ArrayList<Address>();
@@ -122,6 +139,11 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
         }
     }
 
+    /**
+     * backButton will bring the user back to the last page,
+     * knowMoreButton will reach the API and ask for more informations abou the transformator
+     * @param view the button pressed
+     */
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.backButton) {

@@ -12,12 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import istic.projet.estampille.utils.APICalls;
 
@@ -28,6 +31,10 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
     private TextInputEditText textFieldEstampille3;
     private Context context;
     private ProgressDialog mProgressDialog;
+
+    private static final Pattern normalStamp = Pattern.compile("[0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
+    private static final Pattern domTomStamp = Pattern.compile("[0-9][0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
+    private static final Pattern corsicaStamp = Pattern.compile("[0-9](A|B)[.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,15 +73,29 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
 
     @Override
     public void onClick(View view) {
-        mProgressDialog = new ProgressDialog(getActivity(), R.style.FoodOriginAlertDialog);
-        mProgressDialog.setMessage(getString(R.string.loading_dialog_message));
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.show();
-        String txt = "";
-        //Recover the stamp in the text field
-        txt = Objects.requireNonNull(this.textFieldEstampille1.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille2.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille3.getText()).toString();
-        // calling the remote API
-        APICalls.searchStampInRemoteAPI(this.getActivity(), txt, mProgressDialog);
+        if(!textFieldEstampille1.getText().toString().isEmpty() && !textFieldEstampille2.getText().toString().isEmpty() && !textFieldEstampille3.getText().toString().isEmpty()){
+            String tempText = textFieldEstampille1.getText().toString() + "." + textFieldEstampille2.getText().toString() + "." + textFieldEstampille3.getText().toString();
+            Matcher normalMatcher = normalStamp.matcher(tempText);
+            Matcher domTomMatcher = domTomStamp.matcher(tempText);
+            Matcher corsicaMatcher = corsicaStamp.matcher(tempText);
+            if(normalMatcher.find() || domTomMatcher.find() || corsicaMatcher.find()){
+                mProgressDialog = new ProgressDialog(getActivity(), R.style.FoodOriginAlertDialog);
+                mProgressDialog.setMessage(getString(R.string.loading_dialog_message));
+                mProgressDialog.setIndeterminate(true);
+                mProgressDialog.show();
+                String txt = "";
+                //Recover the stamp in the text field
+                txt = Objects.requireNonNull(this.textFieldEstampille1.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille2.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille3.getText()).toString();
+                // calling the remote API
+                APICalls.searchStampInRemoteAPI(this.getActivity(), txt, mProgressDialog);
+            }
+            else{
+                Toast.makeText(context, R.string.bad_estampille_form, Toast.LENGTH_SHORT).show();
+            }
+        }
+        else{
+            Toast.makeText(context, R.string.estampille_not_complete, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -106,6 +127,14 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
     @Override
     public void afterTextChanged(Editable editable) {
 
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        textFieldEstampille1.setText("");
+        textFieldEstampille2.setText("");
+        textFieldEstampille3.setText("");
     }
 }
 

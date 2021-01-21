@@ -216,7 +216,7 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                 @Override
                 public void run() {
                     int lineCount = textViewDescription.getLineCount();
-                    if (lineCount < 5) {
+                    if (lineCount < COLLAPSED_MAX_LINES) {
                         showMoreButton.setVisibility(View.GONE);
                     }
                 }
@@ -565,5 +565,57 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                 break;
         }
         return false;
+    }
+
+    public APIInfosTransformateur getApiInfosTransformateur() {
+        return apiInfosTransformateur;
+    }
+
+    public List<APIVideo> getVideoUrls() {
+        return videoUrls;
+    }
+
+    public List<APICertification> getCertifications() {
+        return certifications;
+    }
+
+    public List<APILabel> getLabels() {
+        return labels;
+    }
+
+    public List<APIFermePartenaire> getFermePartenaires() {
+        return fermePartenaires;
+    }
+
+    public List<APIDenreeAnimale> getDenreeAnimales() {
+        return denreeAnimales;
+    }
+
+    public String getWebsiteUrl() {
+        return websiteUrl;
+    }
+
+    public String getFacebookUrl() {
+        return facebookUrl;
+    }
+
+    public String getInstagramUrl() {
+        return instagramUrl;
+    }
+
+    public String getTwitterUrl() {
+        return twitterUrl;
+    }
+
+    public APIVideo getVideoItem() {
+        return videoItem;
+    }
+
+    public ImageButton getBackButton() {
+        return backButton;
+    }
+
+    public List<String> getUris() {
+        return uris;
     }
 }

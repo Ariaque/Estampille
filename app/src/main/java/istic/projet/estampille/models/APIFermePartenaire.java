@@ -4,7 +4,9 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
-
+/**
+ * Class to map "FermePartenaire" objects that come from remote API.
+ */
 public class APIFermePartenaire implements Serializable {
 
     @SerializedName("id")

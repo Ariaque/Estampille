@@ -1,12 +1,10 @@
 package istic.projet.estampille.utils;
 
-import android.content.res.Resources;
 import android.net.TrafficStats;
 import android.util.Log;
 
 import java.io.IOException;
 
-import istic.projet.estampille.R;
 import istic.projet.estampille.models.APIInfosTransformateur;
 import istic.projet.estampille.models.APITransformateur;
 import okhttp3.Interceptor;

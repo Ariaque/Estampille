@@ -4,7 +4,9 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
-
+/**
+ * Class to map "Label" objects that come from remote API.
+ */
 public class APILabel implements Serializable {
 
     @SerializedName("id")

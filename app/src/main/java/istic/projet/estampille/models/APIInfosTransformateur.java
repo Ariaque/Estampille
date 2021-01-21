@@ -5,7 +5,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.List;
-
+/**
+ * Class to map "InfosTransformateur" objects that come from remote API.
+ */
 public class APIInfosTransformateur implements Serializable {
 
     private static final long serialVersionUID = 2L;
@@ -52,7 +54,7 @@ public class APIInfosTransformateur implements Serializable {
     @SerializedName("fermesP")
     @Expose
     private List<APIFermePartenaire> fermesP = null;
-    @SerializedName("denreesA")
+    @SerializedName("denrees")
     @Expose
     private List<APIDenreeAnimale> denreesA = null;
 

@@ -4,26 +4,39 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+/**
+ * Class to map "DenreeAnimale" objects that come from remote API.
+ */
+public class APIDenreeAnimale implements  Serializable {
 
-public class APIDenreeAnimale implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @SerializedName("id")
     @Expose
     private Long id;
-    @SerializedName("nom")
+    @SerializedName("typeDenree")
     @Expose
-    private String nom;
-    @SerializedName("origine")
+    private APITypeDenree typeDenree;
+    @SerializedName("origineDenree")
     @Expose
-    private String origine;
+    private APIOrigineDenree origineDenree;
+    @SerializedName("infosTypeDenree")
+    @Expose
+    private String infosTypeDenree;
+    @SerializedName("infosOrigineDenree")
+    @Expose
+    private String infosOrigineDenree;
 
-    public APIDenreeAnimale() {
+    public APIDenreeAnimale(Long id, APITypeDenree typeDenree, APIOrigineDenree origineDenree, String infosTypeDenree, String infosOrigineDenree) {
+        this.id = id;
+        this.typeDenree = typeDenree;
+        this.origineDenree = origineDenree;
+        this.infosTypeDenree = infosTypeDenree;
+        this.infosOrigineDenree = infosOrigineDenree;
     }
 
-    public APIDenreeAnimale(Long id, String nom, String origine) {
-        this.id = id;
-        this.nom = nom;
-        this.origine = origine;
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
     }
 
     public Long getId() {
@@ -34,19 +47,35 @@ public class APIDenreeAnimale implements Serializable {
         this.id = id;
     }
 
-    public String getNom() {
-        return nom;
+    public APITypeDenree getTypeDenree() {
+        return typeDenree;
     }
 
-    public void setNom(String nom) {
-        this.nom = nom;
+    public void setTypeDenree(APITypeDenree typeDenree) {
+        this.typeDenree = typeDenree;
     }
 
-    public String getOrigine() {
-        return origine;
+    public APIOrigineDenree getOrigineDenree() {
+        return origineDenree;
     }
 
-    public void setOrigine(String origine) {
-        this.origine = origine;
+    public void setOrigineDenree(APIOrigineDenree origineDenree) {
+        this.origineDenree = origineDenree;
+    }
+
+    public String getInfosTypeDenree() {
+        return infosTypeDenree;
+    }
+
+    public void setInfosTypeDenree(String infosTypeDenree) {
+        this.infosTypeDenree = infosTypeDenree;
+    }
+
+    public String getInfosOrigineDenree() {
+        return infosOrigineDenree;
+    }
+
+    public void setInfosOrigineDenree(String infosOrigineDenree) {
+        this.infosOrigineDenree = infosOrigineDenree;
     }
 }

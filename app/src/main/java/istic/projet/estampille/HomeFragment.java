@@ -87,6 +87,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
+    /**
+     * Check is the phone is connected to internet, if it is, the application proceed as usual,
+     * if not, a new page is loaded, telling the user that the phone can't access internet
+     * @return true if the phone can access internet, false otherwise
+     */
     private boolean checkInternetConnexion() {
         boolean result = true;
 
@@ -247,6 +252,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             if (OCRcounter == 4) {
                 viewPager.setCurrentItem(1);
                 Toast.makeText(context, R.string.recognition_fail_toast, Toast.LENGTH_SHORT).show();
+                mProgressDialog.hide();
             }
         }
     }
