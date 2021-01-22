@@ -253,6 +253,7 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                 int returnCode = conn.getReplyCode();
                 System.out.println(returnCode);
                 if(returnCode == 550) {
+                    System.out.println("here");
                     conn.changeWorkingDirectory("/images/placeholder");
                 }
                 FTPFile[] files = conn.listFiles();
@@ -310,6 +311,10 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                                 }
                             }
                         }
+                    }
+                    if(uris == null || uris.isEmpty()) {
+                        texViewTitleLabels.setVisibility(View.GONE);
+                        labelsGridView.setVisibility(View.GONE);
                     }
                     Collections.sort(uris);
                 }
@@ -370,6 +375,9 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void openBrowserPage(String url) {
+        if(!url.startsWith("http://") && !url.startsWith("https://")) {
+            url="http://"+url;
+        }
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(browserIntent);
     }
