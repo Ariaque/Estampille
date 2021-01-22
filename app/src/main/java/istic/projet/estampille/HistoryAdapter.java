@@ -42,7 +42,9 @@ public class HistoryAdapter extends ArrayAdapter<APITransformateur> {
         // Populate the data into the template view using the data object
         assert transformateur != null;
         item1.setText(transformateur.getRaisonSociale());
-        item2.setText(transformateur.getAdresse());
+        if(!transformateur.getCommune().trim().isEmpty()){
+            item2.setText(transformateur.getCommune());
+        }
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
