@@ -49,5 +49,6 @@
     <string name="estampille_not_complete">L\'estampille n\'est pas complète</string>
     <string name="type_denree_title">Type de denrée</string>
     <string name="origin_denree_title">Origine de la denrée</string>
+    <string name="txt_no_description">Pas de description disponible…</string>
 
 </resources>

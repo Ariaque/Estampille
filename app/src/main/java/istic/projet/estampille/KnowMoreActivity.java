@@ -218,7 +218,7 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         }
         if (description == null || description.isEmpty()) {
             textViewTitleDescription.setVisibility(View.GONE);
-            textViewDescription.setVisibility(View.GONE);
+            textViewDescription.setText(R.string.txt_no_description);
             showMoreButton.setVisibility(View.GONE);
         } else {
             textViewDescription.setText(description);
@@ -263,7 +263,13 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                 conn.enterLocalPassiveMode();
                 conn.setFileType(FTP.BINARY_FILE_TYPE);
                 conn.changeWorkingDirectory("/images/" + idTransformateur);
+                int returnCode = conn.getReplyCode();
+                System.out.println(returnCode);
+                if(returnCode == 550) {
+                    conn.changeWorkingDirectory("/images/placeholder");
+                }
                 FTPFile[] files = conn.listFiles();
+                System.out.println(conn.printWorkingDirectory());
                 ftpLogout(conn);
                 List<FTPFile> filesList = null;
                 if (files != null && files.length != 0) {
@@ -274,15 +280,16 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                         }
                     }
                 }
-                if (filesList != null && !filesList.isEmpty()) {
+                if (returnCode == 550) {
+                    imageList.add(new SlideModel("http://" + FTP_ADDRESS + "/images/placeholder/foodorigintransp.png", ScaleTypes.CENTER_INSIDE));
+                    imageSliderPictures.setBackgroundResource(R.color.FoodOriginGrey2);
+                } else {
                     for (FTPFile file : filesList) {
+                        System.out.println(file.getName());
                         imageList.add(new SlideModel("http://" + FTP_ADDRESS + "/images/" + idTransformateur + "/" + file.getName(), ScaleTypes.CENTER_INSIDE));
 
                     }
                     imageSliderPictures.setBackgroundResource(R.color.FoodOriginBlack);
-                } else {
-                    imageList.add(new SlideModel("http://" + FTP_ADDRESS + "/images/placeholder/foodorigintransp.png", ScaleTypes.CENTER_INSIDE));
-                    imageSliderPictures.setBackgroundResource(R.color.FoodOriginGrey2);
                 }
                 imageSliderPictures.setImageList(imageList);
             }
