@@ -7,7 +7,7 @@ import java.io.OutputStream;
 
 /**
  * Subclass of {@link ObjectOutputStream} that allow to append
- * several Serializable object in one file.
+ * several {@link java.io.Serializable} objects in one file.
  */
 public class AppendableObjectOutputStream extends ObjectOutputStream {
 
@@ -16,7 +16,6 @@ public class AppendableObjectOutputStream extends ObjectOutputStream {
     private final DataOutputStream dout;
 
     /**
-     *
      * @param out
      * @param append true if we want to append an object after another, false otherwise.
      * @throws IOException
@@ -31,6 +30,7 @@ public class AppendableObjectOutputStream extends ObjectOutputStream {
 
     /**
      * If append is false, we must write an header.
+     *
      * @throws IOException
      */
     @Override

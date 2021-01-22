@@ -24,17 +24,19 @@ import java.util.regex.Pattern;
 
 import istic.projet.estampille.utils.APICalls;
 
+/**
+ * Handling of the page where the user write a stamp.
+ */
 public class WritePackagingNumberFragment extends Fragment implements View.OnTouchListener, View.OnClickListener, View.OnFocusChangeListener, TextWatcher {
 
+    private static final Pattern normalStamp = Pattern.compile("[0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
+    private static final Pattern domTomStamp = Pattern.compile("[0-9][0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
+    private static final Pattern corsicaStamp = Pattern.compile("[0-9](A|B)[.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
     private TextInputEditText textFieldEstampille1;
     private TextInputEditText textFieldEstampille2;
     private TextInputEditText textFieldEstampille3;
     private Context context;
     private ProgressDialog mProgressDialog;
-
-    private static final Pattern normalStamp = Pattern.compile("[0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
-    private static final Pattern domTomStamp = Pattern.compile("[0-9][0-9][0-9][.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
-    private static final Pattern corsicaStamp = Pattern.compile("[0-9](A|B)[.][0-9][0-9][0-9][.][0-9][0-9][0-9]");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,12 +75,12 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
 
     @Override
     public void onClick(View view) {
-        if(!textFieldEstampille1.getText().toString().isEmpty() && !textFieldEstampille2.getText().toString().isEmpty() && !textFieldEstampille3.getText().toString().isEmpty()){
+        if (!textFieldEstampille1.getText().toString().isEmpty() && !textFieldEstampille2.getText().toString().isEmpty() && !textFieldEstampille3.getText().toString().isEmpty()) {
             String tempText = textFieldEstampille1.getText().toString() + "." + textFieldEstampille2.getText().toString() + "." + textFieldEstampille3.getText().toString();
             Matcher normalMatcher = normalStamp.matcher(tempText);
             Matcher domTomMatcher = domTomStamp.matcher(tempText);
             Matcher corsicaMatcher = corsicaStamp.matcher(tempText);
-            if(normalMatcher.find() || domTomMatcher.find() || corsicaMatcher.find()){
+            if (normalMatcher.find() || domTomMatcher.find() || corsicaMatcher.find()) {
                 mProgressDialog = new ProgressDialog(getActivity(), R.style.FoodOriginAlertDialog);
                 mProgressDialog.setMessage(getString(R.string.loading_dialog_message));
                 mProgressDialog.setIndeterminate(true);
@@ -88,12 +90,10 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
                 txt = Objects.requireNonNull(this.textFieldEstampille1.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille2.getText()).toString() + "." + Objects.requireNonNull(this.textFieldEstampille3.getText()).toString();
                 // calling the remote API
                 APICalls.searchStampInRemoteAPI(this.getActivity(), txt, mProgressDialog);
-            }
-            else{
+            } else {
                 Toast.makeText(context, R.string.bad_estampille_form, Toast.LENGTH_SHORT).show();
             }
-        }
-        else{
+        } else {
             Toast.makeText(context, R.string.estampille_not_complete, Toast.LENGTH_SHORT).show();
         }
     }
@@ -130,7 +130,7 @@ public class WritePackagingNumberFragment extends Fragment implements View.OnTou
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
         textFieldEstampille1.setText("");
         textFieldEstampille2.setText("");

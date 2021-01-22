@@ -8,12 +8,13 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.core.content.ContextCompat;
-
 import java.util.List;
 
 import istic.projet.estampille.models.APIDenreeAnimale;
 
+/**
+ * Adapter for the animal's products dialog.
+ */
 public class ListViewAnimalProductAdapter extends BaseAdapter {
 
     private final Context context;
@@ -27,6 +28,11 @@ public class ListViewAnimalProductAdapter extends BaseAdapter {
     private TextView textViewDenreePays;
     private TextView textViewDenreeOriginInfos;
 
+    /**
+     * Constructor.
+     * @param context
+     * @param denreeAnimales List of {@link APIDenreeAnimale} to display.
+     */
     public ListViewAnimalProductAdapter(Context context, List<APIDenreeAnimale> denreeAnimales) {
         this.context = context;
         this.denreeAnimales = denreeAnimales;
@@ -76,6 +82,9 @@ public class ListViewAnimalProductAdapter extends BaseAdapter {
         return view;
     }
 
+    /**
+     * Choosing components to display according to the value of {@link APIDenreeAnimale}.
+     */
     private void chooseComponentsToDisplay() {
         if (currentDenreeAnimale.getInfosTypeDenree() == null || currentDenreeAnimale.getInfosTypeDenree().isEmpty()) {
             textViewDenreeTypeInfos.setVisibility(View.GONE);

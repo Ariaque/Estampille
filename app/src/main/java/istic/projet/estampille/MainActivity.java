@@ -89,7 +89,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     /**
      * Check is the phone is connected to internet, if it is, the application proceed as usual,
-     * if not, a new page is loaded, telling the user that the phone can't access internet
+     * if not, a new page is loaded, telling the user that the phone can't access internet.
+     *
      * @return true if the phone can access internet, false otherwise
      */
     private boolean checkInternetConnexion() {
@@ -354,15 +355,14 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
      */
     @Override
     public void onBackPressed() {
-        if(viewPager.getCurrentItem() != 0) {
+        if (viewPager.getCurrentItem() != 0) {
             viewPager.setCurrentItem(0);
             try {
                 setFocusOnHomeItem();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        else {
+        } else {
             super.onBackPressed();
         }
     }

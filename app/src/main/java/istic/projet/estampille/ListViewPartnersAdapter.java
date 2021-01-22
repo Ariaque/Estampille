@@ -8,18 +8,25 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import java.util.List;
 
 import istic.projet.estampille.models.APIFermePartenaire;
 
+/**
+ * Adapter for the partner's dialog.
+ */
 public class ListViewPartnersAdapter extends BaseAdapter {
 
-    private Context context;
-    private List<APIFermePartenaire> partenaires;
-    private LayoutInflater inflater;
+    private final Context context;
+    private final List<APIFermePartenaire> partenaires;
+    private final LayoutInflater inflater;
 
+    /**
+     * Constructor.
+     *
+     * @param context
+     * @param partenaires list of {@link APIFermePartenaire} to display.
+     */
     public ListViewPartnersAdapter(Context context, List<APIFermePartenaire> partenaires) {
         this.context = context;
         this.partenaires = partenaires;
@@ -46,14 +53,13 @@ public class ListViewPartnersAdapter extends BaseAdapter {
 
         LinearLayout view;
         APIFermePartenaire result = this.partenaires.get(position);
-        if(convertView == null) {
+        if (convertView == null) {
             view = (LinearLayout) inflater.inflate(R.layout.simple_dialog_listview_item, null, false);
             TextView textViewItemTitle = view.findViewById(R.id.item_title);
             textViewItemTitle.setText(result.getNom());
             TextView textViewItemText = view.findViewById(R.id.item_text);
             textViewItemText.setText(result.getDescription());
-        }
-        else {
+        } else {
             view = (LinearLayout) convertView;
         }
 

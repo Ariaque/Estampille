@@ -31,6 +31,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * LookAround page.
+ */
 public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
     private final HashMap<String, LatLng> markersToAdd = new HashMap<>();
     private SupportMapFragment mapFragment;
@@ -58,8 +61,9 @@ public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * Add a marker to the map at the given coordinates
-     * @param googleMap the map we want to add a marker on
+     * Add a marker to the map at the given coordinates.
+     *
+     * @param googleMap    the map we want to add a marker on
      * @param markersToAdd the coordinate where to put the marker
      */
     private void addMarkers(GoogleMap googleMap, HashMap<String, LatLng> markersToAdd) {
@@ -71,8 +75,9 @@ public class LookAroundFragment extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * Given an address, return the latitude and longitude of the address
-     * @param address the address we want toknow the coordinate of
+     * Given an address, return the latitude and longitude of the address.
+     *
+     * @param address the address we want to know the coordinates of
      * @return a LatLng object containing the coordinate of the given address
      */
     private LatLng getCoords(String address) {

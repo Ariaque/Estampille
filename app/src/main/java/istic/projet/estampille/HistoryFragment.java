@@ -26,6 +26,9 @@ import istic.projet.estampille.models.APITransformateur;
 import istic.projet.estampille.utils.AppendableObjectOutputStream;
 import istic.projet.estampille.utils.Constants;
 
+/**
+ * History page.
+ */
 public class HistoryFragment extends Fragment implements View.OnClickListener {
 
     private static final String TAG = HistoryFragment.class.getName();
@@ -135,20 +138,4 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
             clearHistoryFile();
         }
     }
-
-    /**
-     * Sets the visibility of the tutorial image on the HistoryFragment
-     * @param isTutoVisible true if the image must be visible, false otherwise
-     */
-    /**public void setTutoVisibility(boolean isTutoVisible) {
-     ImageView imageView = getView().findViewById(R.id.tuto_image);
-     if (isTutoVisible) {
-     imageView.setVisibility(View.VISIBLE);
-     final ConstraintLayout.LayoutParams layoutparams = (ConstraintLayout.LayoutParams) imageView.getLayoutParams();
-     layoutparams.setMargins(0, 0, 0, 0);
-     imageView.setLayoutParams(layoutparams);
-     } else {
-     imageView.setVisibility(View.INVISIBLE);
-     }
-     }*/
 }

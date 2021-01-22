@@ -89,8 +89,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     /**
      * Check is the phone is connected to internet, if it is, the application proceed as usual,
-     * if not, a new page is loaded, telling the user that the phone can't access internet
-     * @return true if the phone can access internet, false otherwise
+     * if not, a new page is loaded, telling the user that the phone can't access internet.
+     *
+     * @return true if the phone can access internet, false otherwise.
      */
     private boolean checkInternetConnexion() {
         boolean result = true;
@@ -299,7 +300,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     /**
      * Launch the search of the stamp in the remote database.
      *
-     * @param estampilleSearched
+     * @param estampilleSearched stamp's searched
      */
     private void searchStampInDB(String estampilleSearched) {
         mProgressDialog.show();

@@ -7,6 +7,9 @@ import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * No internet handling.
+ */
 public class NoInternetActivity extends AppCompatActivity implements View.OnClickListener {
     ImageButton reloadButton;
 

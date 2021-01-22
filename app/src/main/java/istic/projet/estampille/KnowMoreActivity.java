@@ -52,6 +52,9 @@ import istic.projet.estampille.models.APILabel;
 import istic.projet.estampille.models.APIVideo;
 import istic.projet.estampille.utils.Constants;
 
+/**
+ * Activity for the page "En savoir plus".
+ */
 public class KnowMoreActivity extends AppCompatActivity implements View.OnClickListener, View.OnTouchListener, AdapterView.OnItemClickListener {
 
 
@@ -118,6 +121,9 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    /**
+     * Recover data from the received intent, instance of {@link APIInfosTransformateur}.
+     */
     private void recoverInformation() {
         FTP_ADDRESS = getString(R.string.ftp_address);
         FTP_USERNAME = getString(R.string.ftp_username);
@@ -185,6 +191,10 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         loadCompanyPicturesImageSlider();
     }
 
+    /**
+     * Choose components to display according to the values
+     * that are in the received intent, instance of {@link APIInfosTransformateur}.
+     */
     private void chooseComponentsToDisplay() {
         if (companyName == null || companyName.isEmpty()) {
             companyName = getResources().getString(R.string.txt_company_name_placeholder);
@@ -233,13 +243,16 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
             texViewTitleLabels.setVisibility(View.GONE);
             labelsGridView.setVisibility(View.GONE);
         } else {
-            loadLabelsCerificationsLogos();
+            loadLabelsCertificationsLogos();
             labelsGridView.setAdapter(new ImageAdapterGridView(this, uris));
         }
         //Faire le check pour les labels et certifications
 
     }
 
+    /**
+     * Loading pictures from the FTP server.
+     */
     private void loadCompanyPicturesImageSlider() {
         int idTransformateur = apiInfosTransformateur.getTransformateur().getId();
         ArrayList<SlideModel> imageList = new ArrayList<>();
@@ -286,7 +299,10 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    private void loadLabelsCerificationsLogos() {
+    /**
+     * Loading labels and certifications logos from the FTP server.
+     */
+    private void loadLabelsCertificationsLogos() {
         FTPClient conn = null;
         uris = new ArrayList<>();
         try {
@@ -324,6 +340,11 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    /**
+     * Connect to the FTP server.
+     *
+     * @return
+     */
     private FTPClient ftpConnexion() {
         FTPClient conn = null;
         try {
@@ -343,6 +364,11 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         return conn;
     }
 
+    /**
+     * Disconnect from the FTP server.
+     *
+     * @param conn
+     */
     private void ftpLogout(FTPClient conn) {
         try {
             conn.logout();
@@ -374,6 +400,11 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    /**
+     * Opening browser page.
+     *
+     * @param url
+     */
     private void openBrowserPage(String url) {
         if(!url.startsWith("http://") && !url.startsWith("https://")) {
             url="http://"+url;
@@ -382,6 +413,9 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         startActivity(browserIntent);
     }
 
+    /**
+     * Opening a dialog to show the transformator's videos.
+     */
     private void openVideosDialog() {
         dialog = new Dialog(KnowMoreActivity.this);
         dialog.setContentView(R.layout.listview_dialog);
@@ -398,6 +432,9 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         dialogListView.setAdapter(new ListViewVideoUrlsAdapter(KnowMoreActivity.this, videoUrls));
     }
 
+    /**
+     * Opening a dialog to show the transformator's partners.
+     */
     private void openPartnersDialog() {
         dialog = new Dialog(KnowMoreActivity.this);
         dialog.setContentView(R.layout.listview_dialog);
@@ -415,6 +452,9 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
+    /**
+     * Opening a dialog to show the transformator's "denrées".
+     */
     private void openAnimalProductsDialog() {
         dialog = new Dialog(KnowMoreActivity.this);
         dialog.setContentView(R.layout.listview_dialog);
