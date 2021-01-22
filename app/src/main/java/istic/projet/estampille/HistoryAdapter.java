@@ -21,6 +21,11 @@ public class HistoryAdapter extends ArrayAdapter<APITransformateur> {
     private final Context context;
     private final ArrayList<APITransformateur> transformateurs;
 
+    /**
+     *
+     * @param context
+     * @param transformateurs {@link APITransformateur} that are in the history.
+     */
     public HistoryAdapter(Context context, ArrayList<APITransformateur> transformateurs) {
         super(context, 0, transformateurs);
         this.context = context;
@@ -42,7 +47,7 @@ public class HistoryAdapter extends ArrayAdapter<APITransformateur> {
         // Populate the data into the template view using the data object
         assert transformateur != null;
         item1.setText(transformateur.getRaisonSociale());
-        if(!transformateur.getCommune().trim().isEmpty()){
+        if (!transformateur.getCommune().trim().isEmpty()) {
             item2.setText(transformateur.getCommune());
         }
         convertView.setOnClickListener(new View.OnClickListener() {

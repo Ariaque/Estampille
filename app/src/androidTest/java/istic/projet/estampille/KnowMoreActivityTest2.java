@@ -85,7 +85,7 @@ public class KnowMoreActivityTest2 {
         List<APIFermePartenaire> apiFermePartenaireList = new ArrayList<>();
         apiFermePartenaireList.add(apiFermePartenaire);
         apiFermePartenaireList.add(apiFermePartenaire2);
-        APITypeDenree apiTypeDenree = new APITypeDenree((long) 1,"Viande","Bovins","Genisse");
+        APITypeDenree apiTypeDenree = new APITypeDenree((long) 1, "Viande", "Bovins", "Genisse");
         APIOrigineDenree apiOrigineDenree = new APIOrigineDenree((long) 1, "France", "Bretagne");
         apiDenreeAnimale = new APIDenreeAnimale((long) 1, apiTypeDenree, apiOrigineDenree, "infos sur le type de la denrée", "infos sur l'origine de la denrée");
         List<APIDenreeAnimale> apiDenreeAnimaleList = new ArrayList<>();

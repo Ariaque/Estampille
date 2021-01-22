@@ -19,7 +19,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Class which calls the remote API
+ * Class which calls the remote API.
  */
 public class APICalls {
 
@@ -27,8 +27,9 @@ public class APICalls {
 
     /**
      * Call the API to know if a given estampille match with any transformator in the database
+     *
      * @param activity
-     * @param estampille the estampille we are searching a match for
+     * @param estampille     the estampille we are searching a match for
      * @param progressDialog ProgressDialog that mus be hidden when treatment is over
      */
     public static void searchStampInRemoteAPI(Activity activity, String estampille, ProgressDialog progressDialog) {
@@ -56,7 +57,7 @@ public class APICalls {
                 Log.wtf(TAG, "onResponseFailed : " + call.request().url());
                 t.printStackTrace();
                 Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.api_problem), Toast.LENGTH_SHORT).show();
-                if(progressDialog != null){
+                if (progressDialog != null) {
                     progressDialog.hide();
                 }
             }
@@ -67,7 +68,7 @@ public class APICalls {
      * Search the details to show in "En savoir plus".
      *
      * @param activity
-     * @param idTransformateur
+     * @param idTransformateur identifiant of the searched {@link APITransformateur}
      */
     public static void searchMoreInRemoteAPI(Activity activity, String idTransformateur, ProgressDialog progressDialog) {
         APIService apiService = APIService.retrofit.create(APIService.class);
@@ -79,11 +80,11 @@ public class APICalls {
                 if (infosTransformateur != null) {
                     Intent intent = new Intent(activity.getApplicationContext(), KnowMoreActivity.class);
                     intent.putExtra(Constants.KEY_INTENT_MORE_INFOS_TRANSFORMATEUR, infosTransformateur);
-                    activity.startActivity(intent);}
-                else {
+                    activity.startActivity(intent);
+                } else {
                     Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.api_problem), Toast.LENGTH_SHORT).show();
                 }
-                if(progressDialog != null){
+                if (progressDialog != null) {
                     progressDialog.hide();
                 }
 
@@ -94,7 +95,7 @@ public class APICalls {
                 Log.wtf(TAG, "onResponseFailed : " + call.request().url());
                 t.printStackTrace();
                 Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.api_problem), Toast.LENGTH_SHORT).show();
-                if(progressDialog != null){
+                if (progressDialog != null) {
                     progressDialog.hide();
                 }
             }
@@ -104,11 +105,12 @@ public class APICalls {
 
     /**
      * Call the API to know if a given user account is active or not to know if we have to display the know more button or not.
+     *
      * @param activity
      * @param searchedTransformateur Transformator that have the SIRET number of the user we are looking for
-     * @param progressDialog ProgressDialog that mus be hidden when treatment is over
+     * @param progressDialog         ProgressDialog that mus be hidden when treatment is over
      */
-    public static void searchUserStateAPI(Activity activity, APITransformateur searchedTransformateur, ProgressDialog progressDialog){
+    public static void searchUserStateAPI(Activity activity, APITransformateur searchedTransformateur, ProgressDialog progressDialog) {
         APIService apiService = APIService.retrofit.create(APIService.class);
         Call<Boolean> call = apiService.getUserState(searchedTransformateur.getSiret());
         call.enqueue(new Callback<Boolean>() {
@@ -124,7 +126,7 @@ public class APICalls {
                 } else {
                     Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.api_problem), Toast.LENGTH_SHORT).show();
                 }
-                if(progressDialog != null){
+                if (progressDialog != null) {
                     progressDialog.hide();
                 }
             }
@@ -134,12 +136,10 @@ public class APICalls {
                 Log.wtf(TAG, "onResponseFailed : " + call.request().url());
                 t.printStackTrace();
                 Toast.makeText(activity.getApplicationContext(), activity.getApplicationContext().getString(R.string.api_problem), Toast.LENGTH_SHORT).show();
-                if(progressDialog != null){
+                if (progressDialog != null) {
                     progressDialog.hide();
                 }
             }
         });
     }
-
-
 }

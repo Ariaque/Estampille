@@ -9,20 +9,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-
-import com.google.mlkit.vision.text.Text;
-
 import java.util.List;
 
 import istic.projet.estampille.models.APIVideo;
 
-
+/**
+ * Adapter for the video's dialog.
+ */
 public class ListViewVideoUrlsAdapter extends BaseAdapter {
-    private Context context;
-    private List<APIVideo> videos;
-    private LayoutInflater inflater;
+    private final Context context;
+    private final List<APIVideo> videos;
+    private final LayoutInflater inflater;
 
+    /**
+     * Constructor.
+     *
+     * @param context
+     * @param videos  List of {@link APIVideo} to display.
+     */
     public ListViewVideoUrlsAdapter(Context context, List<APIVideo> videos) {
         this.context = context;
         this.videos = videos;
@@ -49,7 +53,7 @@ public class ListViewVideoUrlsAdapter extends BaseAdapter {
 
         LinearLayout view;
         APIVideo result = this.videos.get(position);
-        if(convertView == null) {
+        if (convertView == null) {
             view = (LinearLayout) inflater.inflate(R.layout.simple_dialog_listview_item, null, false);
             view.setOrientation(LinearLayout.HORIZONTAL);
             ImageView playButton = view.findViewById(R.id.play_button);
@@ -58,8 +62,7 @@ public class ListViewVideoUrlsAdapter extends BaseAdapter {
             textViewItemTitle.setText(result.getTitre());
             TextView textViewItemText = view.findViewById(R.id.item_text);
             textViewItemText.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             view = (LinearLayout) convertView;
         }
 

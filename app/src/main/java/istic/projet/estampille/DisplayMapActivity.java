@@ -69,10 +69,10 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
             textViewName.setText(Html.fromHtml(getResources().getString(R.string.name, name)));
 
 
-            if(!isActive){
+            if (!isActive) {
                 View button = findViewById(R.id.button_know_more);
                 button.setVisibility(View.GONE);
-            }else{
+            } else {
                 View text = findViewById(R.id.textView_no_more_info);
                 text.setVisibility((View.GONE));
             }
@@ -88,13 +88,14 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
     /**
      * Check is the phone is connected to internet, if it is, the application proceed as usual,
      * if not, a new page is loaded, telling the user that the phone can't access internet
+     *
      * @return true if the phone can access internet, false otherwise
      */
-    private boolean checkInternetConnexion(){
+    private boolean checkInternetConnexion() {
         boolean result = true;
 
-        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)) {
             Intent intent = new Intent(this, NoInternetActivity.class);
             startActivity(intent);
@@ -104,7 +105,8 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     /**
-     * Called when the google map is ready to be displayed on screen
+     * Called when the google map is ready to be displayed on screen.
+     *
      * @param googleMap
      */
     @Override
@@ -119,7 +121,8 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
 
     /**
      * Given an address, return the latitude and longitude of the address
-     * @param address the address we want toknow the coordinate of
+     *
+     * @param address the address we want to know the coordinates of
      * @return a LatLng object containing the coordinate of the given address
      */
     private LatLng getCoords(String address) {
@@ -141,7 +144,8 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
 
     /**
      * backButton will bring the user back to the last page,
-     * knowMoreButton will reach the API and ask for more informations abou the transformator
+     * knowMoreButton will reach the API and ask for more informations about the transformator.
+     *
      * @param view the button pressed
      */
     @Override
@@ -153,7 +157,7 @@ public class DisplayMapActivity extends AppCompatActivity implements OnMapReadyC
             finish();
         }
         if (view.getId() == R.id.button_know_more) {
-            if(checkInternetConnexion()){
+            if (checkInternetConnexion()) {
                 mProgressDialog = new ProgressDialog(this, R.style.FoodOriginAlertDialog);
                 mProgressDialog.setMessage(getString(R.string.loading_dialog_message));
                 mProgressDialog.setIndeterminate(true);
