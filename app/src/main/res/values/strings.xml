@@ -50,5 +50,6 @@
     <string name="type_denree_title">Type de denrée</string>
     <string name="origin_denree_title">Origine de la denrée</string>
     <string name="txt_no_description">Pas de description disponible…</string>
+    <string name="txt_not_found">Le site demandé est introuvable</string>
 
 </resources>

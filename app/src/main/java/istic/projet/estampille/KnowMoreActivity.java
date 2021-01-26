@@ -38,6 +38,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -405,8 +406,15 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
         if(!url.startsWith("http://") && !url.startsWith("https://")) {
             url="http://"+url;
         }
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        startActivity(browserIntent);
+        try {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(browserIntent);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, getString(R.string.txt_not_found) , Toast.LENGTH_SHORT);
+        }
+
     }
 
     /**
