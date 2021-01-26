@@ -113,7 +113,7 @@ public class APICalls {
             @Override
             public void onResponse(Call<APIInfosTransformateur> call, Response<APIInfosTransformateur> response) {
                 APIInfosTransformateur infosTransformateur = response.body();
-                if(infosTransformateur == null) {
+                if(infosTransformateur == null || (infosTransformateur.getCertifications().isEmpty() && infosTransformateur.getDenreesA().isEmpty() && infosTransformateur.getDescription().isEmpty() && infosTransformateur.getFermesP().isEmpty() && infosTransformateur.getLabels().isEmpty() && infosTransformateur.getUrlFacebook() == null && infosTransformateur.getUrlInstagram() == null && infosTransformateur.getUrlTwitter() == null && infosTransformateur.getUrlSite() == null && infosTransformateur.getUrls().isEmpty())) {
                     transformateur.setKnowMoreActive(false);
                 }
                 HistoryFragment.writeSearchInHistory(activity, transformateur);
