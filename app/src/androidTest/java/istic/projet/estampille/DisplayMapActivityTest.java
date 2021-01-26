@@ -47,7 +47,7 @@ public class DisplayMapActivityTest {
     @Before
     public void before() {
         apiTransformateur = new APITransformateur(1, "01.006.009", "01236547896532", "Entreprise A", "7 rue des violettes", "75000", "Paris", "", "", "", "", "");
-        apiTransformateur.setIsKnowMoreActive(true);
+        apiTransformateur.setKnowMoreActive(true);
     }
 
     @After
@@ -76,7 +76,7 @@ public class DisplayMapActivityTest {
     @Test
     public void testClickKnowMoreNotActive() {
         Intent i = new Intent();
-        apiTransformateur.setIsKnowMoreActive(false);
+        apiTransformateur.setKnowMoreActive(false);
         i.putExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR, apiTransformateur);
         intentsTestRule.launchActivity(i);
         onView(withId(R.id.button_know_more)).check(matches(not(isDisplayed())));

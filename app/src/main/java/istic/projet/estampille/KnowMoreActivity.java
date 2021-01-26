@@ -264,13 +264,10 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                 conn.setFileType(FTP.BINARY_FILE_TYPE);
                 conn.changeWorkingDirectory("/images/" + idTransformateur);
                 int returnCode = conn.getReplyCode();
-                System.out.println(returnCode);
                 if(returnCode == 550) {
-                    System.out.println("here");
                     conn.changeWorkingDirectory("/images/placeholder");
                 }
                 FTPFile[] files = conn.listFiles();
-                System.out.println(conn.printWorkingDirectory());
                 ftpLogout(conn);
                 List<FTPFile> filesList = null;
                 if (files != null && files.length != 0) {
@@ -286,7 +283,6 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                     imageSliderPictures.setBackgroundResource(R.color.FoodOriginGrey2);
                 } else {
                     for (FTPFile file : filesList) {
-                        System.out.println(file.getName());
                         imageList.add(new SlideModel("http://" + FTP_ADDRESS + "/images/" + idTransformateur + "/" + file.getName(), ScaleTypes.CENTER_INSIDE));
 
                     }

@@ -1,6 +1,7 @@
 package istic.projet.estampille;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     private int foodOriginWhite;
     private ConstraintLayout containerView;
     private ArrayList<APITransformateur> listHistoryItems;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +79,9 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         viewPager.setOffscreenPageLimit(3);
         foodOriginDarkOrange = ResourcesCompat.getColor(getResources(), R.color.FoodOriginDarkOrange, null);
         foodOriginWhite = ResourcesCompat.getColor(getResources(), R.color.FoodOriginWhite, null);
-
+        mProgressDialog = new ProgressDialog(context, R.style.FoodOriginAlertDialog);
+        mProgressDialog.setMessage(getString(R.string.loading_dialog_message));
+        mProgressDialog.setIndeterminate(true);
         //Detects everything that's potentially suspect and write it in log
         StrictMode.VmPolicy builder = new StrictMode.VmPolicy.Builder()
                 .detectAll()
@@ -325,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
             HistoryFragment.getInstance().setHistoryFragmentComponentsVisibility(listHistoryItems.size() == 0);
 
             //Changes the adapter list
-            HistoryAdapter adapter = new HistoryAdapter(this, listHistoryItems);
+            HistoryAdapter adapter = new HistoryAdapter(this,this, listHistoryItems, mProgressDialog);
             listView.setAdapter(adapter);
         }
     }

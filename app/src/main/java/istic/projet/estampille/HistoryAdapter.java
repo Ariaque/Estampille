@@ -1,5 +1,7 @@
 package istic.projet.estampille;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import istic.projet.estampille.models.APITransformateur;
+import istic.projet.estampille.utils.APICalls;
 import istic.projet.estampille.utils.Constants;
 
 /**
@@ -20,16 +23,21 @@ public class HistoryAdapter extends ArrayAdapter<APITransformateur> {
 
     private final Context context;
     private final ArrayList<APITransformateur> transformateurs;
+    private Activity parentActivity;
+    private ProgressDialog progressDialog;
 
     /**
      *
      * @param context
      * @param transformateurs {@link APITransformateur} that are in the history.
      */
-    public HistoryAdapter(Context context, ArrayList<APITransformateur> transformateurs) {
+    public HistoryAdapter(Activity parentActivity, Context context, ArrayList<APITransformateur> transformateurs, ProgressDialog progressDialog) {
         super(context, 0, transformateurs);
         this.context = context;
+        this.parentActivity = parentActivity;
         this.transformateurs = transformateurs;
+        this.progressDialog = progressDialog;
+
     }
 
     @Override
@@ -53,9 +61,11 @@ public class HistoryAdapter extends ArrayAdapter<APITransformateur> {
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, DisplayMapActivity.class);
+                progressDialog.show();
+                APICalls.searchStampInRemoteAPI(parentActivity, transformateurs.get(position).getNumAgrement(), progressDialog);
+                /*Intent intent = new Intent(context, DisplayMapActivity.class);
                 intent.putExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR, transformateurs.get(position));
-                context.startActivity(intent);
+                context.startActivity(intent);*/
             }
         });
 

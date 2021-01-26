@@ -32,8 +32,9 @@ public interface APIService {
             .build();
 
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://192.168.1.10:8080/") // TODO: If tests are done on a device and as long as the API run on a localhost:
+            .baseUrl("http://000.000.000:8080/") // TODO: If tests are done on a device and as long as the API run on a localhost:
             // TODO: put the IP of the machine on which the API is running. The device and the computer must be connected to the same network in order for the device to be able to call the API.
+            .addConverterFactory(new NullOnEmptyConverterFactory())
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build();
@@ -42,7 +43,7 @@ public interface APIService {
     Call<APITransformateur> getTansformateur(@Query("estampille") String estampille);
 
     @GET("/infoTransformateur/transformateur/{id}")
-    Call<APIInfosTransformateur> getInfosTansformateur(@Path("id") String estampille);
+    Call<APIInfosTransformateur> getInfosTansformateur(@Path("id") String idTransformateur);
 
     @GET("/user/isActive/{siret}")
     Call<Boolean> getUserState(@Path("siret")String siret);

@@ -1,6 +1,7 @@
 package istic.projet.estampille;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
     private ListView listView;
     private TextView textEmptyHistory;
     private Button buttonDeleteHistory;
+    private ProgressDialog mProgressDialog;
 
     /**
      * Gets the current instance of {@link HistoryFragment}.
@@ -80,6 +82,9 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
         buttonDeleteHistory.setOnClickListener(this);
         buttonDeleteHistory.setVisibility(View.INVISIBLE);
         instance = this;
+        mProgressDialog = new ProgressDialog(getContext(), R.style.FoodOriginAlertDialog);
+        mProgressDialog.setMessage(getString(R.string.loading_dialog_message));
+        mProgressDialog.setIndeterminate(true);
         return rootView;
     }
 
@@ -92,7 +97,7 @@ public class HistoryFragment extends Fragment implements View.OnClickListener {
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         ArrayList<APITransformateur> list = new ArrayList<>();
-                        HistoryAdapter adapter = new HistoryAdapter(HistoryFragment.super.getContext(), list);
+                        HistoryAdapter adapter = new HistoryAdapter(HistoryFragment.super.getActivity(), HistoryFragment.super.getContext(), list, mProgressDialog);
                         listView.setAdapter(adapter);
                         File file = new File(HistoryFragment.super.getContext().getFilesDir(), "" + File.separator + Constants.HISTORY_FILE_NAME);
                         try {

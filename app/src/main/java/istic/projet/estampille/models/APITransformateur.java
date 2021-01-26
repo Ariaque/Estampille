@@ -13,7 +13,7 @@ import java.util.Objects;
  */
 public class APITransformateur implements Serializable {
 
-    private Boolean isKnowMoreActive;
+    private Boolean knowMoreActive;
 
     private static final long serialVersionUID = 1L;
 
@@ -90,9 +90,9 @@ public class APITransformateur implements Serializable {
         this.longitude = longitude;
     }
 
-    public Boolean getIsKnowMoreActive(){return isKnowMoreActive;}
+    public Boolean getKnowMoreActive(){return knowMoreActive;}
 
-    public void setIsKnowMoreActive(Boolean isKnowMoreActive){this.isKnowMoreActive = isKnowMoreActive;}
+    public void setKnowMoreActive(Boolean isKnowMoreActive){this.knowMoreActive = isKnowMoreActive;}
 
     public Integer getId() {
         return id;
