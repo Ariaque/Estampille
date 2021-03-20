@@ -280,7 +280,7 @@ public class KnowMoreActivity extends AppCompatActivity implements View.OnClickL
                     }
                 }
                 if (returnCode == 550) {
-                    imageList.add(new SlideModel("http://" + FTP_ADDRESS + "/images/placeholder/foodorigintransp_canary.png", ScaleTypes.CENTER_INSIDE));
+                    imageList.add(new SlideModel("http://" + FTP_ADDRESS + "/images/placeholder/foodorigintransp.png", ScaleTypes.CENTER_INSIDE));
                     imageSliderPictures.setBackgroundResource(R.color.FoodOriginGrey2);
                 } else {
                     for (FTPFile file : filesList) {

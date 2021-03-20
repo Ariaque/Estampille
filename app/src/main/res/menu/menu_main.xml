@@ -5,6 +5,7 @@
         android:id="@+id/action_look_around"
         android:focusable="true"
         android:gravity="left"
+        android:visible="false"
         android:icon="@drawable/ic_baseline_location_on_24"
         android:background="?attr/selectableItemBackground"
         android:title=""
