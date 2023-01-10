@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "istic.projet.estampille"
         minSdkVersion 23
-        targetSdkVersion 30
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
@@ -20,6 +20,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    namespace 'istic.projet.estampille'
 }
 
 dependencies {
@@ -49,5 +50,12 @@ dependencies {
     implementation 'com.github.denzcoskun:ImageSlideshow:0.1.0'
 
     implementation 'commons-net:commons-net:3.7.2'
+    implementation 'androidx.core:core-ktx:1.9.0'
+
+    // add by ace
+    def work_version = "2.7.1"
+    implementation "androidx.work:work-runtime:$work_version"
+    // optional - Test helpers
+    androidTestImplementation "androidx.work:work-testing:$work_version"
 
 }

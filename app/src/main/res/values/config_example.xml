@@ -3,4 +3,7 @@
     <string name="ftp_address_example">example@template.fr</string>
     <string name="ftp_username_example">username</string>
     <string name="ftp_password_example">password</string>
+    <string name="ftp_address">example@template.fr</string>
+    <string name="ftp_username">username</string>
+    <string name="ftp_password">password</string>
 </resources>

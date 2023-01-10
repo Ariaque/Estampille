@@ -1,11 +1,13 @@
 package istic.projet.estampille;
 
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,6 +23,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
+import static androidx.test.espresso.matcher.RootMatchers.isPlatformPopup;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -88,11 +91,13 @@ public class DisplayMapActivityTest {
      */
     @Test
     public void testClickKnowMoreActive() {
+
         Intent i = new Intent();
         i.putExtra(Constants.KEY_INTENT_SEARCHED_TRANSFORMATEUR, apiTransformateur);
         intentsTestRule.launchActivity(i);
         onView(withId(R.id.button_know_more)).check(matches(isDisplayed())).perform(click());
-        onView(withText(R.string.loading_dialog_message)).inRoot(isDialog()).check(matches(isDisplayed()));
+        //onView(withText(containsString("Chargement en cours…"))).inRoot(isPlatformPopup()).check(matches(isDisplayed()));
+        onView(withText(R.string.loading_dialog_message)).inRoot(isPlatformPopup()).check(matches(isDisplayed()));
     }
 
 

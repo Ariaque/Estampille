@@ -1,14 +1,18 @@
 package istic.projet.estampille;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,6 +27,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -93,12 +98,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
      *
      * @return true if the phone can access internet, false otherwise.
      */
-    private boolean checkInternetConnexion() {
+    private boolean checkInternetConnection() {
         boolean result = true;
-
-        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        /*ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)) {
+            Intent intent = new Intent(getActivity(), NoInternetActivity.class);
+            startActivity(intent);
+            result = false;
+        }
+        return result;*/
+
+        // Add by Ace
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (!(connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork()).hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork()).hasTransport(NetworkCapabilities.TRANSPORT_WIFI))) {
             Intent intent = new Intent(getActivity(), NoInternetActivity.class);
             startActivity(intent);
             result = false;
@@ -109,8 +123,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.tile_scan) {
-            if (checkInternetConnexion()) {
-                if (Objects.requireNonNull(this.getActivity()).checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            if (checkInternetConnection()) {
+                if (getActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     PermissionsUtils.checkPermission(this, containerView, new String[]{Manifest.permission.CAMERA}, "La caméra est nécessaire pour scanner les estampilles", PermissionsUtils.REQUEST_CODE_PERMISSION_CAMERA);
                 } else {
                     openCamera();
@@ -130,23 +144,38 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
      */
     private void openCamera() {
         //Intent to open the camera
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            //Intent chooser = Intent.createChooser(takePictureIntent, "Select camera App:");
+            //startActivity(chooser);
         if (takePictureIntent.resolveActivity(context.getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                Toast.makeText(context, R.string.file_creation_fail_toast, Toast.LENGTH_SHORT).show();
-                Log.i("File error", ex.toString());
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                oldPhotoURI = photoURI1;
-                photoURI1 = Uri.fromFile(photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI1);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE1_CAPTURE);
+                File photoFile = null;
+                try {
+                    photoFile = createImageFile();
+                } catch (IOException ex) {
+                    Toast.makeText(context, "Impossible de créer le fichier", Toast.LENGTH_SHORT).show();
+                    Log.e("File error", Objects.requireNonNull(ex.getMessage()));
+                }
+                if (photoFile != null) {
+                    // Delete the previous photo
+                    deletePreviousPhoto();
+                    // Store the new photo URI
+                    photoURI1 = FileProvider.getUriForFile(context, "istic.projet.estampille.fileprovider", photoFile);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI1);
+                    takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    takePictureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE1_CAPTURE);
+                }
             }
         }
+
+    private void deletePreviousPhoto() {
+            if (oldPhotoURI != null) {
+                File file = new File(oldPhotoURI.getPath());
+                if (file.exists()) {
+                    file.delete();
+                }
+                oldPhotoURI = null;
+            }
     }
 
     /**
@@ -156,25 +185,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
      * @throws IOException Throws an {@link IOException} if something goes wrong in the file creation process.
      */
     public File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("MMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        ///////////////////////////////////////////////////////// Add by ace
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMdd_HHmmss");
+        StringBuilder imageFileNameBuilder = new StringBuilder("JPEG_");
         File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
+        String timeStamp = dateFormat.format(new Date());
+        imageFileNameBuilder.append(timeStamp).append("_");
+        String imageFileName = imageFileNameBuilder.toString();
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        String mCurrentPhotoPath = image.getAbsolutePath();
+
         return image;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         //Calls after that user takes a photo
-        if (resultCode == Activity.RESULT_OK) {
+        if (requestCode == REQUEST_IMAGE1_CAPTURE && resultCode == Activity.RESULT_OK) {
             Bitmap bmp = null;
             try {
                 //Creates a bitmap from the stamp image
@@ -189,9 +217,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             }
             //Starts the stamp recognition
             doOCR(bmp);
+
             OutputStream os;
             try {
-                os = new FileOutputStream(photoURI1.getPath());
+                // Ouvrez un flux d'écriture sur le fichier à l'aide du content resolver et du fileUri
+                os = context.getContentResolver().openOutputStream(photoURI1);
+
                 if (bmp != null) {
                     bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
                 }
@@ -201,7 +232,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 Log.e(getClass().getSimpleName(), Objects.requireNonNull(ex.getMessage()));
                 Toast.makeText(context, R.string.file_creation_fail_toast, Toast.LENGTH_SHORT).show();
             }
-        } else {
+            /*try {
+                os = new FileOutputStream(photoURI1.getPath());
+                if (bmp != null) {
+                    bmp.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                }
+                os.flush();
+                os.close();
+            } catch (Exception ex) {
+                Log.e(getClass().getSimpleName(), Objects.requireNonNull(ex.getMessage()));
+                Toast.makeText(context, R.string.file_creation_fail_toast, Toast.LENGTH_SHORT).show();
+            }*/
+        }
+        else {
             photoURI1 = oldPhotoURI;
         }
     }

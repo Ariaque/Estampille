@@ -9,6 +9,7 @@ import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
 import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -89,6 +91,10 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 .build();
         StrictMode.setVmPolicy(builder);
 
+        if (!checkInternetConnection()){
+            Toast.makeText(context, R.string.no_internet, Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     /**
@@ -97,11 +103,23 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
      *
      * @return true if the phone can access internet, false otherwise
      */
-    private boolean checkInternetConnexion() {
+    /*private boolean checkInternetConnexion() {
         boolean result = true;
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (!(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)) {
+            Intent intent = new Intent(this, NoInternetActivity.class);
+            startActivity(intent);
+            result = false;
+        }
+        return result;
+    }*/
+    private boolean checkInternetConnection() {
+        boolean result = true;
+        // Add by Ace
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (!(connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork()).hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork()).hasTransport(NetworkCapabilities.TRANSPORT_WIFI))) {
             Intent intent = new Intent(this, NoInternetActivity.class);
             startActivity(intent);
             result = false;
@@ -148,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 }
                 return true;
             case R.id.action_write_code:
-                if (checkInternetConnexion()) {
+                if (checkInternetConnection()) {
                     setFocusOnSearchItem();
                     viewPager.setCurrentItem(1);
                 }
@@ -162,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 }
                 return true;
             case R.id.action_look_around:
-                if (checkInternetConnexion()) {
+                if (checkInternetConnection()) {
                     setFocusOnLookAroundItem();
                     viewPager.setCurrentItem(3);
                 }
@@ -186,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 e.printStackTrace();
             }
         } else if (position == 1) {
-            if (checkInternetConnexion()) {
+            if (checkInternetConnection()) {
                 setFocusOnSearchItem();
             }
         } else if (position == 2) {
@@ -196,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
                 e.printStackTrace();
             }
         } else if (position == 3) {
-            if (checkInternetConnexion()) {
+            if (checkInternetConnection()) {
                 setFocusOnLookAroundItem();
             }
         }

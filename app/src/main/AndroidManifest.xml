@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="istic.projet.estampille">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-feature android:name="android.hardware.camera" />
 
@@ -10,6 +9,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <permission android:name="com.example.myapp.fileprovider"
+        android:readPermission="true"
+        android:writePermission="true"/>
 
 
     <application
@@ -33,13 +35,20 @@
         <activity android:name=".KnowMoreActivity" android:screenOrientation="portrait"/>
         <activity android:name=".TutorialActivity" android:screenOrientation="portrait"/>
         <activity android:name=".NoInternetActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".MainActivity" android:screenOrientation="portrait" android:windowSoftInputMode="adjustPan">
+        <activity android:name=".MainActivity" android:screenOrientation="portrait" android:windowSoftInputMode="adjustPan"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider android:name="androidx.core.content.FileProvider"
+            android:authorities="istic.projet.estampille.fileprovider"
+            android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 
